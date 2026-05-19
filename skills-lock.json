@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "cio": {
+      "source": "customerio/cli",
+      "sourceType": "github",
+      "skillPath": "skills/cio/SKILL.md",
+      "computedHash": "028228a46e4052d49f362cfd80b0e1c6b4dd7b0976ea8773e8d0e92295536c04"
+    }
+  }
+}

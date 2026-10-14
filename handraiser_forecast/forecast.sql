@@ -115,7 +115,7 @@ handraiser_people AS (
   GROUP BY 1, 2
 ),
 quarterly AS (
-  SELECT quarter_start, segment, region_group, COUNT(*) AS leads
+  SELECT quarter_start, segment, region_group, COUNT(*) AS handraisers
   FROM handraiser_people
   GROUP BY 1, 2, 3
 ),
@@ -147,7 +147,7 @@ detail AS (
     segments.segment_sort,
     regions.region_group,
     regions.region_sort,
-    COALESCE(q.leads, 0) AS leads
+    COALESCE(q.handraisers, 0) AS handraisers
   FROM quarters
   CROSS JOIN segments
   CROSS JOIN regions
@@ -158,10 +158,10 @@ detail AS (
   WHERE segments.segment != 'All segments'
 ),
 with_total AS (
-  SELECT quarter_start, segment, segment_sort, region_group, region_sort, leads
+  SELECT quarter_start, segment, segment_sort, region_group, region_sort, handraisers
   FROM detail
   UNION ALL
-  SELECT quarter_start, 'All segments', 6, region_group, region_sort, SUM(leads)
+  SELECT quarter_start, 'All segments', 6, region_group, region_sort, SUM(handraisers)
   FROM detail
   GROUP BY 1, 2, 3, 4, 5
 )
@@ -170,6 +170,6 @@ SELECT
   segment,
   EXTRACT(YEAR FROM quarter_start) AS fiscal_year,
   EXTRACT(QUARTER FROM quarter_start) AS fiscal_quarter,
-  leads
+  handraisers
 FROM with_total
 ORDER BY region_sort, segment_sort, quarter_start

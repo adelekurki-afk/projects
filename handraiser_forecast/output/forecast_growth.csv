@@ -1,4 +1,4 @@
-region,segment,scenario,forecast_quarter,ttm_yoy,g_shrunk,anchor,phi,g_final,clamped_flag,forecast_leads
+region,segment,scenario,forecast_quarter,ttm_yoy,g_shrunk,anchor,phi,g_final,clamped_flag,forecast_handraisers
 US+LATAM+ANZ,Self-Service,conservative,2027-Q1,-0.4651639344262295,-0.5148164834885169,0.0,0.6,-0.2,True,625
 US+LATAM+ANZ,Self-Service,conservative,2027-Q2,-0.4651639344262295,-0.5148164834885169,0.0,0.6,-0.1853339340558661,False,631
 US+LATAM+ANZ,Self-Service,conservative,2027-Q3,-0.4651639344262295,-0.5148164834885169,0.0,0.6,-0.11120036043351965,False,696

@@ -54,7 +54,7 @@ def test_anchor_is_zero_until_eight_trailing_yoy_rates_exist():
     assert set(forecast["anchor"]) == {0.0}
     # The quarter a year after the missing quarter has no base, so the count stays blank.
     missing_base = forecast[forecast["forecast_quarter"] == "2026-Q4"]
-    assert missing_base["forecast_leads"].isna().all()
+    assert missing_base["forecast_handraisers"].isna().all()
 
 
 def test_segment_forecasts_sum_to_the_total_row():
@@ -63,13 +63,13 @@ def test_segment_forecasts_sum_to_the_total_row():
     segments = forecast[forecast["segment"] != "All segments"]
     totals = forecast[forecast["segment"] == "All segments"]
     summed = (
-        segments.groupby(["region", "scenario", "forecast_quarter"], as_index=False)["forecast_leads"]
+        segments.groupby(["region", "scenario", "forecast_quarter"], as_index=False)["forecast_handraisers"]
         .sum()
-        .rename(columns={"forecast_leads": "summed"})
+        .rename(columns={"forecast_handraisers": "summed"})
     )
     merged = totals.merge(summed, on=["region", "scenario", "forecast_quarter"])
     assert len(merged) > 0
-    assert (merged["forecast_leads"] == merged["summed"]).all()
+    assert (merged["forecast_handraisers"] == merged["summed"]).all()
 
 
 def test_phi_outside_the_allowed_range_is_rejected():
@@ -91,15 +91,15 @@ def test_published_history_leaves_fy27_q4_blank_and_lets_segments_sum():
     # Seven quarters cannot fill the quarter whose year-ago base has not closed.
     quarterly = pd.read_csv(Path(__file__).with_name("data") / "quarterly_handraisers.csv")
     forecast = prepare_forecast(quarterly, CONFIG)
-    assert forecast.loc[forecast["forecast_quarter"] == "2027-Q4", "forecast_leads"].isna().all()
+    assert forecast.loc[forecast["forecast_quarter"] == "2027-Q4", "forecast_handraisers"].isna().all()
     segments = forecast[forecast["segment"] != "All segments"]
     totals = forecast[forecast["segment"] == "All segments"]
-    summed = segments.groupby(["region", "scenario", "forecast_quarter"], as_index=False)["forecast_leads"].sum(
+    summed = segments.groupby(["region", "scenario", "forecast_quarter"], as_index=False)["forecast_handraisers"].sum(
         min_count=1
     )
     merged = totals.merge(summed, on=["region", "scenario", "forecast_quarter"], suffixes=("_total", "_summed"))
-    both_blank = merged["forecast_leads_total"].isna() & merged["forecast_leads_summed"].isna()
-    matched = merged["forecast_leads_total"] == merged["forecast_leads_summed"]
+    both_blank = merged["forecast_handraisers_total"].isna() & merged["forecast_handraisers_summed"].isna()
+    matched = merged["forecast_handraisers_total"] == merged["forecast_handraisers_summed"]
     assert (both_blank | matched).all()
 
 
@@ -129,7 +129,7 @@ def _counted(counts):
                     "segment": segment,
                     "fiscal_year": year,
                     "fiscal_quarter": quarter,
-                    "leads": leads,
+                    "handraisers": leads,
                 }
             )
     return pd.DataFrame(rows)
@@ -146,7 +146,7 @@ def _panel(quarters, segment_leads):
                     "segment": segment,
                     "fiscal_year": year,
                     "fiscal_quarter": quarter,
-                    "leads": leads * (index + 1),
+                    "handraisers": leads * (index + 1),
                 }
             )
         rows.append(
@@ -155,7 +155,7 @@ def _panel(quarters, segment_leads):
                 "segment": "All segments",
                 "fiscal_year": year,
                 "fiscal_quarter": quarter,
-                "leads": sum(segment_leads.values()) * (index + 1),
+                "handraisers": sum(segment_leads.values()) * (index + 1),
             }
         )
     return pd.DataFrame(rows)

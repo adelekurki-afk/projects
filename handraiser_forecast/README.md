@@ -2,7 +2,7 @@
 
 This folder turns quarterly handraiser actuals into a growth rate for next year. The rate starts from the latest year-over-year change, then three guards pull a steep quarter back toward something that can be used as a target.
 
-The count is handraisers. The files call that count `leads` because the forecast multiplies it. It is not every Salesforce lead.
+Every figure in this forecast is a handraiser count. The history column is `handraisers`. The forecast column is `forecast_handraisers`.
 
 ## What went into the count
 
@@ -79,7 +79,7 @@ All of the knobs live in the `CONFIG` dictionary at the top of `growth_softening
 - `floor` and `cap` — the hold, as decimals. Defaults are −0.20 and 0.25.
 - `scenarios` — each entry can set `phi` and `anchor_cap_at_zero`. Add a scenario by adding a key.
 
-Refresh the history by running `forecast.sql` in BigQuery for quarters that have fully closed, and saving the result as `data/quarterly_handraisers.csv` with columns `region`, `segment`, `fiscal_year`, `fiscal_quarter`, `leads`. Keep the `All segments` row. Then, from this folder:
+Refresh the history by running `forecast.sql` in BigQuery for quarters that have fully closed, and saving the result as `data/quarterly_handraisers.csv` with columns `region`, `segment`, `fiscal_year`, `fiscal_quarter`, `handraisers`. Keep the `All segments` row. Then, from this folder:
 
 ```bash
 python3 -m pytest

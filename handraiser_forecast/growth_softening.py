@@ -1,4 +1,4 @@
-"""Soften a steep year-over-year lead rate before it is used as a forecast.
+"""Soften a steep year-over-year handraiser rate before it is used as a forecast.
 
 Plain year-over-year copies last year's shock into next year. Shrinkage stops a
 thin segment from outvoting the market, and damping lets that shock fade.
@@ -79,7 +79,7 @@ def prepare_forecast(quarterly: pd.DataFrame, config: dict | None = None) -> pd.
         "phi",
         "g_final",
         "clamped_flag",
-        "forecast_leads",
+        "forecast_handraisers",
     ]
     return pd.DataFrame(rows, columns=columns)
 
@@ -131,7 +131,7 @@ def shrinkage_k(volumes: pd.Series, config: dict) -> float:
 def _forecast_region(region: str, region_frame: pd.DataFrame, config: dict) -> list[dict]:
     total_name = config["total_segment"]
     series = {
-        segment: group.set_index("quarter_index")["leads"].sort_index()
+        segment: group.set_index("quarter_index")["handraisers"].sort_index()
         for segment, group in region_frame.groupby("segment", sort=False)
     }
     if total_name not in series:
@@ -162,8 +162,8 @@ def _forecast_region(region: str, region_frame: pd.DataFrame, config: dict) -> l
             for horizon, (year, quarter) in enumerate(forecast_quarters, start=1):
                 raw = damped_growth(anchor, shrunk[segment], phi, horizon)
                 final, flagged = clamp_growth(raw, config["floor"], config["cap"])
-                base = _leads_at(series[segment], year - 1, quarter)
-                leads = None if base is None else _round_half_up(base * (1.0 + final))
+                base = _handraisers_at(series[segment], year - 1, quarter)
+                count = None if base is None else _round_half_up(base * (1.0 + final))
                 segment_rows.append(
                     {
                         "region": region,
@@ -176,8 +176,8 @@ def _forecast_region(region: str, region_frame: pd.DataFrame, config: dict) -> l
                         "phi": phi,
                         "g_final": final,
                         "clamped_flag": flagged,
-                        "forecast_leads": leads,
-                        "base_leads": base,
+                        "forecast_handraisers": count,
+                        "base_handraisers": base,
                         "horizon": horizon,
                     }
                 )
@@ -189,14 +189,14 @@ def _forecast_region(region: str, region_frame: pd.DataFrame, config: dict) -> l
     for (scenario, forecast_quarter), group in keyed.groupby(["scenario", "forecast_quarter"], sort=False):
         sample = group.iloc[0]
         overrides = config["scenarios"][scenario]
-        complete = group["forecast_leads"].notna().all() and group["base_leads"].notna().all()
-        base_sum = group["base_leads"].sum() if complete else None
+        complete = group["forecast_handraisers"].notna().all() and group["base_handraisers"].notna().all()
+        base_sum = group["base_handraisers"].sum() if complete else None
         if complete and base_sum:
-            leads = int(group["forecast_leads"].sum())
+            count = int(group["forecast_handraisers"].sum())
             # The total's rate is the volume result, because each segment was clamped on its own.
-            implied = leads / float(base_sum) - 1.0
+            implied = count / float(base_sum) - 1.0
         else:
-            leads = None
+            count = None
             implied = None
         totals.append(
             {
@@ -210,15 +210,15 @@ def _forecast_region(region: str, region_frame: pd.DataFrame, config: dict) -> l
                 "phi": sample["phi"],
                 "g_final": implied,
                 "clamped_flag": bool(group["clamped_flag"].any()),
-                "forecast_leads": leads,
-                "base_leads": None if base_sum is None else base_sum,
+                "forecast_handraisers": count,
+                "base_handraisers": None if base_sum is None else base_sum,
                 "horizon": int(sample["horizon"]),
             }
         )
     combined = segment_rows + totals
     for row in combined:
         row.pop("horizon", None)
-        row.pop("base_leads", None)
+        row.pop("base_handraisers", None)
     return combined
 
 
@@ -227,7 +227,7 @@ def _backtest_region(region: str, region_frame: pd.DataFrame, config: dict) -> l
     total_name = config["total_segment"]
     indexes = sorted(int(index) for index in region_frame["quarter_index"].unique())
     series = {
-        segment: group.set_index("quarter_index")["leads"].sort_index()
+        segment: group.set_index("quarter_index")["handraisers"].sort_index()
         for segment, group in region_frame.groupby("segment", sort=False)
     }
     if total_name not in series:
@@ -359,7 +359,7 @@ def _split_index(index: int) -> tuple[int, int]:
     return (index - 1) // 4, (index - 1) % 4 + 1
 
 
-def _leads_at(leads: pd.Series, year: int, quarter: int) -> float | None:
+def _handraisers_at(leads: pd.Series, year: int, quarter: int) -> float | None:
     return _value(leads, year * 4 + quarter)
 
 
@@ -389,7 +389,7 @@ def main() -> None:
     output = root / "output"
     output.mkdir(exist_ok=True)
     # Nullable integers keep a missing quarter blank instead of turning it into zero.
-    forecast["forecast_leads"] = forecast["forecast_leads"].astype("Int64")
+    forecast["forecast_handraisers"] = forecast["forecast_handraisers"].astype("Int64")
     forecast.to_csv(output / "forecast_growth.csv", index=False, na_rep="")
     summary.to_csv(output / "backtest_mape.csv", index=False)
     detail.to_csv(output / "backtest_detail.csv", index=False)

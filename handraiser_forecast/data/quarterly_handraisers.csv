@@ -1,0 +1,127 @@
+region,segment,fiscal_year,fiscal_quarter,handraisers
+US+LATAM+ANZ,Self-Service,2025,1,849
+US+LATAM+ANZ,Self-Service,2025,2,1885
+US+LATAM+ANZ,Self-Service,2025,3,1464
+US+LATAM+ANZ,Self-Service,2025,4,978
+US+LATAM+ANZ,Self-Service,2026,1,781
+US+LATAM+ANZ,Self-Service,2026,2,774
+US+LATAM+ANZ,Self-Service,2026,3,783
+US+LATAM+ANZ,Commercial,2025,1,411
+US+LATAM+ANZ,Commercial,2025,2,1059
+US+LATAM+ANZ,Commercial,2025,3,1113
+US+LATAM+ANZ,Commercial,2025,4,677
+US+LATAM+ANZ,Commercial,2026,1,610
+US+LATAM+ANZ,Commercial,2026,2,459
+US+LATAM+ANZ,Commercial,2026,3,377
+US+LATAM+ANZ,Mid-Market,2025,1,135
+US+LATAM+ANZ,Mid-Market,2025,2,426
+US+LATAM+ANZ,Mid-Market,2025,3,596
+US+LATAM+ANZ,Mid-Market,2025,4,382
+US+LATAM+ANZ,Mid-Market,2026,1,305
+US+LATAM+ANZ,Mid-Market,2026,2,217
+US+LATAM+ANZ,Mid-Market,2026,3,163
+US+LATAM+ANZ,Enterprise,2025,1,151
+US+LATAM+ANZ,Enterprise,2025,2,390
+US+LATAM+ANZ,Enterprise,2025,3,546
+US+LATAM+ANZ,Enterprise,2025,4,348
+US+LATAM+ANZ,Enterprise,2026,1,280
+US+LATAM+ANZ,Enterprise,2026,2,191
+US+LATAM+ANZ,Enterprise,2026,3,198
+US+LATAM+ANZ,Unknown,2025,1,446
+US+LATAM+ANZ,Unknown,2025,2,1068
+US+LATAM+ANZ,Unknown,2025,3,890
+US+LATAM+ANZ,Unknown,2025,4,398
+US+LATAM+ANZ,Unknown,2026,1,90
+US+LATAM+ANZ,Unknown,2026,2,5
+US+LATAM+ANZ,Unknown,2026,3,4
+US+LATAM+ANZ,All segments,2025,1,1992
+US+LATAM+ANZ,All segments,2025,2,4828
+US+LATAM+ANZ,All segments,2025,3,4609
+US+LATAM+ANZ,All segments,2025,4,2783
+US+LATAM+ANZ,All segments,2026,1,2066
+US+LATAM+ANZ,All segments,2026,2,1646
+US+LATAM+ANZ,All segments,2026,3,1525
+EMEA+ASIA,Self-Service,2025,1,785
+EMEA+ASIA,Self-Service,2025,2,1800
+EMEA+ASIA,Self-Service,2025,3,1420
+EMEA+ASIA,Self-Service,2025,4,1063
+EMEA+ASIA,Self-Service,2026,1,829
+EMEA+ASIA,Self-Service,2026,2,744
+EMEA+ASIA,Self-Service,2026,3,761
+EMEA+ASIA,Commercial,2025,1,327
+EMEA+ASIA,Commercial,2025,2,751
+EMEA+ASIA,Commercial,2025,3,886
+EMEA+ASIA,Commercial,2025,4,622
+EMEA+ASIA,Commercial,2026,1,566
+EMEA+ASIA,Commercial,2026,2,422
+EMEA+ASIA,Commercial,2026,3,415
+EMEA+ASIA,Mid-Market,2025,1,139
+EMEA+ASIA,Mid-Market,2025,2,356
+EMEA+ASIA,Mid-Market,2025,3,409
+EMEA+ASIA,Mid-Market,2025,4,298
+EMEA+ASIA,Mid-Market,2026,1,290
+EMEA+ASIA,Mid-Market,2026,2,217
+EMEA+ASIA,Mid-Market,2026,3,215
+EMEA+ASIA,Enterprise,2025,1,171
+EMEA+ASIA,Enterprise,2025,2,323
+EMEA+ASIA,Enterprise,2025,3,398
+EMEA+ASIA,Enterprise,2025,4,361
+EMEA+ASIA,Enterprise,2026,1,320
+EMEA+ASIA,Enterprise,2026,2,248
+EMEA+ASIA,Enterprise,2026,3,216
+EMEA+ASIA,Unknown,2025,1,469
+EMEA+ASIA,Unknown,2025,2,1180
+EMEA+ASIA,Unknown,2025,3,1019
+EMEA+ASIA,Unknown,2025,4,727
+EMEA+ASIA,Unknown,2026,1,151
+EMEA+ASIA,Unknown,2026,2,8
+EMEA+ASIA,Unknown,2026,3,2
+EMEA+ASIA,All segments,2025,1,1891
+EMEA+ASIA,All segments,2025,2,4410
+EMEA+ASIA,All segments,2025,3,4132
+EMEA+ASIA,All segments,2025,4,3071
+EMEA+ASIA,All segments,2026,1,2156
+EMEA+ASIA,All segments,2026,2,1639
+EMEA+ASIA,All segments,2026,3,1609
+Unknown,Self-Service,2025,1,232
+Unknown,Self-Service,2025,2,457
+Unknown,Self-Service,2025,3,368
+Unknown,Self-Service,2025,4,301
+Unknown,Self-Service,2026,1,299
+Unknown,Self-Service,2026,2,331
+Unknown,Self-Service,2026,3,1404
+Unknown,Commercial,2025,1,73
+Unknown,Commercial,2025,2,159
+Unknown,Commercial,2025,3,215
+Unknown,Commercial,2025,4,138
+Unknown,Commercial,2026,1,123
+Unknown,Commercial,2026,2,104
+Unknown,Commercial,2026,3,110
+Unknown,Mid-Market,2025,1,35
+Unknown,Mid-Market,2025,2,81
+Unknown,Mid-Market,2025,3,82
+Unknown,Mid-Market,2025,4,94
+Unknown,Mid-Market,2026,1,69
+Unknown,Mid-Market,2026,2,82
+Unknown,Mid-Market,2026,3,87
+Unknown,Enterprise,2025,1,20
+Unknown,Enterprise,2025,2,53
+Unknown,Enterprise,2025,3,40
+Unknown,Enterprise,2025,4,61
+Unknown,Enterprise,2026,1,50
+Unknown,Enterprise,2026,2,54
+Unknown,Enterprise,2026,3,43
+Unknown,Unknown,2025,1,851
+Unknown,Unknown,2025,2,421
+Unknown,Unknown,2025,3,420
+Unknown,Unknown,2025,4,373
+Unknown,Unknown,2026,1,1079
+Unknown,Unknown,2026,2,1339
+Unknown,Unknown,2026,3,458
+Unknown,All segments,2025,1,1211
+Unknown,All segments,2025,2,1171
+Unknown,All segments,2025,3,1125
+Unknown,All segments,2025,4,967
+Unknown,All segments,2026,1,1620
+Unknown,All segments,2026,2,1910
+Unknown,All segments,2026,3,2102

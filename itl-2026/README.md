@@ -1,115 +1,100 @@
-# ITL 2026 (In the Loop) — Registrant Enrichment
+# ITL 2026 (In the Loop) — SFDC Campaign-Driven Dashboard
 
 ## Overview
 
-Fliplet export (13 tabs) → enriched registrant CSV with cross-tab joins → BigQuery + Hex dashboard.
+All ITL 2026 registrants are already in SFDC under dedicated campaigns with Lead/Contact IDs.
+The Hex dashboard is fully driven by `CampaignMember` queries — no email guessing or inline data needed.
 
 **Hex dashboard:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
 ---
 
-## Files
+## SFDC Campaign IDs
 
-| File | Description |
-|------|-------------|
-| `itl_2026_registrants_enriched.csv` | Full 1,269-row enriched dataset (all Fliplet tabs joined) |
-| `itl_2026_full_bq_query.sql` | Full 1,269-row compact inline BigQuery SQL (use this to load data inline in Hex/BQ) |
-
----
-
-## Data Model
-
-### Fliplet Cross-Tab Joins
-
-The raw Fliplet export has 13 tabs. Key linkage:
-- `Purchases.User Unique ID` = `Scans.UserID` = `Session Feedback.UserID` = `Booked Meetings.BookedByID`
-
-### Enriched Columns
-
-| Column | Description |
-|--------|-------------|
-| `email` | Registrant email (from Purchases tab) |
-| `name` | Full name |
-| `company` | Company name |
-| `country` | Country |
-| `ticket_type` | Early Bird / General / Partner Day + Ecosystem Day / etc. |
-| `partner_type` | Ambassador / Strategic Partner / Node Partner / Expert Partner |
-| `day1` | Attended Partner Day (Day 1) = True/False |
-| `day2` | Attended Ecosystem Day (Day 2) = True/False |
-| `has_badge_scan` | Scanned badge at any session = True/False |
-| `booked_meeting_count` | Number of Booked Meetings |
-| `has_lead_note` | Has event lead note = True/False |
-| `is_exhibitor` | Is listed as exhibitor = True/False |
-| `fliplet_uid` | Fliplet User Unique ID (for cross-reference) |
-
-### Key Stats (from 1,269 registrants)
-- Badge scanned (physically attended): 981 (77%)
-- Booked meetings: 480 with ≥1 meeting
-- Lead notes captured: 47
-- Partner Day attendees: ~160+
+| Campaign | SFDC ID | Members | Status |
+|----------|---------|---------|--------|
+| Event - n8n Conference - In The Loop (main) | `701cj0000157ynMAAQ` | 987L + 243C | Free/Paid = active |
+| Event - n8n Conference - Ecosystem Day | `701cj00001LbEQvAAN` | 870 | Attended |
+| Event - n8n Conference - Partner Day | `701cj00001LbE7XAAV` | 404 | Attended |
+| Event - n8n Conference - Meetings Booked | `701cj00001MqzF9AAJ` | 23 | Meeting Booked |
+| Event - n8n Conference - RSVP form | `701cj0000157a6nAAA` | 1,727L + 59C | — |
 
 ---
 
-## Loading into BigQuery
+## Key Metrics (live from SFDC, run Nov 9 2026)
 
-To run SFDC enrichment against the full 1,269-row dataset:
+### Registration & Attendance
+| Metric | Count |
+|--------|-------|
+| Registered (Free + Paid, ITL campaign) | **1,119** unique |
+| Attended (Ecosystem Day OR Partner Day) | **815** (72.8%) |
+| Had n8n Meeting (Meetings Booked campaign) | **20** (1.8%) |
 
-```bash
-# Load enriched CSV into BigQuery (EU region)
-bq load \
-  --location=EU \
-  --source_format=CSV \
-  --skip_leading_rows=1 \
-  --schema=email:STRING,name:STRING,company:STRING,country:STRING,ticket_type:STRING,partner_type:STRING,day1:BOOLEAN,day2:BOOLEAN,has_badge_scan:BOOLEAN,booked_meeting_count:INTEGER,has_lead_note:BOOLEAN,is_exhibitor:BOOLEAN,fliplet_uid:STRING \
-  n8n-telemetry:itl_2026_snapshots.registrants \
-  ./itl_2026_registrants_enriched.csv
-```
+### Segment Breakdown
+| Segment | Registered | Attended | Attended Partner Day | Attended Eco Day | Had Meeting | SFDC Accounts |
+|---------|-----------|----------|---------------------|-------------------|------------|---------------|
+| ENT | 222 (19.7%) | 198 (89%) | 67 | 176 | 0 | 75 |
+| MM | 355 (31.4%) | 309 (87%) | 103 | 283 | **27** | 109 |
+| SMB | 487 (43.1%) | 324 (67%) | 142 | 287 | 1 | 61 |
+| Unknown | 65 (5.8%) | 54 (83%) | 30 | 46 | 0 | 25 |
 
-Then update the Hex dashboard cells to query:
-```sql
-SELECT * FROM `n8n-telemetry.itl_2026_snapshots.registrants`
-```
+> MM had the highest meeting engagement — 27 entries linked to meetings.
+
+### Pipeline Attribution (Opportunities on registrant accounts, NB+Expansion, created >= Oct 12 2026)
+
+| Type | Segment | Opps | Accounts | From Meeting | Total Amount | Closed Won | Open Pipeline |
+|------|---------|------|----------|-------------|-------------|-----------|---------------|
+| New Business | ENT | 4 | 4 | 0 | $779,000 | 1 ($8K) | 3 ($771K) |
+| New Business | MM | 8 | 8 | **1** | $512,700 | 1 ($22K) | 7 ($490.7K) |
+| Expansion | ENT | 3 | 3 | 0 | $505,000 | 0 | 3 ($505K) |
+| Expansion | MM | 5 | 5 | 0 | $385,012 | 1 ($3.6K) | 4 ($381.4K) |
+| **Total** | | **20** | **20** | **1** | **$2.18M** | **3 ($33.6K)** | **17 ($2.15M)** |
+
+**Notable accounts:**
+- NVIDIA — $700K NB ENT at "Meeting Booked" stage
+- TeamViewer — $196.7K NB MM at "Value Workshop"
+- Eleven Labs — $80K Expansion MM
+- Next PLC — $55K Expansion ENT
+- Rohde & Schwarz — $55K NB ENT
+- Deloitte, Apaleo, Globalization Partners — Closed Won
+
+---
+
+## Funnel (5 stages)
+
+| Stage | Count | % of Registered |
+|-------|-------|-----------------|
+| Registered (ITL, Free/Paid) | 1,119 | 100% |
+| Attended (Eco Day or Partner Day) | 815 | 72.8% |
+| Had n8n Meeting | 20 | 1.8% |
+| Account with Opp (NB/Exp, >= Oct 12) | 48 | 4.3% |
+| Closed Won | 6 | 0.5% |
 
 ---
 
 ## Hex Dashboard Cells
 
-| Cell Name | Cell ID | Purpose |
-|-----------|---------|---------|
-| `registrants` | `01a1bfdf-7e47-7033-854d-a9b4b95334d4` | 250-row sample of registrant data |
-| `sfdc_account_enrichment` | `01a1c073-4619-72fc-8f83-6730f947eb2c` | Segment breakdown: ENT/MM/SMB/Unknown |
-| `lead_funnel` | `01a1bfe3-9664-7625-8434-3eb44d19d6d7` | 5-stage funnel: registered → attended → SFDC match → opp → closed won |
+| Cell | Cell ID | Purpose |
+|------|---------|---------|
+| `registrants` | `01a1bfdf-7e47-7033-854d-a9b4b95334d4` | Full registrant list from CampaignMember with attendance + meeting flags |
+| `sfdc_account_enrichment` | `01a1c073-4619-72fc-8f83-6730f947eb2c` | Segment breakdown: ENT/MM/SMB with attendance and meeting rates |
+| `lead_funnel` | `01a1bfe3-9664-7625-8434-3eb44d19d6d7` | 5-stage funnel |
+| `pipeline_arr` | `01a1bfe4-17f7-77be-b00d-dc93b845655b` | Pipeline amounts by type × segment with meeting attribution |
 
 ---
 
-## SFDC Match Strategy
+## Technical Notes
 
-1. **Email match to Lead** (`salesforce_bq.Lead.Email`)
-2. **Email match to Contact** (`salesforce_bq.Contact.Email`) → Account
-3. **Domain fallback** (`salesforce_bq.Account.Website_Domain__c`) for corporate emails
-
-Domain exclusions: `gmail.com`, `yahoo.com`, `hotmail.com`, `outlook.com` and other free email providers.
+- **ARR fields** (`New_Business_ARR__c`, `Expansion_ARR__c`) are NULL in BigQuery sync — use `Opportunity.Amount`
+- **Meeting attribution**: `from_meeting = TRUE` when the opportunity's account appears in the "Meetings Booked" campaign (23 members who had an n8n 1:1 during ITL)
+- **Deduplication**: Registrants cell uses `UNION ALL` (Lead + Contact paths) — `COUNT(DISTINCT email)` for aggregates
+- **Account linkage**: Leads use `ConvertedAccountId` or `Matched_Account__c`; Contacts use `AccountId`
+- **Opp window**: `DATE(CreatedDate) >= '2026-10-12'` — ITL was Oct 15-16, 2026; 3 days pre-event buffer for deals sourced at event
 
 ---
 
-## Results (from 70-row sub-sample)
+## Fliplet Enriched Data (backup)
 
-### Segment Breakdown
-| Segment | Count | Attended | Booked Mtgs | SFDC Accounts |
-|---------|-------|----------|-------------|---------------|
-| Unknown | 40 (55.6%) | 93% | 21 | 1 |
-| ENT | 15 (20.8%) | 93% | 10 | 7 |
-| MM | 12 (16.7%) | 92% | 6 | 10 |
-| SMB | 5 (6.9%) | 100% | 3 | 0 |
+The file `itl_2026_registrants_enriched.csv` (1,269 rows) was generated by cross-joining all 13 Fliplet tabs using `User Unique ID` as the linkage key. It includes badge scan data and Fliplet meeting counts (not 1:1 meetings with n8n — these are exhibitor/networking meetings booked through Fliplet).
 
-### Lead Funnel (71-row sample)
-| Stage | Count | % of Registered |
-|-------|-------|-----------------|
-| Registered | 71 | 100% |
-| Physically Attended | 66 | 93% |
-| Matched in SFDC | 15 | 21% |
-| Account with Opp (≥ Oct 12) | 0 | 0% |
-| Closed Won | 0 | 0% |
-
-> **Note:** The 0 for opps/closed won is expected in this small sample biased toward partner/ecosystem attendees.
-> With the full 1,269 row dataset loaded into BQ, re-run the cells for accurate pipeline attribution.
+The full inline SQL version is in `itl_2026_full_bq_query.sql`.

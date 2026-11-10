@@ -1,12 +1,9 @@
 import plotly.graph_objects as go
 
-# Physical headcount from Fliplet Purchases + Scans (snapshot 10 Nov 2026).
-# Overlapping on purpose. Do not use Salesforce campaign leftovers here.
+# Per-day visits from Fliplet Purchases + Scans (snapshot 10 Nov 2026).
 registered = 1269
 partner = 391
 eco = 878
-either = 997
-both = 272
 
 try:
     total_pipeline = float(pipeline_arr["total_amount"].sum())
@@ -16,11 +13,10 @@ except Exception:
     opp_rows = 0
 
 kpis = [
-    {"value": registered, "title": "Registered (Fliplet)", "sub": "Paid + Free tickets, unique email", "x": [0, 0.18]},
-    {"value": partner, "title": "Partner Day", "sub": "13 Oct door scans, overlapping", "x": [0.21, 0.39]},
-    {"value": eco, "title": "Ecosystem Day", "sub": "14 Oct door scans, overlapping", "x": [0.42, 0.60]},
-    {"value": either, "title": "Either day", "sub": f"{both:,} came both days", "x": [0.63, 0.81]},
-    {"value": total_pipeline, "title": "Pipeline (USD)", "sub": f"{opp_rows} opp rows · Salesforce Amount", "x": [0.84, 1.0]},
+    {"value": registered, "title": "Registered (Fliplet)", "sub": "Paid + Free tickets, unique email", "x": [0, 0.24]},
+    {"value": partner, "title": "Partner Day visits", "sub": "13 Oct door scans", "x": [0.26, 0.49]},
+    {"value": eco, "title": "Ecosystem Day visits", "sub": "14 Oct door scans", "x": [0.51, 0.74]},
+    {"value": total_pipeline, "title": "Pipeline (USD)", "sub": f"{opp_rows} opp rows · Salesforce Amount", "x": [0.76, 1.0]},
 ]
 
 fig = go.Figure()

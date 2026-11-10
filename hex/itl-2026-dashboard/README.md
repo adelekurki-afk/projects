@@ -6,10 +6,15 @@ Project: **In the Loop 2026 — Lead & Pipeline Dashboard**
 
 ## Use the notebook (recommended)
 
-1. Open the Hex project → **Notebook**.
-2. Run the cells labelled **APP: Fliplet overlapping days** and **APP: Staff and Speakers**.
-3. Live check: the first output must read **NOV 10 NOTEBOOK v7 is live**.
-4. To share: App builder → **Classic app** (not Generative) → pin those cells plus pipeline/GA4.
+You are not running a Hex App. You are running two **Notebook cells**. The `APP:` prefix is only a cell name.
+
+1. Open the project and click **Notebook** at the top (not App / Preview).
+2. Open the **Outline** on the left.
+3. Click **START HERE — run these two cells**, then the next cell **APP: Fliplet overlapping days**.
+4. Click **Run** in the top-right of that cell, or press Cmd+Enter / Ctrl+Enter.
+5. Run **APP: Staff and Speakers** the same way.
+6. Live check: **NOV 10 NOTEBOOK v8 is live**. Per-day visits only (no either-day unique).
+7. To share later: App builder → **Classic app** (not Generative) → drag those cells into the layout.
 
 ## Optional: Generative App.js
 

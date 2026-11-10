@@ -1,5 +1,5 @@
 # APP: Staff and Speakers
-# Snapshot 10 Nov 2026 from Fliplet Purchases + Speakers + Scans.
+# Snapshot 10 Nov 2026. Per-day scans only (no either-day unique).
 import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display, Markdown
@@ -7,8 +7,8 @@ from IPython.display import display, Markdown
 staff_kpis = [
     (113, "Staff tickets", "Fliplet Ticket family = Staff"),
     (168, "n8n on any ticket", "13 staff, 48 speaker, 107 other"),
-    (29, "Staff scanned either day", "Crew rarely used the attendee door scan"),
-    (148, "n8n scanned either day", "Of 168 n8n ticket holders"),
+    (40, "C2 crew tickets", "Largest staff bucket"),
+    (76, "Speaker tickets", "Fliplet Ticket family = Speakers"),
 ]
 staff_fig = go.Figure()
 for i, (val, title, sub) in enumerate(staff_kpis):
@@ -27,18 +27,18 @@ staff_fig.update_layout(
 display(staff_fig)
 
 staff = pd.DataFrame([
-    {"crew": "C2", "registered": 40, "partner_day": 0, "eco_day": 2, "either": 2},
-    {"crew": "Hospitality / QT Events", "registered": 36, "partner_day": 8, "eco_day": 6, "either": 12},
-    {"crew": "Content / merch / film", "registered": 19, "partner_day": 1, "eco_day": 2, "either": 3},
-    {"crew": "n8n (staff ticket)", "registered": 13, "partner_day": 6, "eco_day": 8, "either": 9},
-    {"crew": "Other crew", "registered": 5, "partner_day": 3, "eco_day": 1, "either": 3},
+    {"crew": "C2", "registered": 40, "partner_day": 0, "eco_day": 2},
+    {"crew": "Hospitality / QT Events", "registered": 36, "partner_day": 8, "eco_day": 6},
+    {"crew": "Content / merch / film", "registered": 19, "partner_day": 1, "eco_day": 2},
+    {"crew": "n8n (staff ticket)", "registered": 13, "partner_day": 6, "eco_day": 8},
+    {"crew": "Other crew", "registered": 5, "partner_day": 3, "eco_day": 1},
 ])
 staff_bar = go.Figure()
-staff_bar.add_trace(go.Bar(name="Registered", x=staff["crew"], y=staff["registered"], marker_color="#4F7FB8", text=staff["registered"], textposition="outside"))
-staff_bar.add_trace(go.Bar(name="Scanned either day", x=staff["crew"], y=staff["either"], marker_color="#FF6D5A", text=staff["either"], textposition="outside"))
+staff_bar.add_trace(go.Bar(name="Partner Day scans", x=staff["crew"], y=staff["partner_day"], marker_color="#4F7FB8", text=staff["partner_day"], textposition="outside"))
+staff_bar.add_trace(go.Bar(name="Eco Day scans", x=staff["crew"], y=staff["eco_day"], marker_color="#FF6D5A", text=staff["eco_day"], textposition="outside"))
 staff_bar.update_layout(
     barmode="group",
-    title=dict(text="Staff tickets vs door scans", font=dict(size=16)),
+    title=dict(text="Staff door scans by day", font=dict(size=16)),
     height=380, paper_bgcolor="white", plot_bgcolor="white",
     margin=dict(t=60, b=80, l=40, r=20),
     font=dict(family="Inter, Arial, sans-serif", color="#333"),
@@ -47,7 +47,7 @@ staff_bar.update_layout(
 staff_bar.update_xaxes(tickangle=15)
 display(staff_bar)
 display(staff)
-display(Markdown("Purchases has Ticket family Staff (113). Fliplet People Type=Team from the debrief is not a column in that export."))
+display(Markdown("Purchases has Ticket family Staff (113). Crew rarely used the attendee door scan, so scan counts are lower than tickets."))
 
 speaker_kpis = [
     (116, "Programme speakers", "Speakers tab in Fliplet raw workbook"),
@@ -74,8 +74,6 @@ display(spk_fig)
 speakers = pd.DataFrame([
     {"day": "Partner Day", "speakers": 62},
     {"day": "Ecosystem Day", "speakers": 79},
-    {"day": "Both days", "speakers": 43},
-    {"day": "Either day", "speakers": 98},
 ])
 spk_bar = go.Figure(go.Bar(
     x=speakers["day"], y=speakers["speakers"], marker_color="#FF6D5A",
@@ -89,5 +87,5 @@ spk_bar.update_layout(
     yaxis=dict(title="Speakers"),
 )
 display(spk_bar)
-display(Markdown("98 of 116 programme speakers have a door scan on 13 or 14 Oct. 76 people hold a Speakers ticket."))
+display(Markdown("62 programme speakers scanned on Partner Day, 79 on Ecosystem Day. 43 of them are in both day counts."))
 display(speakers)

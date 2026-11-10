@@ -23,11 +23,11 @@ const tableStyle = { width: "100%", borderCollapse: "collapse", fontSize: "var(-
 /* Physical attendance: Fliplet Purchases + Scans + CAB sheet. Snapshot 10 Nov 2026.
    Overlapping on purpose: a person on both days counts in Partner AND Eco. */
 const DAY_ROWS = [
-  { day: "Partner Day", date: "13 Oct", participants: 391, registered: 487, note: "Door scans. Also counted if they came on Eco Day." },
-  { day: "Ecosystem Day", date: "14 Oct", participants: 878, registered: 1205, note: "Door scans. Also counted if they came on Partner Day." },
-  { day: "Both days", date: "13 + 14 Oct", participants: 272, registered: 425, note: "Scanned on Partner Day and Ecosystem Day." },
-  { day: "Either day", date: "13 or 14 Oct", participants: 997, registered: 1269, note: "Unique people scanned at least once." }
+  { day: "Partner Day", date: "13 Oct", participants: 391, registered: 487, note: "Door scans. People who also came on Eco Day are included here." },
+  { day: "Ecosystem Day", date: "14 Oct", participants: 878, registered: 1205, note: "Door scans. People who also came on Partner Day are included here." }
 ];
+const REGISTERED = 1269;
+const BOTH_DAYS = 272;
 
 const CAB_ROWS = [
   { attendance_group: "CAB total", on_cab_list: 39, partner_day: 29, eco_day: 39, both_days: 29, redeemed: 39 },
@@ -38,16 +38,16 @@ const CAB_ROWS = [
 const STAFF_KPIS = [
   { label: "Staff tickets", value: 113, note: "Fliplet Ticket family = Staff (crew, not n8n-only)" },
   { label: "n8n on any ticket", value: 168, note: "13 staff tickets, 48 speaker tickets, 107 other" },
-  { label: "Staff scanned either day", value: 29, note: "Crew rarely went through the attendee door scan" },
-  { label: "n8n scanned either day", value: 148, note: "Of 168 n8n ticket holders" }
+  { label: "C2 crew tickets", value: 40, note: "Largest staff bucket" },
+  { label: "Speaker tickets", value: 76, note: "Fliplet Ticket family = Speakers" }
 ];
 
 const STAFF_BUCKETS = [
-  { bucket: "C2", registered: 40, partner_day: 0, eco_day: 2, either: 2 },
-  { bucket: "Hospitality / QT Events", registered: 36, partner_day: 8, eco_day: 6, either: 12 },
-  { bucket: "Content / merch / film", registered: 19, partner_day: 1, eco_day: 2, either: 3 },
-  { bucket: "n8n (staff ticket)", registered: 13, partner_day: 6, eco_day: 8, either: 9 },
-  { bucket: "Other crew", registered: 5, partner_day: 3, eco_day: 1, either: 3 }
+  { bucket: "C2", registered: 40, partner_day: 0, eco_day: 2 },
+  { bucket: "Hospitality / QT Events", registered: 36, partner_day: 8, eco_day: 6 },
+  { bucket: "Content / merch / film", registered: 19, partner_day: 1, eco_day: 2 },
+  { bucket: "n8n (staff ticket)", registered: 13, partner_day: 6, eco_day: 8 },
+  { bucket: "Other crew", registered: 5, partner_day: 3, eco_day: 1 }
 ];
 
 const SPEAKER_KPIS = [
@@ -59,9 +59,7 @@ const SPEAKER_KPIS = [
 
 const SPEAKER_DAYS = [
   { day: "Partner Day", speakers: 62 },
-  { day: "Ecosystem Day", speakers: 79 },
-  { day: "Both days", speakers: 43 },
-  { day: "Either day", speakers: 98 }
+  { day: "Ecosystem Day", speakers: 79 }
 ];
 
 const PERSONA_ROWS = [
@@ -241,26 +239,23 @@ function App() {
   const mtg = stage["Had n8n Meeting"];
   const partnerDay = DAY_ROWS[0];
   const ecoDay = DAY_ROWS[1];
-  const bothDays = DAY_ROWS[2];
-  const eitherDay = DAY_ROWS[3];
   const ready = pipe.hasData;
   const sourced = attrMap.Sourced, influenced = attrMap.Influenced, renewals = attrMap["Renewal touched"];
   const pagesReady = pages && pages.hasData;
 
   const bannerEl = h("div", { "data-testid": "nov10-banner", style: { background: "#ff6d5a", color: "#fff", padding: "12px 16px", borderRadius: "8px", fontWeight: 600 } },
-    "NOV 10 FULL PASTE v7 is live - no React global; day counts from Fliplet tickets and door scans.");
+    "NOV 10 FULL PASTE v8 is live - per-day visits only, no either-day unique.");
 
   const headerEl = h("header", { "data-testid": "header", style: { display: "flex", flexDirection: "column", gap: "var(--space-3)" } },
     h("h1", { style: { fontSize: "var(--text-3xl)", margin: 0 } }, "In the Loop 2026 - Lead & Pipeline Dashboard"),
     h("p", { style: { margin: 0, color: "var(--color-text-muted)" } }, "Who was in the room: Fliplet tickets and door scans. Pipeline: Salesforce / BigQuery from 12 Oct 2026."),
     h("div", { style: { borderLeft: "3px solid var(--color-accent, #4f7fb8)", padding: "var(--space-2) var(--space-4)", fontSize: "var(--text-sm)" } },
-      "Days overlap on purpose. Partner Day " + n(partnerDay.participants) + " and Ecosystem Day " + n(ecoDay.participants) + " both include the " + n(bothDays.participants) + " people who came both days. Unpaid/comp, Eco-only tickets, staff, speakers and guests are in. CAB is an overlay from the CAB sheet (39 people, all redeemed)."));
+      "Per-day visits. Partner Day " + n(partnerDay.participants) + " and Ecosystem Day " + n(ecoDay.participants) + " both include the " + n(BOTH_DAYS) + " people who came both days. Unpaid/comp, Eco-only tickets, staff, speakers and guests are in. CAB is an overlay from the CAB sheet (39 people, all redeemed)."));
 
   const kpiEl = h("div", { "data-testid": "kpis", style: kpiGridStyle },
-    h(KpiCard, { label: "Registered (Fliplet)", value: n(eitherDay.registered), comparison: "Paid + Free tickets, unique email" }),
-    h(KpiCard, { label: "Partner Day", value: n(partnerDay.participants), comparison: "13 Oct door scans, overlapping" }),
-    h(KpiCard, { label: "Ecosystem Day", value: n(ecoDay.participants), comparison: "14 Oct door scans, overlapping" }),
-    h(KpiCard, { label: "Either day", value: n(eitherDay.participants), comparison: n(bothDays.participants) + " came both days" }),
+    h(KpiCard, { label: "Registered (Fliplet)", value: n(REGISTERED), comparison: "Paid + Free tickets, unique email" }),
+    h(KpiCard, { label: "Partner Day visits", value: n(partnerDay.participants), comparison: "13 Oct door scans" }),
+    h(KpiCard, { label: "Ecosystem Day visits", value: n(ecoDay.participants), comparison: "14 Oct door scans" }),
     h(KpiCard, { label: "Pipeline (USD deal amount)", value: ready ? money(tot.amt) : "-", comparison: ready ? (tot.opps + " opps - " + money(tot.openAmt) + " open") : "" }));
 
   const dayCards = h("div", { "data-testid": "day-cards", style: cardGridStyle },
@@ -278,23 +273,22 @@ function App() {
       return h("div", { key: r.attendance_group, style: Object.assign({}, cardStyle, { border: "1px solid #4f7fb8" }) },
         h("div", { style: { fontWeight: 600 } }, r.attendance_group),
         h("div", { style: { fontSize: "var(--text-2xl)" } }, r.on_cab_list + " people"),
-        h("div", { style: muted }, "Partner Day " + r.partner_day + " / Eco Day " + r.eco_day + " / both " + r.both_days),
+        h("div", { style: muted }, "Partner Day " + r.partner_day + " / Eco Day " + r.eco_day),
         h("div", { style: muted }, r.redeemed + " redeemed on the CAB sheet"));
     }));
 
   const daysEl = h(Section, { testid: "days", title: "Who was in which days", note: "Source: Fliplet Scans (Berlin timezone) joined to Purchases (Paid + Free, including unpaid/comp, staff, speakers, VIP). A person can sit in more than one tile. This is the n8n ops grain, not Salesforce exclusive leftovers." },
     dayCards,
     cabCards,
-    h("p", { style: muted }, "n8n ops door scans were Partner 388 / Eco 874 / either 995. Raw Scans tab is Partner 391 / Eco 878 / either 997 (Berlin day). Fliplet app check-in is slightly higher on Partner Day (406) and is not a column in the Purchases dump."));
+    h("p", { style: muted }, n(BOTH_DAYS) + " people visited both days, so they sit in both Partner Day and Ecosystem Day. Raw Scans tab is Partner 391 / Eco 878 (Berlin day)."));
 
-  const staffHead = HeadRow(["Crew", "Registered", "Partner Day scans", "Eco Day scans", "Either day"]);
+  const staffHead = HeadRow(["Crew", "Registered", "Partner Day scans", "Eco Day scans"]);
   const staffBody = h("tbody", null, STAFF_BUCKETS.map(function (r) {
     return h("tr", { key: r.bucket },
       h("td", { style: td }, r.bucket),
       h("td", { style: td }, n(r.registered)),
       h("td", { style: td }, n(r.partner_day)),
-      h("td", { style: td }, n(r.eco_day)),
-      h("td", { style: td }, n(r.either)));
+      h("td", { style: td }, n(r.eco_day)));
   }));
   const staffTable = h("div", { style: { overflowX: "auto" } },
     h("table", { style: tableStyle }, staffHead, staffBody));
@@ -316,7 +310,7 @@ function App() {
   const speakersEl = h(Section, { testid: "speakers", title: "Speakers", note: "Programme list from the Speakers tab in the Fliplet raw workbook, not Salesforce titles." },
     speakerKpis,
     speakerChart,
-    h("p", { style: muted }, "98 of 116 programme speakers have a door scan on 13 or 14 Oct. 76 people hold a Speakers ticket."));
+    h("p", { style: muted }, "62 programme speakers scanned on Partner Day, 79 on Ecosystem Day. 43 of them are in both day counts."));
 
   const funnelEl = h(Section, { testid: "funnel", title: "Commercial funnel (Salesforce ITL Free/Paid)", note: "This funnel is the Salesforce campaign universe for conversion, not physical headcount. Do not compare these Registered/Attended numbers to the day tiles above." },
     h("div", { style: { height: 300 } },

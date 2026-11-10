@@ -1,10 +1,10 @@
 import "app/app.css";
+import { createElement as h, useMemo, useState } from "react";
 import { render, useHexData } from "app/_data.js";
 import { KpiCard } from "app/components/KpiCard.js";
 import { CartesianChart } from "app/components/CartesianChart.js";
 import { SEGMENT_COLORS, SEGMENT_ORDER, segLabel, money } from "app/theme.js";
 
-var h = React.createElement;
 const STAGES = ["Registered", "Attended", "Had n8n Meeting", "Account with Opp", "Closed Won"];
 const GROUP_ORDER = ["Both Days", "Partner Day only", "Ecosystem Day only", "Gap (Did Not Attend)"];
 const ATTR_TABS = ["Sourced", "Influenced", "Renewals"];
@@ -173,7 +173,6 @@ function OppTable({ rows }) {
 }
 
 function App() {
-  const { useMemo, useState } = React;
   const funnel = useHexData("01a1bfe3-9664-7625-8434-41290e76c627");
   const pipe = useHexData("01a1bfe4-17f7-77be-b00d-e14537341ed5");
   const mix = useHexData("01a1c473-53ad-7318-bb55-1e5a6f7647ca");
@@ -249,7 +248,7 @@ function App() {
   const pagesReady = pages && pages.hasData;
 
   const bannerEl = h("div", { "data-testid": "nov10-banner", style: { background: "#ff6d5a", color: "#fff", padding: "12px 16px", borderRadius: "8px", fontWeight: 600 } },
-    "NOV 10 FULL PASTE v6 is live - day counts from Fliplet tickets and door scans, not Salesforce campaigns.");
+    "NOV 10 FULL PASTE v7 is live - no React global; day counts from Fliplet tickets and door scans.");
 
   const headerEl = h("header", { "data-testid": "header", style: { display: "flex", flexDirection: "column", gap: "var(--space-3)" } },
     h("h1", { style: { fontSize: "var(--text-3xl)", margin: 0 } }, "In the Loop 2026 - Lead & Pipeline Dashboard"),

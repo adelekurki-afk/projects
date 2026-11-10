@@ -1,15 +1,23 @@
 # In the Loop 2026 — Hex dashboard
 
-Do not paste App.js. Do not open App / Preview.
+The red error on **App** is the **Generative** preview (`App.js`). It is not the visit numbers.
 
-## Open this (working notebook)
+## Make the existing App stop erroring
 
-[ITL 2026 — Per-day visits](https://eu.hex.tech/n8n/hex/ITL-2026-Per-day-visits-034vAfCGRR48AULJJUT0YV/draft/logic)
+Open the original project:
 
-Stay on **Notebook**. If a chart is blank, click **Run all** at the top, then scroll.
+https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx
 
-Partner Day **391** · Ecosystem Day **878**. People who came both days (272) are inside both numbers.
+1. Click **App builder**.
+2. Open the **App type** menu.
+3. Switch **Generative app** → **Classic app**.
+   Hex keeps every notebook cell. Only the broken App.js Preview goes away.
+4. Click **Run all**.
+5. In Classic App builder, keep **APP: Executive scoreboard**, **Day visit KPIs**, and **Partner vs Eco bars** in the layout. Hide probe/SQL tables if they showed up.
+6. Click **Publish**, then share the project with the workspace if others need the `/app/.../latest` link.
 
-Hex Claude also built native charts in this thread: https://eu.hex.tech/n8n/thread/01a1c580-a457-72bf-97f3-f41197dd15c9
+You do not paste code.
 
-Visit counts are a Fliplet snapshot (10 Nov 2026). Hex cannot query those sheets live.
+If you stay on Generative, open **App builder → Code**, replace `App.js` with the file in this folder (`import * as React from "react"`, no JSX), then click **Preview**. Or prompt the Hex agent in the App builder sidebar: `Fix React is not defined. Use import * as React from "react" and React.createElement only. Show Partner Day 391 and Ecosystem Day 878.`
+
+Partner Day **391** · Ecosystem Day **878**. The 272 people who came both days are inside both numbers.

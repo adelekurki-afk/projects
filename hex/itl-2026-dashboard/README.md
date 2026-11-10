@@ -1,23 +1,37 @@
 # In the Loop 2026 — Hex dashboard
 
-The red error on **App** is the **Generative** preview (`App.js`). It is not the visit numbers.
+Classic App is empty after switching from Generative because **Run all does not pin cells**. Hex only auto-lays-out Classic the first time you open App builder. This project opened as Generative, so Classic is a blank canvas. The notebook still has the charts.
 
-## Make the existing App stop erroring
+## Fill the empty App
 
-Open the original project:
+Open:
 
 https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx
 
-1. Click **App builder**.
-2. Open the **App type** menu.
-3. Switch **Generative app** → **Classic app**.
-   Hex keeps every notebook cell. Only the broken App.js Preview goes away.
-4. Click **Run all**.
-5. In Classic App builder, keep **APP: Executive scoreboard**, **Day visit KPIs**, and **Partner vs Eco bars** in the layout. Hide probe/SQL tables if they showed up.
-6. Click **Publish**, then share the project with the workspace if others need the `/app/.../latest` link.
+### One click
 
-You do not paste code.
+1. Stay on **App builder** (Classic).
+2. Left sidebar: **Outline**.
+3. **Reset layout** → **Use default layout**.
+4. Remove `probe_` SQL tables from the App if they appear (does not delete the notebook).
 
-If you stay on Generative, open **App builder → Code**, replace `App.js` with the file in this folder (`import * as React from "react"`, no JSX), then click **Preview**. Or prompt the Hex agent in the App builder sidebar: `Fix React is not defined. Use import * as React from "react" and React.createElement only. Show Partner Day 391 and Ecosystem Day 878.`
+### Or pin only visits
+
+In **Notebook**, click **Add to app** (hexagon on the cell) on:
+
+- APP: Executive scoreboard
+- Day visit KPIs
+- Partner vs Eco bars
+- Staff KPIs
+- CAB overlay
+- Speaker KPIs
+
+Then click **App**.
+
+### Or prompt the Notebook agent in App builder
+
+`Pin these cells to the Classic app, output only, in this order: APP: Executive scoreboard, Day visit KPIs, Partner vs Eco bars, Staff KPIs, CAB overlay, Speaker KPIs, Speakers by day. Do not add probe SQL tables.`
+
+Then **Publish**.
 
 Partner Day **391** · Ecosystem Day **878**. The 272 people who came both days are inside both numbers.

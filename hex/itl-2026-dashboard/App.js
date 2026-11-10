@@ -15,6 +15,10 @@ const muted = { margin: 0, color: "var(--color-text-muted)", fontSize: "var(--te
 const grid2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "var(--space-6)" };
 const th = { textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--color-border)", whiteSpace: "nowrap" };
 const td = { padding: "8px 10px", borderBottom: "1px solid var(--color-border)", verticalAlign: "top" };
+const kpiGridStyle = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" };
+const cardGridStyle = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" };
+const cardStyle = { border: "1px solid var(--color-border)", borderRadius: "8px", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" };
+const tableStyle = { width: "100%", borderCollapse: "collapse", fontSize: "var(--text-sm)" };
 
 /* Physical attendance: Fliplet Purchases + Scans + CAB sheet. Snapshot 10 Nov 2026.
    Overlapping on purpose: a person on both days counts in Partner AND Eco. */
@@ -98,7 +102,7 @@ const ATTR_OPPS = [
   { opp_id: "i6", account_name: "HiSolutions AG", segment: "MM", opp_name: "HiSolutions AG-New Business-1-2027", primary_campaign: "Talk to Sales Web Form", opp_type: "New Business", attribution: "Influenced - new opp", StageName: "Value Workshop", status: "Open", amount: 26000, people_associated: "Sandro Grundmann" },
   { opp_id: "i7", account_name: "voize", segment: "MM", opp_name: "voize-New Business-12-2026", primary_campaign: "Talk to Sales Web Form", opp_type: "New Business", attribution: "Influenced - new opp", StageName: "Value Workshop", status: "Open", amount: 26000, people_associated: "Alessio Pellegrini, Charlotte Cheung" },
   { opp_id: "i8", account_name: "C Digital Technologies Limited", segment: "MM", opp_name: "C Digital Technologies Limited-New Business-11-2026", primary_campaign: "Talk to Sales Web Form", opp_type: "New Business", attribution: "Influenced - new opp", StageName: "Value Workshop", status: "Open", amount: 26000, people_associated: "Jasmina Popovikj Zabrchanec" },
-  { opp_id: "i9", account_name: "Apaleo", segment: "MM", opp_name: "Apaleo-New Business-10-2026", primary_campaign: "", opp_type: "New Business", attribution: "Influenced - new opp", StageName: "Closed Won Approved", status: "Closed won", amount: 22000, people_associated: "Jan Schwarz, Raphael Daubner" },
+  { opp_id: "i9", account_name: "Apaleo", segment: "MM", opp_name: "Apaleo-New Business-12-2026", primary_campaign: "", opp_type: "New Business", attribution: "Influenced - new opp", StageName: "Closed Won Approved", status: "Closed won", amount: 22000, people_associated: "Jan Schwarz, Raphael Daubner" },
   { opp_id: "i10", account_name: "Deutsche Telekom MMS GmbH", segment: "ENT", opp_name: "Deutsche Telekom MMS GmbH-New Business-12-2026", primary_campaign: "Talk to Sales Web Form", opp_type: "New Business", attribution: "Influenced - new opp", StageName: "Meeting Booked", status: "Open", amount: 16000, people_associated: "Askan Schmeisser, Christoph Keller, Hannah Materne, Mirko Golze" },
   { opp_id: "i11", account_name: "Globalization Partners LLC", segment: "MM", opp_name: "Globalization Partners LLC-Expansion-10-2026", primary_campaign: "", opp_type: "Expansion", attribution: "Influenced - new opp", StageName: "Closed Won Approved", status: "Closed won", amount: 3640, people_associated: "Volker Elzner" },
   { opp_id: "i12", account_name: "Solaris SE", segment: "MM", opp_name: "Solaris SE-New Business-12-2026", primary_campaign: "Talk to Sales Web Form", opp_type: "New Business", attribution: "Influenced - existing open", StageName: "Stakeholder Alignment", status: "Open", amount: 86000, people_associated: "Uzair Anwar" },
@@ -126,26 +130,46 @@ const TREND_WEEKS = ["5 Oct", "12 Oct", "19 Oct", "26 Oct", "2 Nov"];
 function Section({ title, note, children, testid }) {
   return h("section", { "data-testid": testid, style: { display: "flex", flexDirection: "column", gap: "var(--space-4)", borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-6)" } },
     h("h2", { style: { fontSize: "var(--text-xl)", margin: 0 } }, title),
-    note && h("p", { style: muted }, note),
+    note ? h("p", { style: muted }, note) : null,
     children);
 }
+
 const pct = (v) => (Number(v) || 0).toFixed(1) + "%";
 const dash = (v) => (v == null || v === "" ? "-" : String(v));
 const n = (v) => Number(v || 0).toLocaleString();
 
+function breakdownHas(row, needle) {
+  return String(row.breakdown || "").toLowerCase().indexOf(needle) !== -1;
+}
+
+function HeadRow(labels) {
+  return h("thead", null,
+    h("tr", null, labels.map(function (c) {
+      return h("th", { key: c, style: th }, c);
+    })));
+}
+
 function OppTable({ rows }) {
+  const head = HeadRow(["Account", "Opportunity", "Type", "Stage", "Amount", "Person associated"]);
+  const body = h("tbody", null, rows.map(function (r) {
+    return h("tr", { key: r.opp_id },
+      h("td", { style: td },
+        h("div", { style: { fontWeight: 600 } }, dash(r.account_name)),
+        h("div", { style: muted }, dash(r.segment))),
+      h("td", { style: td },
+        dash(r.opp_name),
+        h("div", { style: muted }, dash(r.primary_campaign))),
+      h("td", { style: td },
+        dash(r.opp_type),
+        h("div", { style: muted }, dash(r.attribution))),
+      h("td", { style: td },
+        dash(r.StageName),
+        h("div", { style: muted }, dash(r.status))),
+      h("td", { style: Object.assign({}, td, { whiteSpace: "nowrap" }) }, money(+r.amount || 0)),
+      h("td", { style: td }, dash(r.people_associated)));
+  }));
   return h("div", { style: { overflowX: "auto" } },
-    h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: "var(--text-sm)" } },
-      h("thead", null,
-        h("tr", null, ["Account", "Opportunity", "Type", "Stage", "Amount", "Person associated"].map((c) => h("th", { key: c, style: th }, c)))),
-      h("tbody", null,
-        rows.map((r) => h("tr", { key: r.opp_id },
-          h("td", { style: td }, h("div", { style: { fontWeight: 600 } }, dash(r.account_name)), h("div", { style: muted }, dash(r.segment))),
-          h("td", { style: td }, dash(r.opp_name), h("div", { style: muted }, dash(r.primary_campaign))),
-          h("td", { style: td }, dash(r.opp_type), h("div", { style: muted }, dash(r.attribution))),
-          h("td", { style: td }, dash(r.StageName), h("div", { style: muted }, dash(r.status))),
-          h("td", { style: Object.assign({}, td, { whiteSpace: "nowrap" }) }, money(+r.amount || 0)),
-          h("td", { style: td }, dash(r.people_associated)))))));
+    h("table", { style: tableStyle }, head, body));
 }
 
 function App() {
@@ -185,8 +209,8 @@ function App() {
     });
     return out;
   }, [pipeRows]);
-  const segMix = useMemo(() => (mix.rows || []).filter((r) => /seg/i.test(r.breakdown)).map((r) => Object.assign({}, r, { label: segLabel(r.label) })), [mix.rows]);
-  const regMix = useMemo(() => (mix.rows || []).filter((r) => /reg/i.test(r.breakdown)), [mix.rows]);
+  const segMix = useMemo(() => (mix.rows || []).filter((r) => breakdownHas(r, "seg")).map((r) => Object.assign({}, r, { label: segLabel(r.label) })), [mix.rows]);
+  const regMix = useMemo(() => (mix.rows || []).filter((r) => breakdownHas(r, "reg")), [mix.rows]);
   const grpRows = useMemo(() => GROUP_ORDER.map((g) => (grp.rows || []).find((r) => r.attendance_group === g)).filter(Boolean), [grp.rows]);
   const grpPipeRows = useMemo(() => {
     const out = [];
@@ -224,176 +248,210 @@ function App() {
   const sourced = attrMap.Sourced, influenced = attrMap.Influenced, renewals = attrMap["Renewal touched"];
   const pagesReady = pages && pages.hasData;
 
-  return h("div", { className: "app-container", style: { display: "flex", flexDirection: "column", gap: "var(--space-8)" } },
-    h("div", { "data-testid": "nov10-banner", style: { background: "#ff6d5a", color: "#fff", padding: "12px 16px", borderRadius: "8px", fontWeight: 600 } },
-      "NOV 10 FULL PASTE v5 is live - day counts from Fliplet tickets and door scans, not Salesforce campaigns."),
+  const bannerEl = h("div", { "data-testid": "nov10-banner", style: { background: "#ff6d5a", color: "#fff", padding: "12px 16px", borderRadius: "8px", fontWeight: 600 } },
+    "NOV 10 FULL PASTE v6 is live - day counts from Fliplet tickets and door scans, not Salesforce campaigns.");
 
-    h("header", { "data-testid": "header", style: { display: "flex", flexDirection: "column", gap: "var(--space-3)" } },
-      h("h1", { style: { fontSize: "var(--text-3xl)", margin: 0 } }, "In the Loop 2026 - Lead & Pipeline Dashboard"),
-      h("p", { style: { margin: 0, color: "var(--color-text-muted)" } }, "Who was in the room: Fliplet tickets and door scans. Pipeline: Salesforce / BigQuery from 12 Oct 2026."),
-      h("div", { style: { borderLeft: "3px solid var(--color-accent, #4f7fb8)", padding: "var(--space-2) var(--space-4)", fontSize: "var(--text-sm)" } },
-        "Days overlap on purpose. Partner Day " + n(partnerDay.participants) + " and Ecosystem Day " + n(ecoDay.participants) + " both include the " + n(bothDays.participants) + " people who came both days. Unpaid/comp, Eco-only tickets, staff, speakers and guests are in. CAB is an overlay from the CAB sheet (39 people, all redeemed).")),
+  const headerEl = h("header", { "data-testid": "header", style: { display: "flex", flexDirection: "column", gap: "var(--space-3)" } },
+    h("h1", { style: { fontSize: "var(--text-3xl)", margin: 0 } }, "In the Loop 2026 - Lead & Pipeline Dashboard"),
+    h("p", { style: { margin: 0, color: "var(--color-text-muted)" } }, "Who was in the room: Fliplet tickets and door scans. Pipeline: Salesforce / BigQuery from 12 Oct 2026."),
+    h("div", { style: { borderLeft: "3px solid var(--color-accent, #4f7fb8)", padding: "var(--space-2) var(--space-4)", fontSize: "var(--text-sm)" } },
+      "Days overlap on purpose. Partner Day " + n(partnerDay.participants) + " and Ecosystem Day " + n(ecoDay.participants) + " both include the " + n(bothDays.participants) + " people who came both days. Unpaid/comp, Eco-only tickets, staff, speakers and guests are in. CAB is an overlay from the CAB sheet (39 people, all redeemed)."));
 
-    h("div", { "data-testid": "kpis", style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
-      h(KpiCard, { label: "Registered (Fliplet)", value: n(eitherDay.registered), comparison: "Paid + Free tickets, unique email" }),
-      h(KpiCard, { label: "Partner Day", value: n(partnerDay.participants), comparison: "13 Oct door scans, overlapping" }),
-      h(KpiCard, { label: "Ecosystem Day", value: n(ecoDay.participants), comparison: "14 Oct door scans, overlapping" }),
-      h(KpiCard, { label: "Either day", value: n(eitherDay.participants), comparison: n(bothDays.participants) + " came both days" }),
-      h(KpiCard, { label: "Pipeline (USD deal amount)", value: ready ? money(tot.amt) : "-", comparison: ready ? (tot.opps + " opps - " + money(tot.openAmt) + " open") : "" })),
-    h("p", { style: muted }, "Currency: Salesforce Opportunity.Amount as stored (shown in $). Physical headcount is door scans, not campaign members."),
+  const kpiEl = h("div", { "data-testid": "kpis", style: kpiGridStyle },
+    h(KpiCard, { label: "Registered (Fliplet)", value: n(eitherDay.registered), comparison: "Paid + Free tickets, unique email" }),
+    h(KpiCard, { label: "Partner Day", value: n(partnerDay.participants), comparison: "13 Oct door scans, overlapping" }),
+    h(KpiCard, { label: "Ecosystem Day", value: n(ecoDay.participants), comparison: "14 Oct door scans, overlapping" }),
+    h(KpiCard, { label: "Either day", value: n(eitherDay.participants), comparison: n(bothDays.participants) + " came both days" }),
+    h(KpiCard, { label: "Pipeline (USD deal amount)", value: ready ? money(tot.amt) : "-", comparison: ready ? (tot.opps + " opps - " + money(tot.openAmt) + " open") : "" }));
 
-    h(Section, { testid: "days", title: "Who was in which days", note: "Source: Fliplet Scans (Berlin timezone) joined to Purchases (Paid + Free, including unpaid/comp, staff, speakers, VIP). A person can sit in more than one tile. This is the n8n ops grain, not Salesforce exclusive leftovers." },
-      h("div", { "data-testid": "day-cards", style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" } },
-        DAY_ROWS.map((r) => h("div", { key: r.day, style: { border: "1px solid var(--color-border)", borderRadius: "8px", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" } },
-          h("div", { style: { fontWeight: 600 } }, r.day),
-          h("div", { style: muted }, r.date),
-          h("div", { style: { fontSize: "var(--text-2xl)" } }, n(r.participants) + " came"),
-          h("div", { style: muted }, n(r.registered) + " had a ticket for this"),
-          h("div", { style: muted }, r.note)))),
-      h("div", { "data-testid": "cab-overlay", style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" } },
-        CAB_ROWS.map((r) => h("div", { key: r.attendance_group, style: { border: "1px solid #4f7fb8", borderRadius: "8px", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" } },
-          h("div", { style: { fontWeight: 600 } }, r.attendance_group),
-          h("div", { style: { fontSize: "var(--text-2xl)" } }, r.on_cab_list + " people"),
-          h("div", { style: muted }, "Partner Day " + r.partner_day + " / Eco Day " + r.eco_day + " / both " + r.both_days),
-          h("div", { style: muted }, r.redeemed + " redeemed on the CAB sheet")))),
-      h("p", { style: muted }, "n8n ops door scans were Partner 388 / Eco 874 / either 995. Raw Scans tab is Partner 391 / Eco 878 / either 997 (Berlin day). Fliplet app check-in is slightly higher on Partner Day (406) and is not a column in the Purchases dump.")),
+  const dayCards = h("div", { "data-testid": "day-cards", style: cardGridStyle },
+    DAY_ROWS.map(function (r) {
+      return h("div", { key: r.day, style: cardStyle },
+        h("div", { style: { fontWeight: 600 } }, r.day),
+        h("div", { style: muted }, r.date),
+        h("div", { style: { fontSize: "var(--text-2xl)" } }, n(r.participants) + " came"),
+        h("div", { style: muted }, n(r.registered) + " had a ticket for this"),
+        h("div", { style: muted }, r.note));
+    }));
 
-    h(Section, { testid: "staff", title: "Staff", note: "Fliplet Ticket family = Staff. Crew rarely went through the attendee door scan, so scan counts are lower than tickets." },
-      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
-        STAFF_KPIS.map((r) => h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note }))),
-      h("div", { style: { overflowX: "auto" } },
-        h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: "var(--text-sm)" } },
-          h("thead", null,
-            h("tr", null,
-              h("th", { style: th }, "Crew"),
-              h("th", { style: th }, "Registered"),
-              h("th", { style: th }, "Partner Day scans"),
-              h("th", { style: th }, "Eco Day scans"),
-              h("th", { style: th }, "Either day"))),
-          h("tbody", null, STAFF_BUCKETS.map((r) => h("tr", { key: r.bucket },
-            h("td", { style: td }, r.bucket),
-            h("td", { style: td }, n(r.registered)),
-            h("td", { style: td }, n(r.partner_day)),
-            h("td", { style: td }, n(r.eco_day)),
-            h("td", { style: td }, n(r.either)))))))),
-      h("p", { style: muted }, "Purchases has Ticket family Staff (113). Fliplet People Type=Team from the debrief is not a column in that export.")),
+  const cabCards = h("div", { "data-testid": "cab-overlay", style: cardGridStyle },
+    CAB_ROWS.map(function (r) {
+      return h("div", { key: r.attendance_group, style: Object.assign({}, cardStyle, { border: "1px solid #4f7fb8" }) },
+        h("div", { style: { fontWeight: 600 } }, r.attendance_group),
+        h("div", { style: { fontSize: "var(--text-2xl)" } }, r.on_cab_list + " people"),
+        h("div", { style: muted }, "Partner Day " + r.partner_day + " / Eco Day " + r.eco_day + " / both " + r.both_days),
+        h("div", { style: muted }, r.redeemed + " redeemed on the CAB sheet"));
+    }));
 
-    h(Section, { testid: "speakers", title: "Speakers", note: "Programme list from the Speakers tab in the Fliplet raw workbook, not Salesforce titles." },
-      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
-        SPEAKER_KPIS.map((r) => h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note }))),
-      h("div", { style: { height: 260 } }, h(CartesianChart, {
-        instanceId: "itl-speaker-days", title: "Programme speakers scanned by day", data: SPEAKER_DAYS, baseAxisField: "day", valueAxisField: "speakers",
-        dataLabelsVisible: true, valueAxisNumericFormat: ",.0f", valueAxisTitle: "Speakers (Count)", baseAxisTitle: "Day"
+  const daysEl = h(Section, { testid: "days", title: "Who was in which days", note: "Source: Fliplet Scans (Berlin timezone) joined to Purchases (Paid + Free, including unpaid/comp, staff, speakers, VIP). A person can sit in more than one tile. This is the n8n ops grain, not Salesforce exclusive leftovers." },
+    dayCards,
+    cabCards,
+    h("p", { style: muted }, "n8n ops door scans were Partner 388 / Eco 874 / either 995. Raw Scans tab is Partner 391 / Eco 878 / either 997 (Berlin day). Fliplet app check-in is slightly higher on Partner Day (406) and is not a column in the Purchases dump."));
+
+  const staffHead = HeadRow(["Crew", "Registered", "Partner Day scans", "Eco Day scans", "Either day"]);
+  const staffBody = h("tbody", null, STAFF_BUCKETS.map(function (r) {
+    return h("tr", { key: r.bucket },
+      h("td", { style: td }, r.bucket),
+      h("td", { style: td }, n(r.registered)),
+      h("td", { style: td }, n(r.partner_day)),
+      h("td", { style: td }, n(r.eco_day)),
+      h("td", { style: td }, n(r.either)));
+  }));
+  const staffTable = h("div", { style: { overflowX: "auto" } },
+    h("table", { style: tableStyle }, staffHead, staffBody));
+  const staffKpis = h("div", { style: kpiGridStyle }, STAFF_KPIS.map(function (r) {
+    return h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note });
+  }));
+  const staffEl = h(Section, { testid: "staff", title: "Staff", note: "Fliplet Ticket family = Staff. Crew rarely went through the attendee door scan, so scan counts are lower than tickets." },
+    staffKpis,
+    staffTable,
+    h("p", { style: muted }, "Purchases has Ticket family Staff (113). Fliplet People Type=Team from the debrief is not a column in that export."));
+
+  const speakerKpis = h("div", { style: kpiGridStyle }, SPEAKER_KPIS.map(function (r) {
+    return h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note });
+  }));
+  const speakerChart = h("div", { style: { height: 260 } }, h(CartesianChart, {
+    instanceId: "itl-speaker-days", title: "Programme speakers scanned by day", data: SPEAKER_DAYS, baseAxisField: "day", valueAxisField: "speakers",
+    dataLabelsVisible: true, valueAxisNumericFormat: ",.0f", valueAxisTitle: "Speakers (Count)", baseAxisTitle: "Day"
+  }));
+  const speakersEl = h(Section, { testid: "speakers", title: "Speakers", note: "Programme list from the Speakers tab in the Fliplet raw workbook, not Salesforce titles." },
+    speakerKpis,
+    speakerChart,
+    h("p", { style: muted }, "98 of 116 programme speakers have a door scan on 13 or 14 Oct. 76 people hold a Speakers ticket."));
+
+  const funnelEl = h(Section, { testid: "funnel", title: "Commercial funnel (Salesforce ITL Free/Paid)", note: "This funnel is the Salesforce campaign universe for conversion, not physical headcount. Do not compare these Registered/Attended numbers to the day tiles above." },
+    h("div", { style: { height: 300 } },
+      h(CartesianChart, {
+        instanceId: "itl-stage-counts", title: "Registrants by funnel stage", data: funnel.rows || [], baseAxisField: "stage", valueAxisField: "count",
+        orientation: "horizontal", baseAxisCategoricalOrder: stageOrder, dataLabelsVisible: true,
+        valueAxisNumericFormat: ",.0f", valueAxisTickNumericFormat: "~s", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Stage"
       })),
-      h("p", { style: muted }, "98 of 116 programme speakers have a door scan on 13 or 14 Oct. 76 people hold a Speakers ticket.")),
+    h("div", { style: { display: "flex", gap: "var(--space-6)", flexWrap: "wrap", fontSize: "var(--text-sm)" } },
+      (funnel.rows || []).map(function (r) {
+        return h("span", { key: r.stage }, h("strong", null, r.stage), " " + Number(r.count).toLocaleString() + " - " + pct(r.pct_of_registered));
+      })));
 
-    h(Section, { testid: "funnel", title: "Commercial funnel (Salesforce ITL Free/Paid)", note: "This funnel is the Salesforce campaign universe for conversion, not physical headcount. Do not compare these Registered/Attended numbers to the day tiles above." },
-      h("div", { style: { height: 300 } },
-        h(CartesianChart, {
-          instanceId: "itl-stage-counts", title: "Registrants by funnel stage", data: funnel.rows || [], baseAxisField: "stage", valueAxisField: "count",
-          orientation: "horizontal", baseAxisCategoricalOrder: stageOrder, dataLabelsVisible: true,
-          valueAxisNumericFormat: ",.0f", valueAxisTickNumericFormat: "~s", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Stage"
-        })),
-      h("div", { style: { display: "flex", gap: "var(--space-6)", flexWrap: "wrap", fontSize: "var(--text-sm)" } },
-        (funnel.rows || []).map((r) => h("span", { key: r.stage }, h("strong", null, r.stage), " " + Number(r.count).toLocaleString() + " - " + pct(r.pct_of_registered))))),
-
-    h(Section, { testid: "registrants", title: "Who registered (Salesforce commercial)", note: "Unique ITL Free/Paid campaign members by Salesforce segment and region." },
-      h("div", { style: grid2 },
-        h("div", { style: { height: 280 } }, h(CartesianChart, {
-          instanceId: "itl-reg-segment", title: "Registrants by segment", data: segMix, baseAxisField: "label", valueAxisField: "registrant_count",
-          colorField: "label", colorCategoricalMap: SEGMENT_COLORS, baseAxisCategoricalOrder: SEGMENT_ORDER, colorCategoricalOrder: SEGMENT_ORDER,
-          showLegend: false, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Segment"
-        })),
-        h("div", { style: { height: 280 } }, h(CartesianChart, {
-          instanceId: "itl-reg-region", title: "Registrants by region", data: regMix, baseAxisField: "label", valueAxisField: "registrant_count",
-          baseAxisCategoricalOrder: REGION_ORDER, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Region"
-        })))),
-
-    h(Section, { testid: "roles", title: "By role", note: "High-level persona from Salesforce Title on ITL registrants (1,119 unique emails). Directors convert to meetings best." },
-      h("div", { style: { height: 360 } }, h(CartesianChart, {
-        instanceId: "itl-persona-roles", title: "Registrants by role", data: PERSONA_ROWS, baseAxisField: "persona", valueAxisField: "registrants",
-        orientation: "horizontal", baseAxisCategoricalOrder: personaOrder, dataLabelsVisible: true,
-        valueAxisNumericFormat: ",.0f", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Role"
+  const registrantsEl = h(Section, { testid: "registrants", title: "Who registered (Salesforce commercial)", note: "Unique ITL Free/Paid campaign members by Salesforce segment and region." },
+    h("div", { style: grid2 },
+      h("div", { style: { height: 280 } }, h(CartesianChart, {
+        instanceId: "itl-reg-segment", title: "Registrants by segment", data: segMix, baseAxisField: "label", valueAxisField: "registrant_count",
+        colorField: "label", colorCategoricalMap: SEGMENT_COLORS, baseAxisCategoricalOrder: SEGMENT_ORDER, colorCategoricalOrder: SEGMENT_ORDER,
+        showLegend: false, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Segment"
       })),
-      h("div", { style: { display: "flex", gap: "var(--space-5)", flexWrap: "wrap", fontSize: "var(--text-sm)" } },
-        PERSONA_ROWS.map((r) => h("span", { key: r.persona }, h("strong", null, r.persona), " " + r.registrants + " - meet " + pct(r.meeting_rate_pct) + " - opp " + pct(r.opp_rate_pct))))),
+      h("div", { style: { height: 280 } }, h(CartesianChart, {
+        instanceId: "itl-reg-region", title: "Registrants by region", data: regMix, baseAxisField: "label", valueAxisField: "registrant_count",
+        baseAxisCategoricalOrder: REGION_ORDER, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Region"
+      }))));
 
-    h(Section, { testid: "pipeline", title: "Pipeline & revenue", note: "New Business and Expansion opps created on or after 12 Oct 2026 at registrant accounts. Account-level overlap, not sourced vs influenced." },
-      h("div", { style: grid2 },
-        h("div", { style: { height: 300 } }, h(CartesianChart, {
-          instanceId: "itl-pipeline-by-type", title: "Opportunity amount by type and segment", data: pipeRows, baseAxisField: "opp_type", valueAxisField: "total_amount",
-          colorField: "segment_label", colorCategoricalMap: SEGMENT_COLORS, colorCategoricalOrder: SEGMENT_ORDER, markMode: "stacked-bar",
-          dataLabelsVisible: true, totalDataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Opportunity Type", legendPosition: "top"
-        })),
-        h("div", { style: { height: 300 } }, h(CartesianChart, {
-          instanceId: "itl-pipeline-status", title: "Open vs closed won by type and segment", data: statusRows, baseAxisField: "bucket", valueAxisField: "amount",
-          colorField: "status", colorCategoricalMap: STATUS_COLORS, colorCategoricalOrder: ["Open pipeline", "Closed won"], markMode: "stacked-bar", orientation: "horizontal",
-          dataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Type / Segment", legendPosition: "top"
-        }))),
-      h("p", { style: muted }, tot.mtg + " of " + tot.opps + " opportunities sit at an account in the meetings-booked campaign. Had n8n meeting (SFDC): " + (mtg ? n(mtg.count) : "-") + ".")),
+  const rolesEl = h(Section, { testid: "roles", title: "By role", note: "High-level persona from Salesforce Title on ITL registrants (1,119 unique emails). Directors convert to meetings best." },
+    h("div", { style: { height: 360 } }, h(CartesianChart, {
+      instanceId: "itl-persona-roles", title: "Registrants by role", data: PERSONA_ROWS, baseAxisField: "persona", valueAxisField: "registrants",
+      orientation: "horizontal", baseAxisCategoricalOrder: personaOrder, dataLabelsVisible: true,
+      valueAxisNumericFormat: ",.0f", valueAxisTitle: "Registrants (Count)", baseAxisTitle: "Role"
+    })),
+    h("div", { style: { display: "flex", gap: "var(--space-5)", flexWrap: "wrap", fontSize: "var(--text-sm)" } },
+      PERSONA_ROWS.map(function (r) {
+        return h("span", { key: r.persona }, h("strong", null, r.persona), " " + r.registrants + " - meet " + pct(r.meeting_rate_pct) + " - opp " + pct(r.opp_rate_pct));
+      })));
 
-    h(Section, { testid: "attribution", title: "Sourced vs influenced opportunities", note: "Sourced: Primary Campaign Source is an ITL campaign, created from 1 Oct. Influenced: ITL campaign member or CAB person linked on/after 13 Oct, and the opp is not ITL-sourced. Renewals are separate. Snapshot 10 Nov 2026." },
-      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" } },
-        h(KpiCard, { label: "Sourced", value: String(sourced.opp_count), comparison: money(sourced.amount) + " - " + sourced.open_count + " open" }),
-        h(KpiCard, { label: "Influenced", value: String(influenced.opp_count), comparison: money(influenced.amount) + " - " + influenced.won_count + " won", intent: "success" }),
-        h(KpiCard, { label: "Renewals touched", value: String(renewals.opp_count), comparison: money(renewals.amount) + " - not counted as influence" })),
-      h("div", { style: { height: 260 } }, h(CartesianChart, {
-        instanceId: "itl-attr-amount", title: "Deal amount by attribution", data: ATTR_KPIS, baseAxisField: "bucket", valueAxisField: "amount",
-        colorField: "bucket", colorCategoricalMap: ATTR_COLORS, colorCategoricalOrder: ["Sourced", "Influenced", "Renewal touched"],
-        showLegend: false, dataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Attribution"
-      })),
-      h("div", { style: { display: "flex", gap: "var(--space-2)", flexWrap: "wrap" } },
-        ATTR_TABS.map((t) => h("button", {
-          key: t, type: "button", onClick: function () { setAttrTab(t); },
-          style: {
-            padding: "6px 12px", borderRadius: "8px", cursor: "pointer",
-            background: attrTab === t ? "#4f7fb8" : "transparent",
-            border: attrTab === t ? "1px solid #4f7fb8" : "1px solid var(--color-border)",
-            color: attrTab === t ? "#fff" : "inherit", fontSize: "var(--text-sm)"
-          }
-        }, t))),
-      h("p", { style: muted }, attrTab + ": " + attrTabRows.length + " opportunities - " + money(attrTabSum)),
-      h(OppTable, { rows: attrTabRows })),
-
-    h(Section, { testid: "groups", title: "Salesforce conversion groups (not headcount)", note: "Kept only so pipeline can still be split on ITL Free/Paid exclusive leftovers. Do not use these as Partner / Eco / CAB participation. Sum to the Salesforce commercial universe, not Fliplet." },
-      h("div", { "data-testid": "group-cards", style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" } },
-        grpRows.map((r) => h("div", { key: r.attendance_group, style: { border: "1px solid var(--color-border)", borderRadius: "8px", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" } },
-          h("div", { style: { fontWeight: 600 } }, r.attendance_group),
-          h("div", { style: { fontSize: "var(--text-2xl)" } }, Number(r.registrants).toLocaleString() + " registrants"),
-          h("div", { style: muted }, "Meeting rate " + pct(r.meeting_rate_pct) + " (" + r.meetings_booked + ")"),
-          h("div", { style: muted }, "Opp rate " + pct(r.opp_rate_pct) + " (" + r.with_opp + ") - " + r.closed_won + " closed won")))),
+  const pipelineEl = h(Section, { testid: "pipeline", title: "Pipeline & revenue", note: "New Business and Expansion opps created on or after 12 Oct 2026 at registrant accounts. Account-level overlap, not sourced vs influenced." },
+    h("div", { style: grid2 },
       h("div", { style: { height: 300 } }, h(CartesianChart, {
-        instanceId: "itl-group-pipeline", title: "Pipeline by Salesforce attendance group", data: grpPipeRows, baseAxisField: "attendance_group", valueAxisField: "amount",
-        colorField: "status", colorCategoricalMap: STATUS_COLORS, colorCategoricalOrder: ["Open pipeline", "Closed won"], baseAxisCategoricalOrder: GROUP_ORDER, markMode: "stacked-bar",
-        dataLabelsVisible: true, totalDataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Attendance Group", legendPosition: "top"
+        instanceId: "itl-pipeline-by-type", title: "Opportunity amount by type and segment", data: pipeRows, baseAxisField: "opp_type", valueAxisField: "total_amount",
+        colorField: "segment_label", colorCategoricalMap: SEGMENT_COLORS, colorCategoricalOrder: SEGMENT_ORDER, markMode: "stacked-bar",
+        dataLabelsVisible: true, totalDataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Opportunity Type", legendPosition: "top"
       })),
-      h("p", { style: muted }, "Do not sum groups. Partner Day only has no opportunities.")),
+      h("div", { style: { height: 300 } }, h(CartesianChart, {
+        instanceId: "itl-pipeline-status", title: "Open vs closed won by type and segment", data: statusRows, baseAxisField: "bucket", valueAxisField: "amount",
+        colorField: "status", colorCategoricalMap: STATUS_COLORS, colorCategoricalOrder: ["Open pipeline", "Closed won"], markMode: "stacked-bar", orientation: "horizontal",
+        dataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Type / Segment", legendPosition: "top"
+      }))),
+    h("p", { style: muted }, tot.mtg + " of " + tot.opps + " opportunities sit at an account in the meetings-booked campaign. Had n8n meeting (SFDC): " + (mtg ? n(mtg.count) : "-") + "."));
 
-    h(Section, { testid: "ga4", title: "Digital signals (GA4, n8n.io)", note: "Weeks through 8 Nov. No native sign_up event (trial starts are a proxy). No YouTube Analytics; YouTube -> n8n.io is referrer traffic." + (pagesReady ? "" : "") },
-      gaDelta && h("p", { style: { margin: 0, fontSize: "var(--text-sm)" } }, "Berlin events changed " + gaDelta.berlin + "% in conference week vs baseline, while global CTA clicks moved " + gaDelta.cta + "%."),
-      h("div", { style: grid2 },
-        h("div", { style: { height: 260 } }, h(CartesianChart, {
-          instanceId: "itl-ga-berlin", title: "Berlin events by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "berlin_events",
-          baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Berlin Events (Count)", baseAxisTitle: "Week"
-        })),
-        h("div", { style: { height: 260 } }, h(CartesianChart, {
-          instanceId: "itl-ga-cta", title: "Global CTA clicks by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "cta_clicks",
-          baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "CTA Clicks (Count)", baseAxisTitle: "Week"
-        })),
-        h("div", { style: { height: 260 } }, h(CartesianChart, {
-          instanceId: "itl-ga-trials", title: "Trial-start proxy by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "trial_starts",
-          baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Trial Starts (Count)", baseAxisTitle: "Week"
-        })),
-        h("div", { style: { height: 260 } }, h(CartesianChart, {
-          instanceId: "itl-ga-youtube", title: "YouTube to n8n.io events by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "youtube_referrer_events",
-          baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "YouTube Referrer Events (Count)", baseAxisTitle: "Week"
-        })),
-        h("div", { style: { height: 260 } }, h(CartesianChart, {
-          instanceId: "itl-ga-pages", title: "ITL page views by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "itl_page_views",
-          baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Page Views (Count)", baseAxisTitle: "Week"
-        }))),
-      h("p", { style: muted }, "ITL page views peak before the event and fall afterwards."))
-  );
+  const attrButtons = h("div", { style: { display: "flex", gap: "var(--space-2)", flexWrap: "wrap" } },
+    ATTR_TABS.map(function (t) {
+      const on = attrTab === t;
+      return h("button", {
+        key: t, type: "button", onClick: function () { setAttrTab(t); },
+        style: {
+          padding: "6px 12px", borderRadius: "8px", cursor: "pointer",
+          background: on ? "#4f7fb8" : "transparent",
+          border: on ? "1px solid #4f7fb8" : "1px solid var(--color-border)",
+          color: on ? "#fff" : "inherit", fontSize: "var(--text-sm)"
+        }
+      }, t);
+    }));
+  const attributionEl = h(Section, { testid: "attribution", title: "Sourced vs influenced opportunities", note: "Sourced: Primary Campaign Source is an ITL campaign, created from 1 Oct. Influenced: ITL campaign member or CAB person linked on/after 13 Oct, and the opp is not ITL-sourced. Renewals are separate. Snapshot 10 Nov 2026." },
+    h("div", { style: kpiGridStyle },
+      h(KpiCard, { label: "Sourced", value: String(sourced.opp_count), comparison: money(sourced.amount) + " - " + sourced.open_count + " open" }),
+      h(KpiCard, { label: "Influenced", value: String(influenced.opp_count), comparison: money(influenced.amount) + " - " + influenced.won_count + " won", intent: "success" }),
+      h(KpiCard, { label: "Renewals touched", value: String(renewals.opp_count), comparison: money(renewals.amount) + " - not counted as influence" })),
+    h("div", { style: { height: 260 } }, h(CartesianChart, {
+      instanceId: "itl-attr-amount", title: "Deal amount by attribution", data: ATTR_KPIS, baseAxisField: "bucket", valueAxisField: "amount",
+      colorField: "bucket", colorCategoricalMap: ATTR_COLORS, colorCategoricalOrder: ["Sourced", "Influenced", "Renewal touched"],
+      showLegend: false, dataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Attribution"
+    })),
+    attrButtons,
+    h("p", { style: muted }, attrTab + ": " + attrTabRows.length + " opportunities - " + money(attrTabSum)),
+    h(OppTable, { rows: attrTabRows }));
+
+  const groupCards = h("div", { "data-testid": "group-cards", style: cardGridStyle },
+    grpRows.map(function (r) {
+      return h("div", { key: r.attendance_group, style: cardStyle },
+        h("div", { style: { fontWeight: 600 } }, r.attendance_group),
+        h("div", { style: { fontSize: "var(--text-2xl)" } }, Number(r.registrants).toLocaleString() + " registrants"),
+        h("div", { style: muted }, "Meeting rate " + pct(r.meeting_rate_pct) + " (" + r.meetings_booked + ")"),
+        h("div", { style: muted }, "Opp rate " + pct(r.opp_rate_pct) + " (" + r.with_opp + ") - " + r.closed_won + " closed won"));
+    }));
+  const groupsEl = h(Section, { testid: "groups", title: "Salesforce conversion groups (not headcount)", note: "Kept only so pipeline can still be split on ITL Free/Paid exclusive leftovers. Do not use these as Partner / Eco / CAB participation. Sum to the Salesforce commercial universe, not Fliplet." },
+    groupCards,
+    h("div", { style: { height: 300 } }, h(CartesianChart, {
+      instanceId: "itl-group-pipeline", title: "Pipeline by Salesforce attendance group", data: grpPipeRows, baseAxisField: "attendance_group", valueAxisField: "amount",
+      colorField: "status", colorCategoricalMap: STATUS_COLORS, colorCategoricalOrder: ["Open pipeline", "Closed won"], baseAxisCategoricalOrder: GROUP_ORDER, markMode: "stacked-bar",
+      dataLabelsVisible: true, totalDataLabelsVisible: true, valueAxisNumericFormat: "$.3~s", valueAxisTitle: "Opportunity Amount ($)", baseAxisTitle: "Attendance Group", legendPosition: "top"
+    })),
+    h("p", { style: muted }, "Do not sum groups. Partner Day only has no opportunities."));
+
+  const gaEl = h(Section, { testid: "ga4", title: "Digital signals (GA4, n8n.io)", note: "Weeks through 8 Nov. No native sign_up event (trial starts are a proxy). No YouTube Analytics; YouTube -> n8n.io is referrer traffic." + (pagesReady ? "" : "") },
+    gaDelta ? h("p", { style: { margin: 0, fontSize: "var(--text-sm)" } }, "Berlin events changed " + gaDelta.berlin + "% in conference week vs baseline, while global CTA clicks moved " + gaDelta.cta + "%.") : null,
+    h("div", { style: grid2 },
+      h("div", { style: { height: 260 } }, h(CartesianChart, {
+        instanceId: "itl-ga-berlin", title: "Berlin events by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "berlin_events",
+        baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Berlin Events (Count)", baseAxisTitle: "Week"
+      })),
+      h("div", { style: { height: 260 } }, h(CartesianChart, {
+        instanceId: "itl-ga-cta", title: "Global CTA clicks by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "cta_clicks",
+        baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "CTA Clicks (Count)", baseAxisTitle: "Week"
+      })),
+      h("div", { style: { height: 260 } }, h(CartesianChart, {
+        instanceId: "itl-ga-trials", title: "Trial-start proxy by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "trial_starts",
+        baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Trial Starts (Count)", baseAxisTitle: "Week"
+      })),
+      h("div", { style: { height: 260 } }, h(CartesianChart, {
+        instanceId: "itl-ga-youtube", title: "YouTube to n8n.io events by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "youtube_referrer_events",
+        baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "YouTube Referrer Events (Count)", baseAxisTitle: "Week"
+      })),
+      h("div", { style: { height: 260 } }, h(CartesianChart, {
+        instanceId: "itl-ga-pages", title: "ITL page views by week", data: TREND_ROWS, baseAxisField: "week_label", valueAxisField: "itl_page_views",
+        baseAxisCategoricalOrder: TREND_WEEKS, dataLabelsVisible: true, valueAxisNumericFormat: "~s", valueAxisTitle: "Page Views (Count)", baseAxisTitle: "Week"
+      }))),
+    h("p", { style: muted }, "ITL page views peak before the event and fall afterwards."));
+
+  return h("div", { className: "app-container", style: { display: "flex", flexDirection: "column", gap: "var(--space-8)" } },
+    bannerEl,
+    headerEl,
+    kpiEl,
+    h("p", { style: muted }, "Currency: Salesforce Opportunity.Amount as stored (shown in $). Physical headcount is door scans, not campaign members."),
+    daysEl,
+    staffEl,
+    speakersEl,
+    funnelEl,
+    registrantsEl,
+    rolesEl,
+    pipelineEl,
+    attributionEl,
+    groupsEl,
+    gaEl);
 }
 
 render(h(App));

@@ -6,9 +6,13 @@ Paste `App.js` into the Hex project **In the Loop 2026 — Lead & Pipeline Dashb
 
 1. Open the Hex project → App → `app/App.js`.
 2. Select all and replace with this folder’s `App.js`.
-3. The orange banner must read **NOV 10 FULL PASTE v5**.
+3. The orange banner must read **NOV 10 FULL PASTE v6**.
 4. Do not add `import { React }` (Hex injects React).
 5. Do not add extra `useHexData` ids. Only the original seven remain.
+
+## What changed in v6
+
+Hex Preview crashed with `Uncaught SyntaxError: Unexpected token ')'` because an extra `)` closed the staff table. v6 rebuilds each section as its own variable so that cannot happen again.
 
 ## What changed in v4
 

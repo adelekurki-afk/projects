@@ -8,7 +8,6 @@ var h = React.createElement;
 const STAGES = ["Registered", "Attended", "Had n8n Meeting", "Account with Opp", "Closed Won"];
 const GROUP_ORDER = ["Both Days", "Partner Day only", "Ecosystem Day only", "Gap (Did Not Attend)"];
 const ATTR_TABS = ["Sourced", "Influenced", "Renewals"];
-const CREW_TABS = ["Staff", "Speakers"];
 const STATUS_COLORS = { "Open pipeline": "#4f7fb8", "Closed won": "#2e8b57" };
 const ATTR_COLORS = { Sourced: "#4f7fb8", Influenced: "#2e8b57", "Renewal touched": "#888888" };
 const REGION_ORDER = ["EMEA", "NA", "APAC", "LATAM", "ANZ", "Unknown"];
@@ -17,8 +16,8 @@ const grid2 = { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(3
 const th = { textAlign: "left", padding: "8px 10px", borderBottom: "1px solid var(--color-border)", whiteSpace: "nowrap" };
 const td = { padding: "8px 10px", borderBottom: "1px solid var(--color-border)", verticalAlign: "top" };
 
-/* Physical attendance: Fliplet raw workbook (Fliplet Purchases + Scans) + CAB In The Loop sheet.
-   Snapshot 10 Nov 2026. Overlapping on purpose — a person on both days counts in Partner AND Eco. */
+/* Physical attendance: Fliplet Purchases + Scans + CAB sheet. Snapshot 10 Nov 2026.
+   Overlapping on purpose: a person on both days counts in Partner AND Eco. */
 const DAY_ROWS = [
   { day: "Partner Day", date: "13 Oct", participants: 391, registered: 487, note: "Door scans. Also counted if they came on Eco Day." },
   { day: "Ecosystem Day", date: "14 Oct", participants: 878, registered: 1205, note: "Door scans. Also counted if they came on Partner Day." },
@@ -159,7 +158,6 @@ function App() {
   const ga = useHexData("01a1bfe5-4cac-766f-86d7-2325e635fe2d");
   const pages = useHexData("01a1bfe5-702b-7448-a138-15aa30fc8c96");
   const [attrTab, setAttrTab] = useState("Sourced");
-  const [crewTab, setCrewTab] = useState("Staff");
 
   const stage = useMemo(() => {
     const m = {};
@@ -228,7 +226,7 @@ function App() {
 
   return h("div", { className: "app-container", style: { display: "flex", flexDirection: "column", gap: "var(--space-8)" } },
     h("div", { "data-testid": "nov10-banner", style: { background: "#ff6d5a", color: "#fff", padding: "12px 16px", borderRadius: "8px", fontWeight: 600 } },
-      "NOV 10 FULL PASTE v4 is live — day counts from Fliplet raw workbook (Fliplet tickets + door scans), not Salesforce campaigns."),
+      "NOV 10 FULL PASTE v5 is live - day counts from Fliplet tickets and door scans, not Salesforce campaigns."),
 
     h("header", { "data-testid": "header", style: { display: "flex", flexDirection: "column", gap: "var(--space-3)" } },
       h("h1", { style: { fontSize: "var(--text-3xl)", margin: 0 } }, "In the Loop 2026 - Lead & Pipeline Dashboard"),
@@ -244,7 +242,7 @@ function App() {
       h(KpiCard, { label: "Pipeline (USD deal amount)", value: ready ? money(tot.amt) : "-", comparison: ready ? (tot.opps + " opps - " + money(tot.openAmt) + " open") : "" })),
     h("p", { style: muted }, "Currency: Salesforce Opportunity.Amount as stored (shown in $). Physical headcount is door scans, not campaign members."),
 
-    h(Section, { testid: "days", title: "Who was in which days", note: "Source: Fliplet raw workbook → Scans (Berlin timezone) joined to Purchases (Paid + Free, including unpaid/comp, staff, speakers, VIP). A person can sit in more than one tile. This is the n8n ops grain, not Salesforce exclusive leftovers." },
+    h(Section, { testid: "days", title: "Who was in which days", note: "Source: Fliplet Scans (Berlin timezone) joined to Purchases (Paid + Free, including unpaid/comp, staff, speakers, VIP). A person can sit in more than one tile. This is the n8n ops grain, not Salesforce exclusive leftovers." },
       h("div", { "data-testid": "day-cards", style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-4)" } },
         DAY_ROWS.map((r) => h("div", { key: r.day, style: { border: "1px solid var(--color-border)", borderRadius: "8px", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" } },
           h("div", { style: { fontWeight: 600 } }, r.day),
@@ -256,43 +254,38 @@ function App() {
         CAB_ROWS.map((r) => h("div", { key: r.attendance_group, style: { border: "1px solid #4f7fb8", borderRadius: "8px", padding: "var(--space-4)", display: "flex", flexDirection: "column", gap: "var(--space-2)" } },
           h("div", { style: { fontWeight: 600 } }, r.attendance_group),
           h("div", { style: { fontSize: "var(--text-2xl)" } }, r.on_cab_list + " people"),
-          h("div", { style: muted }, "Partner Day " + r.partner_day + " · Eco Day " + r.eco_day + " · both " + r.both_days),
+          h("div", { style: muted }, "Partner Day " + r.partner_day + " / Eco Day " + r.eco_day + " / both " + r.both_days),
           h("div", { style: muted }, r.redeemed + " redeemed on the CAB sheet")))),
       h("p", { style: muted }, "n8n ops door scans were Partner 388 / Eco 874 / either 995. Raw Scans tab is Partner 391 / Eco 878 / either 997 (Berlin day). Fliplet app check-in is slightly higher on Partner Day (406) and is not a column in the Purchases dump.")),
 
-    h(Section, { testid: "crew", title: "Staff and speakers", note: "Separate from attendee headcount. Staff = Fliplet Ticket family Staff. Speakers = Speakers tab in Fliplet raw workbook (programme), not Salesforce titles." },
-      h("div", { style: { display: "flex", gap: "var(--space-2)", flexWrap: "wrap" } },
-        CREW_TABS.map((t) => h("button", {
-          key: t, type: "button", onClick: function () { setCrewTab(t); },
-          style: {
-            padding: "6px 12px", borderRadius: "8px", cursor: "pointer",
-            border: crewTab === t ? "1px solid #4f7fb8" : "1px solid var(--color-border)",
-            background: crewTab === t ? "#4f7fb8" : "transparent",
-            color: crewTab === t ? "#fff" : "inherit", fontSize: "var(--text-sm)"
-          }
-        }, t))),
-      crewTab === "Staff"
-        ? h("div", { "data-testid": "staff-tab", style: { display: "flex", flexDirection: "column", gap: "var(--space-4)" } },
-          h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
-            STAFF_KPIS.map((r) => h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note }))),
-          h("div", { style: { overflowX: "auto" } },
-            h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: "var(--text-sm)" } },
-              h("thead", null, h("tr", null, ["Crew", "Registered", "Partner Day scans", "Eco Day scans", "Either day"].map((c) => h("th", { key: c, style: th }, c)))),
-              h("tbody", null, STAFF_BUCKETS.map((r) => h("tr", { key: r.bucket },
-                h("td", { style: td }, r.bucket),
-                h("td", { style: td }, n(r.registered)),
-                h("td", { style: td }, n(r.partner_day)),
-                h("td", { style: td }, n(r.eco_day)),
-                h("td", { style: td }, n(r.either))))))),
-          h("p", { style: muted }, "Team Debrief had 200 Fliplet Team-type + 104 extra n8n on other types. Purchases only has Ticket family Staff (113). The extra Team-type people are not a column in this export, so they are not invented here."))
-        : h("div", { "data-testid": "speakers-tab", style: { display: "flex", flexDirection: "column", gap: "var(--space-4)" } },
-          h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
-            SPEAKER_KPIS.map((r) => h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note }))),
-          h("div", { style: { height: 260 } }, h(CartesianChart, {
-            instanceId: "itl-speaker-days", title: "Programme speakers scanned by day", data: SPEAKER_DAYS, baseAxisField: "day", valueAxisField: "speakers",
-            dataLabelsVisible: true, valueAxisNumericFormat: ",.0f", valueAxisTitle: "Speakers (Count)", baseAxisTitle: "Day"
-          })),
-          h("p", { style: muted }, "98 of 116 programme speakers have a door scan on 13 or 14 Oct. 76 people hold a Speakers ticket (68 of those scanned). Salesforce has no speaker campaign."))),
+    h(Section, { testid: "staff", title: "Staff", note: "Fliplet Ticket family = Staff. Crew rarely went through the attendee door scan, so scan counts are lower than tickets." },
+      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
+        STAFF_KPIS.map((r) => h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note }))),
+      h("div", { style: { overflowX: "auto" } },
+        h("table", { style: { width: "100%", borderCollapse: "collapse", fontSize: "var(--text-sm)" } },
+          h("thead", null,
+            h("tr", null,
+              h("th", { style: th }, "Crew"),
+              h("th", { style: th }, "Registered"),
+              h("th", { style: th }, "Partner Day scans"),
+              h("th", { style: th }, "Eco Day scans"),
+              h("th", { style: th }, "Either day"))),
+          h("tbody", null, STAFF_BUCKETS.map((r) => h("tr", { key: r.bucket },
+            h("td", { style: td }, r.bucket),
+            h("td", { style: td }, n(r.registered)),
+            h("td", { style: td }, n(r.partner_day)),
+            h("td", { style: td }, n(r.eco_day)),
+            h("td", { style: td }, n(r.either)))))))),
+      h("p", { style: muted }, "Purchases has Ticket family Staff (113). Fliplet People Type=Team from the debrief is not a column in that export.")),
+
+    h(Section, { testid: "speakers", title: "Speakers", note: "Programme list from the Speakers tab in the Fliplet raw workbook, not Salesforce titles." },
+      h("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: "var(--space-4)" } },
+        SPEAKER_KPIS.map((r) => h(KpiCard, { key: r.label, label: r.label, value: String(r.value), comparison: r.note }))),
+      h("div", { style: { height: 260 } }, h(CartesianChart, {
+        instanceId: "itl-speaker-days", title: "Programme speakers scanned by day", data: SPEAKER_DAYS, baseAxisField: "day", valueAxisField: "speakers",
+        dataLabelsVisible: true, valueAxisNumericFormat: ",.0f", valueAxisTitle: "Speakers (Count)", baseAxisTitle: "Day"
+      })),
+      h("p", { style: muted }, "98 of 116 programme speakers have a door scan on 13 or 14 Oct. 76 people hold a Speakers ticket.")),
 
     h(Section, { testid: "funnel", title: "Commercial funnel (Salesforce ITL Free/Paid)", note: "This funnel is the Salesforce campaign universe for conversion, not physical headcount. Do not compare these Registered/Attended numbers to the day tiles above." },
       h("div", { style: { height: 300 } },

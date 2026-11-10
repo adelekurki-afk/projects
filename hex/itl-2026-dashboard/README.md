@@ -1,37 +1,37 @@
-# In the Loop 2026 — Hex dashboard
+# In the Loop 2026 — Classic App
 
-Classic App is empty after switching from Generative because **Run all does not pin cells**. Hex only auto-lays-out Classic the first time you open App builder. This project opened as Generative, so Classic is a blank canvas. The notebook still has the charts.
-
-## Fill the empty App
+Continue editing Adele’s original Hex project in **Classic App** format: pinned markdown, HTML scoreboard, and Plotly tiles. Do not paste App.js. Do not switch back to Generative.
 
 Open:
 
-https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx
+https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app
 
-### One click
+## What the App should show
+
+1. Title + **Conference visits** copy
+2. **APP: Executive scoreboard** (HTML tiles: 1,269 / 391 / 878 / 39)
+3. **Day visit KPIs** and **Partner vs Eco bars**
+4. Staff, CAB overlay, speakers (overlays on the same door scans)
+5. Salesforce funnel / pipeline / GA4 in their own sections (commercial, not physical headcount)
+
+Physical visits stay Fliplet: Partner Day **391** (13 Oct) · Ecosystem Day **878** (14 Oct). 272 people visited both days, so they appear in both tiles. CAB **39** is an overlay, not extra headcount.
+
+## If a new cell is missing from the App canvas
+
+Hex cannot pin cells from the API. After a new scoreboard is added at the top of the notebook:
 
 1. Stay on **App builder** (Classic).
-2. Left sidebar: **Outline**.
-3. **Reset layout** → **Use default layout**.
-4. Remove `probe_` SQL tables from the App if they appear (does not delete the notebook).
+2. **Add to app** (hexagon) on **APP: Executive scoreboard**, or **Outline → Reset layout → Use default layout**.
+3. Remove `probe_` SQL tables from the App canvas if they appear (does not delete the notebook).
+4. **Publish** when you want the `/app/.../latest` link. Workspace share is still **NONE** until you share it.
 
-### Or pin only visits
+## Numbers
 
-In **Notebook**, click **Add to app** (hexagon on the cell) on:
-
-- APP: Executive scoreboard
-- Day visit KPIs
-- Partner vs Eco bars
-- Staff KPIs
-- CAB overlay
-- Speaker KPIs
-
-Then click **App**.
-
-### Or prompt the Notebook agent in App builder
-
-`Pin these cells to the Classic app, output only, in this order: APP: Executive scoreboard, Day visit KPIs, Partner vs Eco bars, Staff KPIs, CAB overlay, Speaker KPIs, Speakers by day. Do not add probe SQL tables.`
-
-Then **Publish**.
-
-Partner Day **391** · Ecosystem Day **878**. The 272 people who came both days are inside both numbers.
+| Tile | Value | Source |
+| --- | --- | --- |
+| Registered | 1,269 | Fliplet Paid + Free, unique email |
+| Partner Day visits | 391 | 13 Oct door scans |
+| Ecosystem Day visits | 878 | 14 Oct door scans |
+| CAB overlay | 39 | All redeemed |
+| Staff tickets | 113 | Fliplet Ticket family = Staff |
+| Programme speakers | 116 | Speakers tab |

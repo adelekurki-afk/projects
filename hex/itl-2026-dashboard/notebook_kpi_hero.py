@@ -6,7 +6,7 @@ eco = 878
 
 fig = go.Figure()
 kpis = [
-    {"value": registered, "title": "Registered (Fliplet)", "sub": "Paid + Free tickets, unique email", "x": [0, 0.32]},
+    {"value": registered, "title": "Registered", "sub": "Paid + Free, unique email", "x": [0, 0.32]},
     {"value": partner, "title": "Partner Day visits", "sub": "13 Oct door scans", "x": [0.34, 0.66]},
     {"value": eco, "title": "Ecosystem Day visits", "sub": "14 Oct door scans", "x": [0.68, 1.0]},
 ]

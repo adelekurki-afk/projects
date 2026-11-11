@@ -26,23 +26,23 @@ html = """
 <div class="itl-dash">
   <div class="itl-kicker">In the Loop 2026</div>
   <h1 class="itl-title">Conference visits</h1>
-  <p class="itl-sub">Fliplet door scans · people who came both days are counted on both days</p>
+  <p class="itl-sub">Everyone who participated · door scans + badge pickup + green YES on the attendance sheet · staff, speakers, and CAB sit inside · people who came both days are counted on both days</p>
   <div class="itl-strip">
-    <div class="itl-tile"><div class="itl-val">1,269</div><div class="itl-label">Registered</div><div class="itl-hint">Paid + Free, unique email</div></div>
-    <div class="itl-tile"><div class="itl-val accent">391</div><div class="itl-label">Partner Day visits</div><div class="itl-hint">13 Oct door scans</div></div>
-    <div class="itl-tile"><div class="itl-val accent">878</div><div class="itl-label">Ecosystem Day visits</div><div class="itl-hint">14 Oct door scans</div></div>
-    <div class="itl-tile"><div class="itl-val">39</div><div class="itl-label">CAB overlay</div><div class="itl-hint">All 39 redeemed</div></div>
+    <div class="itl-tile"><div class="itl-val">1,269</div><div class="itl-label">Registered</div><div class="itl-hint">All participants · Paid + Free unique email</div></div>
+    <div class="itl-tile"><div class="itl-val accent">426</div><div class="itl-label">Partner Day visits</div><div class="itl-hint">391 door + 35 badge pickup</div></div>
+    <div class="itl-tile"><div class="itl-val accent">916</div><div class="itl-label">Ecosystem Day visits</div><div class="itl-hint">878 door + 38 green YES</div></div>
+    <div class="itl-tile"><div class="itl-val">39</div><div class="itl-label">CAB overlay</div><div class="itl-hint">Already inside the day tiles when scanned or YES</div></div>
   </div>
   <div class="itl-days">
-    <div class="itl-day"><h3>Partner Day · 13 Oct</h3><div class="big">391</div><div class="meta">487 had a ticket for this day</div></div>
-    <div class="itl-day"><h3>Ecosystem Day · 14 Oct</h3><div class="big">878</div><div class="meta">1,205 had a ticket for this day</div></div>
+    <div class="itl-day"><h3>Partner Day · 13 Oct</h3><div class="big">426</div><div class="meta">391 unique door scans on 13 Oct, plus 35 people who collected a badge on 12 Oct and did not scan on Partner Day. 18 staff door scans sit inside. 487 had a ticket.</div></div>
+    <div class="itl-day"><h3>Ecosystem Day · 14 Oct</h3><div class="big">916</div><div class="meta">878 unique door scans on 14 Oct, plus 38 people marked YES on the green Incorrect no-show? column (40 YES, 2 already in the door count). 19 staff door scans sit inside. 1,205 had a ticket.</div></div>
   </div>
   <div class="itl-row">
-    <div class="itl-tile"><div class="itl-val">113</div><div class="itl-label">Staff tickets</div><div class="itl-hint">Fliplet Ticket family = Staff</div></div>
-    <div class="itl-tile"><div class="itl-val">116</div><div class="itl-label">Programme speakers</div><div class="itl-hint">62 Partner Day · 79 Eco Day</div></div>
-    <div class="itl-tile"><div class="itl-val">39</div><div class="itl-label">CAB</div><div class="itl-hint">11 members · 28 guests</div></div>
+    <div class="itl-tile"><div class="itl-val">113</div><div class="itl-label">Staff tickets</div><div class="itl-hint">Overlay · 18 / 19 door scans inside 426 / 916</div></div>
+    <div class="itl-tile"><div class="itl-val">116</div><div class="itl-label">Programme speakers</div><div class="itl-hint">Overlay · 86 Partner / 79 Eco on Speakers tab</div></div>
+    <div class="itl-tile"><div class="itl-val">39</div><div class="itl-label">CAB</div><div class="itl-hint">Overlay · 11 members · 28 guests</div></div>
   </div>
-  <div class="itl-note">272 people visited both days, so they appear in Partner Day and Ecosystem Day. There is no either-day unique.</div>
+  <div class="itl-note">426 and 916 are everyone who participated, not attendees-minus-staff and not door scans alone. Monday staff-only badge pickup (35 people) is not added to Partner Day. 324 people are in both day tiles.</div>
 </div>
 """
 display(HTML(html))

@@ -89,7 +89,7 @@ def test_app_js_parses():
 def test_scoreboard_has_day_counts():
     src = (ROOT / "notebook_scoreboard.py").read_text()
     ast.parse(src)
-    for needle in ("1,269", "391", "878", "39", "113", "116", "272"):
+    for needle in ("1,269", "426", "916", "39", "113", "116", "324", "green YES", "badge pickup"):
         assert needle in src, needle
 
 

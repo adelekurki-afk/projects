@@ -3,9 +3,9 @@ import plotly.graph_objects as go
 
 kpi = go.Figure()
 specs = [
-    (1269, "Registered", "Fliplet Paid + Free, unique email"),
-    (391, "Partner Day visits", "13 Oct door scans"),
-    (878, "Ecosystem Day visits", "14 Oct door scans"),
+    (1269, "Registered", "All participants, incl. staff"),
+    (426, "Partner Day visits", "391 door + 35 badge pickup"),
+    (916, "Ecosystem Day visits", "878 door + 38 green YES"),
 ]
 for i, (val, title, sub) in enumerate(specs):
     x0, x1 = i / 3 + 0.02, (i + 1) / 3 - 0.02
@@ -17,7 +17,7 @@ for i, (val, title, sub) in enumerate(specs):
         domain={"x": [x0, x1], "y": [0, 1]},
     ))
 kpi.update_layout(
-    title=dict(text="Per-day visits", font=dict(size=18)),
+    title=dict(text="Per-day visits · door + badge + YES", font=dict(size=18)),
     height=200,
     paper_bgcolor="white",
     margin=dict(t=50, b=10, l=10, r=10),

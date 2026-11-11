@@ -9,12 +9,14 @@ https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyR
 ## What the App should show
 
 1. Title + **Conference visits** copy
-2. **APP: Executive scoreboard** (HTML tiles: 1,269 / 391 / 878 / 39)
+2. **APP: Executive scoreboard** (HTML tiles: 1,269 / 426 / 916 / 39)
 3. **Day visit KPIs** and **Partner vs Eco bars**
-4. Staff, CAB overlay, speakers (overlays on the same door scans)
+4. Staff, CAB overlay, speakers (overlays on the same visit tiles)
 5. Salesforce funnel / pipeline / GA4 in their own sections (commercial, not physical headcount)
 
-Physical visits stay Fliplet: Partner Day **391** (13 Oct) · Ecosystem Day **878** (14 Oct). 272 people visited both days, so they appear in both tiles. CAB **39** is an overlay, not extra headcount.
+Physical visits are people who **participated**: Fliplet door scans **union** Monday badge pickup **union** green YES on the CAB attendance sheet (`Incorrect no-show?` = YES). Partner Day **426** (391 door on 13 Oct + 35 non-staff badge desk on 12 Oct). Ecosystem Day **916** (878 door on 14 Oct + 38 of 40 green YES not already in the Eco door count). Staff 18 / 19 door scans sit inside. 324 people are in both day tiles. CAB **39** is an overlay, not extra headcount. Monday staff-only badge pickup (35) is not added.
+
+Digital section is weekly n8n.io traffic **1 Jun–9 Nov**, plus YouTube/LinkedIn arrivals on n8n.io. There is no YouTube Analytics or LinkedIn Campaign Manager in the warehouse.
 
 ## If a new cell is missing from the App canvas
 
@@ -29,9 +31,9 @@ Hex cannot pin cells from the API. After a new scoreboard is added at the top of
 
 | Tile | Value | Source |
 | --- | --- | --- |
-| Registered | 1,269 | Fliplet Paid + Free, unique email |
-| Partner Day visits | 391 | 13 Oct door scans |
-| Ecosystem Day visits | 878 | 14 Oct door scans |
+| Registered | 1,269 | All participants · Paid + Free unique email |
+| Partner Day visits | 426 | 391 door scans on 13 Oct + 35 badge pickup on 12 Oct |
+| Ecosystem Day visits | 916 | 878 door scans on 14 Oct + 38 green YES |
 | CAB overlay | 39 | All redeemed |
 | Staff tickets | 113 | Fliplet Ticket family = Staff |
 | Programme speakers | 116 | Speakers tab |

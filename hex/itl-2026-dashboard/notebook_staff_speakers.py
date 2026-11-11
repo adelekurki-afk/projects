@@ -72,7 +72,7 @@ spk_fig.update_layout(
 display(spk_fig)
 
 speakers = pd.DataFrame([
-    {"day": "Partner Day", "speakers": 62},
+    {"day": "Partner Day", "speakers": 86},
     {"day": "Ecosystem Day", "speakers": 79},
 ])
 spk_bar = go.Figure(go.Bar(
@@ -87,5 +87,5 @@ spk_bar.update_layout(
     yaxis=dict(title="Speakers"),
 )
 display(spk_bar)
-display(Markdown("62 programme speakers scanned on Partner Day, 79 on Ecosystem Day. 43 of them are in both day counts."))
+display(Markdown("86 programme speakers on Partner Day (62 door on 13 Oct + Monday badge), 79 on Ecosystem Day. 60 of them are in both day counts."))
 display(speakers)

@@ -37,6 +37,44 @@ except Exception:
 europe_share = int(round(100 * web_europe / web_users)) if web_users else 0
 germany_share = int(round(100 * web_germany / web_europe)) if web_europe else 0
 
+countries = [
+    ("Germany", 218861),
+    ("France", 149377),
+    ("United Kingdom", 106459),
+    ("Spain", 85702),
+    ("Russia", 74785),
+    ("Netherlands", 66759),
+    ("Italy", 46533),
+    ("Poland", 42824),
+    ("Ukraine", 26828),
+    ("Switzerland", 21975),
+]
+try:
+    countries = [
+        (str(r["country"]), _itl_int(r["users"], 0))
+        for _, r in ga4_web_europe_countries.iterrows()
+    ]
+except Exception:
+    pass
+countries = [(name, users) for name, users in countries if users > 0][:10]
+max_users = max((users for _, users in countries), default=1)
+
+country_rows = []
+for name, users in countries:
+    width = 100.0 * users / max_users
+    color = "#FF6D5A" if name == "Germany" else "#4F7FB8"
+    safe = (
+        name.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+    country_rows.append(
+        f'<div class="itl-crow"><div class="itl-cname">{safe}</div>'
+        f'<div class="itl-cbar"><span style="width:{width:.1f}%;background:{color}"></span></div>'
+        f'<div class="itl-cnum">{users:,}</div></div>'
+    )
+country_html = "\n".join(country_rows)
+
 html = f"""
 <style>
 .itl-dash {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:#111827; max-width: 1100px; }}
@@ -60,6 +98,12 @@ html = f"""
 @media (max-width: 800px) {{ .itl-row {{ grid-template-columns:1fr; }} }}
 .itl-note {{ margin-top:18px; font-size:13px; color:#6B7280; padding:12px 14px; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; }}
 .itl-webhead {{ font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:#6B7280; margin:4px 0 10px 0; }}
+.itl-cwrap {{ border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px 12px; margin:0 0 20px 0; background:#fff; }}
+.itl-crow {{ display:grid; grid-template-columns:140px 1fr 88px; gap:10px; align-items:center; margin:7px 0; font-size:13px; }}
+.itl-cname {{ color:#374151; }}
+.itl-cbar {{ background:#F3F4F6; border-radius:4px; height:10px; overflow:hidden; }}
+.itl-cbar span {{ display:block; height:100%; border-radius:4px; }}
+.itl-cnum {{ text-align:right; font-variant-numeric:tabular-nums; font-weight:600; color:#111827; }}
 </style>
 <div class="itl-dash">
   <div class="itl-kicker">In the Loop 2026</div>
@@ -77,6 +121,10 @@ html = f"""
     <div class="itl-tile"><div class="itl-val accent">{_itl_short(web_europe)}</div><div class="itl-label">Europe users</div><div class="itl-hint">{europe_share}% of website users · {_itl_short(web_europe_views)} page views</div></div>
     <div class="itl-tile"><div class="itl-val accent">{_itl_short(web_germany)}</div><div class="itl-label">Germany users</div><div class="itl-hint">{germany_share}% of Europe · {_itl_short(web_germany_views)} page views</div></div>
     <div class="itl-tile"><div class="itl-val">{web_germany_week:,}</div><div class="itl-label">Germany · conference week</div><div class="itl-hint">12–18 Oct · {web_europe_week:,} Europe users that week</div></div>
+  </div>
+  <div class="itl-cwrap">
+    <div class="itl-webhead" style="margin-top:0">Top European countries · website users</div>
+    {country_html}
   </div>
   <div class="itl-days">
     <div class="itl-day"><h3>Partner Day · 13 Oct</h3><div class="big">426</div><div class="meta">391 unique door scans on 13 Oct, plus 35 people who collected a badge on 12 Oct and did not scan on Partner Day. 18 staff door scans sit inside. 487 had a ticket.</div></div>

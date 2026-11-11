@@ -92,6 +92,7 @@ def test_scoreboard_has_day_counts():
     for needle in (
         "1,269", "426", "916", "39", "113", "116", "324",
         "green YES", "badge pickup", "Germany users", "Europe users", "Website users",
+        "France", "United Kingdom", "Top European countries",
     ):
         assert needle in src, needle
 

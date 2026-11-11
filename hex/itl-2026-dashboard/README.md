@@ -9,7 +9,7 @@ https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyR
 ## What the App should show
 
 1. Title + **Conference visits** copy
-2. **APP: Executive scoreboard** (conference tiles 1,269 / 426 / 916 / 39, then n8n website users for all / Europe / Germany)
+2. **APP: Executive scoreboard** (conference tiles, then n8n website users for all / Europe / Germany, then top European countries). Do not add extra cells for this.
 3. **Day visit KPIs** and **Partner vs Eco bars**
 4. Staff, CAB overlay, speakers (overlays on the same visit tiles)
 5. Salesforce funnel / pipeline / GA4 in their own sections (commercial, not physical headcount)
@@ -20,12 +20,9 @@ Website tiles next to registration are GA4 page-view users on public n8n sites (
 
 ## If a new cell is missing from the App canvas
 
-Hex cannot pin cells from the API. After a new scoreboard is added at the top of the notebook:
+App builder Outline often lists **only cells already on the canvas**, so names like `APP: n8n websites Germany Europe` will not appear there. Website tiles and the Europe country bars live inside **APP: Executive scoreboard**, which is already on the App. Run all in Notebook, then look at that block.
 
-1. Stay on **App builder** (Classic).
-2. **Add to app** (hexagon) on **APP: Executive scoreboard**, or **Outline → Reset layout → Use default layout**.
-3. Remove `probe_` SQL tables from the App canvas if they appear (does not delete the notebook).
-4. **Publish** when you want the `/app/.../latest` link. Workspace share is still **NONE** until you share it.
+Do **not** use **Outline → Reset layout → Use default layout** (that dumps SQL tables). Do not pin `ga4_web_*` SQL cells. **Publish** when you want the `/app/.../latest` link.
 
 ## Numbers
 

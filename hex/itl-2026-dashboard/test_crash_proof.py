@@ -89,8 +89,18 @@ def test_app_js_parses():
 def test_scoreboard_has_day_counts():
     src = (ROOT / "notebook_scoreboard.py").read_text()
     ast.parse(src)
-    for needle in ("1,269", "426", "916", "39", "113", "116", "324", "green YES", "badge pickup"):
+    for needle in (
+        "1,269", "426", "916", "39", "113", "116", "324",
+        "green YES", "badge pickup", "Germany users", "Europe users", "Website users",
+    ):
         assert needle in src, needle
+
+
+def test_web_europe_chart_is_crash_proof():
+    src = (ROOT / "notebook_web_europe.py").read_text()
+    ast.parse(src)
+    assert "_itl_ready" in src
+    assert "ga4_web_europe_countries" in src
 
 
 if __name__ == "__main__":
@@ -99,4 +109,5 @@ if __name__ == "__main__":
     test_display_cell_missing_frames()
     test_app_js_parses()
     test_scoreboard_has_day_counts()
+    test_web_europe_chart_is_crash_proof()
     print("ok")

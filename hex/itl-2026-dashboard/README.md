@@ -20,7 +20,7 @@ Website tiles next to registration are GA4 page-view users on public n8n sites (
 
 ## If a new cell is missing from the App canvas
 
-Section markdown already on the App (Visit overlap, Commercial funnel, Pipeline, Partner Day notes, Digital signals) now includes tables, not just captions. Salesforce funnel **1,118 / 835 / 20 / 57 / 6** is not Fliplet 1,269 / 426 / 916. Pipeline is **€2.42M** total. If a block shows twice, set **Output** only. Do not use Reset layout.
+**APP: CAB overlay + roles + traffic** is split into three: CAB overlay (the original App cell), **APP: Registrants by role**, and **APP: Web traffic**. Add the last two from Outline (search those labels). Do not Reset layout.
 
 Do **not** use **Outline → Reset layout → Use default layout** (that dumps SQL tables). Do not pin `ga4_web_*` SQL cells. **Publish** when you want the `/app/.../latest` link.
 

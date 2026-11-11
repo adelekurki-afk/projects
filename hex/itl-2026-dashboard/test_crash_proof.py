@@ -117,6 +117,19 @@ def test_web_markdown_section_has_numbers():
         assert needle in src, needle
 
 
+def test_cab_roles_traffic_are_split_and_crash_proof():
+    for name, needle in (
+        ("notebook_cab.py", "cab_overlay_kpis"),
+        ("notebook_roles.py", "persona_by_role"),
+        ("notebook_traffic.py", "ga4_post_event_trend"),
+    ):
+        src = (ROOT / name).read_text()
+        ast.parse(src)
+        assert "_itl_ready" in src
+        assert needle in src
+        assert src.strip().endswith("fig")
+
+
 def test_web_europe_chart_is_crash_proof():
     src = (ROOT / "notebook_web_europe.py").read_text()
     ast.parse(src)
@@ -132,5 +145,6 @@ if __name__ == "__main__":
     test_scoreboard_has_day_counts()
     test_section_markdown_tables_have_numbers()
     test_web_markdown_section_has_numbers()
+    test_cab_roles_traffic_are_split_and_crash_proof()
     test_web_europe_chart_is_crash_proof()
     print("ok")

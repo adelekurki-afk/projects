@@ -90,11 +90,40 @@ def test_scoreboard_has_day_counts():
     src = (ROOT / "notebook_scoreboard.py").read_text()
     ast.parse(src)
     for needle in (
-        "1,269", "426", "916", "39", "113", "116", "324",
-        "green YES", "badge pickup", "Germany users", "Europe users", "Website users",
-        "France", "United Kingdom", "Top European countries",
+        "1,269", "426", "916", "39", "113", "116", "324", "1,018",
+        "green YES", "badge pickup", "Website users",
+        "France", "United Kingdom", "Top Europe",
+        "Pipeline conversion", "Opportunities", "Participation", "Site intent", "Partner Day",
     ):
         assert needle in src, needle
+
+
+def test_scoreboard_renders_overview():
+    import sys
+    import types
+
+    src = (ROOT / "notebook_scoreboard.py").read_text()
+    fake = FakeDisplay()
+
+    class FakeHTML:
+        def __init__(self, data):
+            self.data = data
+
+    ipy = types.ModuleType("IPython")
+    ipy_display = types.ModuleType("IPython.display")
+    ipy_display.display = fake
+    ipy_display.HTML = FakeHTML
+    sys.modules["IPython"] = ipy
+    sys.modules["IPython.display"] = ipy_display
+    exec(compile(src, "notebook_scoreboard.py", "exec"), {"__name__": "__main__"})
+    assert fake.calls, "scoreboard did not display HTML"
+    html = fake.calls[0].data
+    for needle in (
+        "1,269", "426", "916", "1,018", "1,118", "835",
+        "€2.42M", "€2.39M", "3.8M", "1.0M", "219k",
+        "New Business / ENT", "How 426 is built",
+    ):
+        assert needle in html, needle
 
 
 def test_section_markdown_tables_have_numbers():
@@ -143,6 +172,7 @@ if __name__ == "__main__":
     test_display_cell_missing_frames()
     test_app_js_parses()
     test_scoreboard_has_day_counts()
+    test_scoreboard_renders_overview()
     test_section_markdown_tables_have_numbers()
     test_web_markdown_section_has_numbers()
     test_cab_roles_traffic_are_split_and_crash_proof()

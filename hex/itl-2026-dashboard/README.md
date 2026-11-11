@@ -20,7 +20,7 @@ Website tiles next to registration are GA4 page-view users on public n8n sites (
 
 ## If a new cell is missing from the App canvas
 
-The cell already on the App is **APP: n8n websites Germany Europe**. It now contains the 3.8M / 1.0M / 219k tiles and the Europe country table (not just the caption). If that cell shows the text twice, open the three-dot menu on the canvas and set **Output** only. Do not use Reset layout.
+Section markdown already on the App (Visit overlap, Commercial funnel, Pipeline, Partner Day notes, Digital signals) now includes tables, not just captions. Salesforce funnel **1,118 / 835 / 20 / 57 / 6** is not Fliplet 1,269 / 426 / 916. Pipeline is **€2.42M** total. If a block shows twice, set **Output** only. Do not use Reset layout.
 
 Do **not** use **Outline → Reset layout → Use default layout** (that dumps SQL tables). Do not pin `ga4_web_*` SQL cells. **Publish** when you want the `/app/.../latest` link.
 

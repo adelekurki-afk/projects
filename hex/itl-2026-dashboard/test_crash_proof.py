@@ -97,6 +97,20 @@ def test_scoreboard_has_day_counts():
         assert needle in src, needle
 
 
+def test_section_markdown_tables_have_numbers():
+    checks = {
+        "notebook_overlap.md": ("426", "916", "324", "1,018"),
+        "notebook_funnel.md": ("1,118", "835", "20", "57", "6"),
+        "notebook_pipeline.md": ("€2,421,913", "New Business", "ENT"),
+        "notebook_partner.md": ("426", "916", "391", "878"),
+        "notebook_digital.md": ("174,802", "11,428", "84,904"),
+    }
+    for name, needles in checks.items():
+        src = (ROOT / name).read_text()
+        for needle in needles:
+            assert needle in src, f"{name}: {needle}"
+
+
 def test_web_markdown_section_has_numbers():
     src = (ROOT / "notebook_web_section.md").read_text()
     for needle in ("3.8M", "1.0M", "219k", "11,461", "218,861", "Germany", "France"):
@@ -116,6 +130,7 @@ if __name__ == "__main__":
     test_display_cell_missing_frames()
     test_app_js_parses()
     test_scoreboard_has_day_counts()
+    test_section_markdown_tables_have_numbers()
     test_web_markdown_section_has_numbers()
     test_web_europe_chart_is_crash_proof()
     print("ok")

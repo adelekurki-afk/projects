@@ -20,7 +20,7 @@ Website tiles next to registration are GA4 page-view users on public n8n sites (
 
 ## If a new cell is missing from the App canvas
 
-App builder Outline often lists **only cells already on the canvas**, so names like `APP: n8n websites Germany Europe` will not appear there. Website tiles and the Europe country bars live inside **APP: Executive scoreboard**, which is already on the App. Run all in Notebook, then look at that block.
+The cell already on the App is **APP: n8n websites Germany Europe**. It now contains the 3.8M / 1.0M / 219k tiles and the Europe country table (not just the caption). If that cell shows the text twice, open the three-dot menu on the canvas and set **Output** only. Do not use Reset layout.
 
 Do **not** use **Outline → Reset layout → Use default layout** (that dumps SQL tables). Do not pin `ga4_web_*` SQL cells. **Publish** when you want the `/app/.../latest` link.
 

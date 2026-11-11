@@ -97,6 +97,12 @@ def test_scoreboard_has_day_counts():
         assert needle in src, needle
 
 
+def test_web_markdown_section_has_numbers():
+    src = (ROOT / "notebook_web_section.md").read_text()
+    for needle in ("3.8M", "1.0M", "219k", "11,461", "218,861", "Germany", "France"):
+        assert needle in src, needle
+
+
 def test_web_europe_chart_is_crash_proof():
     src = (ROOT / "notebook_web_europe.py").read_text()
     ast.parse(src)
@@ -110,5 +116,6 @@ if __name__ == "__main__":
     test_display_cell_missing_frames()
     test_app_js_parses()
     test_scoreboard_has_day_counts()
+    test_web_markdown_section_has_numbers()
     test_web_europe_chart_is_crash_proof()
     print("ok")

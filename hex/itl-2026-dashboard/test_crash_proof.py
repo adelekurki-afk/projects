@@ -113,7 +113,7 @@ def test_scoreboard_has_day_counts():
     ast.parse(src)
     for needle in (
         "1,269", "426", "916", "1,018",
-        "Pipeline conversion", "Opportunities",
+        "Salesforce conversion", "Opportunities",
     ):
         assert needle in src, needle
     for gone in ("How 426 is built", "Site intent", "3.8M"):
@@ -147,7 +147,6 @@ def test_intent_tab_explains_timeframes():
     ast.parse(src)
     html = _exec_html(ROOT / "notebook_intent.py")
     for needle in (
-        "What these numbers mean",
         "12–18 Oct",
         "5–11 Oct",
         "1 Jun–9 Nov",

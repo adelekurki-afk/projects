@@ -132,9 +132,7 @@ body = f"""
 <div class="itl-dash">
   <div class="itl-kicker">In the Loop 2026</div>
   <h1 class="itl-title">Overview</h1>
-  <p class="itl-sub">Conference visits · Salesforce conversion · opportunities. Participation and website intent live on their own tabs.</p>
-
-  <div class="itl-ch">1 · Conference visits</div>
+  <div class="itl-ch">Visits</div>
   <div class="itl-strip">
     <div class="itl-tile"><div class="itl-val">1,269</div><div class="itl-label">Registered</div><div class="itl-hint">Paid + Free unique email</div></div>
     <div class="itl-tile"><div class="itl-val accent">426</div><div class="itl-label">Partner Day</div><div class="itl-hint">13 Oct · door + badge</div></div>
@@ -142,11 +140,9 @@ body = f"""
     <div class="itl-tile"><div class="itl-val">1,018</div><div class="itl-label">Unique people</div><div class="itl-hint">Either day · 324 came both</div></div>
   </div>
 
-  <div class="itl-ch">2 · Pipeline conversion</div>
-  <p class="itl-sub" style="margin-bottom:10px">Salesforce Free/Paid. This registered count is not the Fliplet 1,269. Attended is not Partner Day 426 or Ecosystem Day 916.</p>
+  <div class="itl-ch">Salesforce conversion</div>
   <div class="itl-cwrap">{funnel_html}</div>
-
-  <div class="itl-ch">3 · Opportunities</div>
+  <div class="itl-ch">Opportunities</div>
   <div class="itl-strip">
     <div class="itl-tile"><div class="itl-val accent">{_euro(pipe_total)}</div><div class="itl-label">Total pipeline</div><div class="itl-hint">NB + Expansion from 12 Oct</div></div>
     <div class="itl-tile"><div class="itl-val">{_euro(pipe_open)}</div><div class="itl-label">Open</div><div class="itl-hint">{pipe_open_n} deals</div></div>
@@ -159,7 +155,6 @@ body = f"""
       {mix_html}
     </table>
   </div>
-  <div class="itl-note">Visits are Fliplet. Conversion and opportunities are Salesforce. Who came both days is on the Participation tab. Website traffic is on the Intent tab.</div>
 </div>
 """
 display(HTML("<style>" + ITL_CSS + "</style>" + body))

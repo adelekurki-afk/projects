@@ -86,23 +86,11 @@ def test_app_js_parses():
     assert src.strip().endswith("render(React.createElement(App));")
 
 
-def test_scoreboard_has_day_counts():
-    src = (ROOT / "notebook_scoreboard.py").read_text()
-    ast.parse(src)
-    for needle in (
-        "1,269", "426", "916", "39", "113", "116", "324", "1,018",
-        "green YES", "badge pickup", "Website users",
-        "France", "United Kingdom", "Top Europe",
-        "Pipeline conversion", "Opportunities", "Participation", "Site intent", "Partner Day",
-    ):
-        assert needle in src, needle
-
-
-def test_scoreboard_renders_overview():
+def _exec_html(path: Path) -> str:
     import sys
     import types
 
-    src = (ROOT / "notebook_scoreboard.py").read_text()
+    src = path.read_text()
     fake = FakeDisplay()
 
     class FakeHTML:
@@ -115,13 +103,60 @@ def test_scoreboard_renders_overview():
     ipy_display.HTML = FakeHTML
     sys.modules["IPython"] = ipy
     sys.modules["IPython.display"] = ipy_display
-    exec(compile(src, "notebook_scoreboard.py", "exec"), {"__name__": "__main__"})
-    assert fake.calls, "scoreboard did not display HTML"
-    html = fake.calls[0].data
+    exec(compile(src, path.name, "exec"), {"__name__": "__main__"})
+    assert fake.calls, f"{path.name} did not display HTML"
+    return fake.calls[0].data
+
+
+def test_scoreboard_has_day_counts():
+    src = (ROOT / "notebook_scoreboard.py").read_text()
+    ast.parse(src)
+    for needle in (
+        "1,269", "426", "916", "1,018",
+        "Pipeline conversion", "Opportunities",
+    ):
+        assert needle in src, needle
+    for gone in ("How 426 is built", "Site intent", "3.8M"):
+        assert gone not in src, gone
+
+
+def test_scoreboard_renders_overview():
+    html = _exec_html(ROOT / "notebook_scoreboard.py")
     for needle in (
         "1,269", "426", "916", "1,018", "1,118", "835",
-        "€2.42M", "€2.39M", "3.8M", "1.0M", "219k",
-        "New Business / ENT", "How 426 is built",
+        "€2.42M", "€2.39M", "New Business / ENT",
+    ):
+        assert needle in html, needle
+    for gone in ("How 426 is built", "3.8M", "Berlin events · conference week"):
+        assert gone not in html, gone
+
+
+def test_participation_tab_html():
+    src = (ROOT / "notebook_participation.py").read_text()
+    ast.parse(src)
+    html = _exec_html(ROOT / "notebook_participation.py")
+    for needle in (
+        "Participation", "426", "916", "324", "1,018",
+        "113", "116", "39", "391", "878", "green YES",
+    ):
+        assert needle in html, needle
+
+
+def test_intent_tab_explains_timeframes():
+    src = (ROOT / "notebook_intent.py").read_text()
+    ast.parse(src)
+    html = _exec_html(ROOT / "notebook_intent.py")
+    for needle in (
+        "What these numbers mean",
+        "12–18 Oct",
+        "5–11 Oct",
+        "1 Jun–9 Nov",
+        "Berlin events",
+        "no global spike",
+        "3.8M",
+        "1.0M",
+        "219k",
+        "n8n.io users by week",
     ):
         assert needle in html, needle
 
@@ -173,6 +208,8 @@ if __name__ == "__main__":
     test_app_js_parses()
     test_scoreboard_has_day_counts()
     test_scoreboard_renders_overview()
+    test_participation_tab_html()
+    test_intent_tab_explains_timeframes()
     test_section_markdown_tables_have_numbers()
     test_web_markdown_section_has_numbers()
     test_cab_roles_traffic_are_split_and_crash_proof()

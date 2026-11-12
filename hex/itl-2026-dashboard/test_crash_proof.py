@@ -168,6 +168,8 @@ def test_section_markdown_tables_have_numbers():
         "notebook_pipeline.md": ("€2,421,913", "New Business", "ENT"),
         "notebook_partner.md": ("426", "916", "391", "878"),
         "notebook_digital.md": ("174,802", "11,428", "84,904"),
+        "notebook_participation_tab.md": ("426", "916", "324", "1,018", "391", "878"),
+        "notebook_intent_tab.md": ("+33%", "12–18 Oct", "5–11 Oct", "3.8M", "262k"),
     }
     for name, needles in checks.items():
         src = (ROOT / name).read_text()

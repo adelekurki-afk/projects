@@ -8,15 +8,15 @@ https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyR
 
 ## Tabs
 
-| Tab | Cell to add from Outline |
+App builder Outline search only lists cells **already on the app**. Do not search there for `APP: Participation`.
+
+| Tab | What is already on it |
 | --- | --- |
-| Overview | **APP: Executive scoreboard** — visits, Salesforce conversion, opportunities |
-| Participation | **APP: Participation** |
-| Intent | **APP: Intent** |
+| Overview | **APP: Executive scoreboard** |
+| Participation | The markdown cell that used to start “Visits · everyone who participated” — now headed **Participation** |
+| Intent | The **Intent** markdown (was Digital signals / n8n websites) |
 
-Hex cannot pin cells onto tabs via API. After **Run all**, in App builder Outline search those labels → **Add to app**, then drag each onto the matching tab. Do **not** Reset layout (that dumps SQL tables). Do not pin `ga4_web_*` SQL cells.
-
-The overview no longer includes the Partner Day how-426-is-built box or website tiles. Those live on Participation / Intent.
+Do **not** Reset layout. Do not pin `ga4_web_*` SQL cells. Markdown updates without Run all; refresh the App builder tab if the old heading is still showing.
 
 Physical visits are people who **participated**: Fliplet door scans **union** Monday badge pickup **union** green YES. Partner Day **426**. Ecosystem Day **916**. Unique people **1,018**. CAB **39** is an overlay.
 

@@ -1,5 +1,7 @@
 # In the Loop 2026
 
+Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
+
 Physical visits are Fliplet. Conversion and pipeline are Salesforce. Website numbers are GA4 on n8n.io (week comparison) and public n8n sites (1 Jun–9 Nov). These are three clocks — do not add them.
 
 ## Result

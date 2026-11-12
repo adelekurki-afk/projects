@@ -1,27 +1,29 @@
 # In the Loop 2026
 
-Use the **new lean Hex project** (same shape as Paid Some LinkedIn: one Result, then a few live tables). Do not keep editing the 77-cell dashboard.
+Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 
-Open (notebook):
+**App:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app
 
-https://eu.hex.tech/n8n/hex/In-the-Loop-2026-034wIyjeDTq6OqIZhESLfP/draft/logic
+**Notebook:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
-App builder (open once so Hex auto-layouts from the notebook):
+Four views on that project. After SQL/CODE edits, **Run all** then refresh the App. Markdown on a tab updates without Run all. Do not Reset layout.
 
-https://eu.hex.tech/n8n/hex/In-the-Loop-2026-034wIyjeDTq6OqIZhESLfP?projectView=app&view=app
+## Summary
 
-Seven cells only:
+Fliplet visits 426 / 916 / 1,018, staff 113, speakers 116, CAB 39, attendance 87% Partner / 76% Eco of tickets. Salesforce funnel. Sourced vs influenced. New Business vs Expansion (no Partner-typed opps).
 
-1. **Readout** — Result
-2. **Visits** — Fliplet 426 / 916 / 1,018
-3. **Conversion** — Salesforce funnel
-4. **Pipeline** — NB / Expansion by segment
-5. **Conference week** — n8n.io 5–11 vs 12–18 vs 19–25 Oct
-6. **Weekly n8n.io** — users and Berlin events, Jun–Nov
-7. **Europe countries** — public n8n sites Jun–Nov
+## Attendance
 
-Physical visits are Fliplet. Salesforce registered is not Fliplet 1,269. Salesforce Attended is not 426 / 916.
+Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniority — a different clock). Fliplet door scans 391 / 878. Zone game scans. n8n sales meetings sheet 23 people. Fliplet booked meetings 1,076. Partner Day survey 8.6/10. No Ecosystem Day survey in Drive. No named session-scan column.
 
-The old project is still at:
+## Funnel
 
-https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app
+Leads progression, AI SDR vs humans (`first_meeting_source`), opportunities per stage, sourced list, influenced list, closed won.
+
+## Intent
+
+Weekly n8n.io users with conference week 12–18 Oct highlighted: worldwide, then Europe and Germany as separate lines. YouTube views (from 1 Jul) and videos published. Acquired instances by `deployment_type`. Paid Google Ads search terms that week (organic SEO / AEO is not in the warehouse). No Common Room table for social posts.
+
+Physical visits are Fliplet. Salesforce registered is not 1,269. Salesforce Attended is not 426 / 916.
+
+See `VIEW_SPEC.md` for source and status of each ask.

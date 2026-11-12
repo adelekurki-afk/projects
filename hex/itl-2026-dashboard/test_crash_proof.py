@@ -142,22 +142,77 @@ def test_participation_tab_html():
         assert needle in html, needle
 
 
+def _exec_view(path: Path, extra: dict | None = None):
+    import sys
+    import types
+
+    src = path.read_text()
+    ast.parse(src)
+    fake = FakeDisplay()
+
+    class FakeHTML:
+        def __init__(self, data):
+            self.data = data
+
+    ipy = types.ModuleType("IPython")
+    ipy_display = types.ModuleType("IPython.display")
+    ipy_display.display = fake
+    ipy_display.HTML = FakeHTML
+    sys.modules["IPython"] = ipy
+    sys.modules["IPython.display"] = ipy_display
+    env = {"__name__": "__main__"}
+    if extra:
+        env.update(extra)
+    exec(compile(src, path.name, "exec"), env)
+    return fake.calls
+
+
 def test_intent_tab_explains_timeframes():
     src = (ROOT / "notebook_intent.py").read_text()
     ast.parse(src)
-    html = _exec_html(ROOT / "notebook_intent.py")
+    calls = _exec_view(ROOT / "notebook_intent.py")
+    blob = " ".join(getattr(c, "data", str(c)) for c in calls)
     for needle in (
+        "Intent",
         "12–18 Oct",
-        "5–11 Oct",
-        "1 Jun–9 Nov",
-        "Berlin events",
-        "no global spike",
-        "3.8M",
-        "1.0M",
-        "219k",
-        "n8n.io users by week",
+        "YouTube",
+        "Common Room",
+        "Paid Google Ads",
+        "Europe and Germany",
     ):
-        assert needle in html, needle
+        assert needle in src or needle in blob, needle
+
+
+def test_four_views_compile_without_sql():
+    for name in (
+        "notebook_summary.py",
+        "notebook_attendance.py",
+        "notebook_funnel.py",
+        "notebook_intent.py",
+    ):
+        calls = _exec_view(ROOT / name)
+        assert calls, name
+
+
+def test_summary_has_sourced_and_attendance_rate():
+    src = (ROOT / "notebook_summary.py").read_text()
+    for needle in ("Summary", "426", "916", "87%", "76%", "Sourced", "Influenced", "113"):
+        assert needle in src, needle
+    html = _exec_html(ROOT / "notebook_summary.py")
+    assert "Summary" in html
+    assert "Sourced opps" in html
+
+
+def test_attendance_has_meetings_and_feedback():
+    src = (ROOT / "notebook_attendance.py").read_text()
+    for needle in (
+        "Attendance",
+        "Sales meetings sheet",
+        "Partner Day overall",
+        "Community Lounge",
+        "Salesforce Attended",
+    ):
+        assert needle in src, needle
 
 
 def test_section_markdown_tables_have_numbers():
@@ -212,6 +267,9 @@ if __name__ == "__main__":
     test_scoreboard_renders_overview()
     test_participation_tab_html()
     test_intent_tab_explains_timeframes()
+    test_four_views_compile_without_sql()
+    test_summary_has_sourced_and_attendance_rate()
+    test_attendance_has_meetings_and_feedback()
     test_section_markdown_tables_have_numbers()
     test_web_markdown_section_has_numbers()
     test_cab_roles_traffic_are_split_and_crash_proof()

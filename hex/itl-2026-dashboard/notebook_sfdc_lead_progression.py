@@ -2,9 +2,12 @@
 import plotly.graph_objects as go
 from IPython.display import display
 
-CORAL = "#FF6D5A"
+PINK = "#FF91AC"
+PINK_MID = "#FFBCCA"
+PINK_LIGHT = "#FFD0D9"
+PINK_DEEP = "#87003C"
 INK = "#9CA3AF"
-STAGE_COLORS = [CORAL, "#FF8F80", "#E08A7A", "#6B7280"]
+STAGE_COLORS = [PINK, PINK_MID, PINK_LIGHT, PINK_DEEP]
 rows = [
     ("ITL Free+Paid", 1102, 100.0),
     ("New — handed to sales", 314, 28.5),
@@ -31,7 +34,7 @@ for i, (label, count, pct) in enumerate(rows):
         text=[f"{count:,}  ({pct}%)"],
         textposition="inside",
         insidetextanchor="middle",
-        textfont={"size": 14, "color": "#111827" if i < 3 else "#F9FAFB"},
+        textfont={"size": 14, "color": "#191919" if i < 3 else "#F9FAFB"},
         hoverinfo="skip",
         showlegend=False,
         width=0.68,

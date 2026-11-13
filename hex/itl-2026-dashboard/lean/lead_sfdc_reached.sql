@@ -1,4 +1,5 @@
 -- Ever reached each Salesforce status. Pin as APP: SFDC lead reached.
+-- Includes Leads (Lead.Status / LeadHistory) and Contacts (Status__c / ContactHistory).
 WITH itl AS (
   SELECT
     cm.LeadId AS lead_id,
@@ -43,16 +44,16 @@ contact_reached AS (
     ON c.Id = i.contact_id AND c.IsDeleted = FALSE
   WHERE i.contact_id IS NOT NULL AND c.Status__c IS NOT NULL
 ),
-reached AS (
-  SELECT email, sfdc_status FROM lead_reached
-  UNION DISTINCT
-  SELECT email, sfdc_status FROM contact_reached
+combined AS (
+  SELECT email, sfdc_status, 'lead' AS src FROM lead_reached
+  UNION ALL
+  SELECT email, sfdc_status, 'contact' AS src FROM contact_reached
 ),
 itl_people AS (
   SELECT COUNT(DISTINCT email) AS itl_people FROM itl WHERE email IS NOT NULL
 )
 SELECT
-  CASE r.sfdc_status
+  CASE c.sfdc_status
     WHEN 'Suspect' THEN 1
     WHEN 'New' THEN 2
     WHEN 'Working' THEN 3
@@ -61,11 +62,13 @@ SELECT
     WHEN 'Unqualified' THEN 6
     ELSE 9
   END AS stage_n,
-  r.sfdc_status,
-  COUNT(DISTINCT r.email) AS people_ever_reached,
+  c.sfdc_status,
+  COUNT(DISTINCT IF(c.src = 'lead', c.email, NULL)) AS as_lead,
+  COUNT(DISTINCT IF(c.src = 'contact', c.email, NULL)) AS as_contact,
+  COUNT(DISTINCT c.email) AS people_ever_reached,
   p.itl_people,
-  ROUND(100.0 * COUNT(DISTINCT r.email) / p.itl_people, 1) AS pct_of_itl
-FROM reached r
+  ROUND(100.0 * COUNT(DISTINCT c.email) / p.itl_people, 1) AS pct_of_itl
+FROM combined c
 CROSS JOIN itl_people p
 GROUP BY 1, 2, p.itl_people
 ORDER BY stage_n, people_ever_reached DESC

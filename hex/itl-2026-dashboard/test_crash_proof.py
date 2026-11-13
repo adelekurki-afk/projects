@@ -196,20 +196,24 @@ def test_four_views_compile_without_sql():
         "notebook_survey_partner.py",
         "notebook_survey_session.py",
         "notebook_sfdc_lead_progression.py",
+        "notebook_sfdc_lead_reached.py",
     ):
         calls = _exec_view(ROOT / name)
         assert calls, name
     funnel_calls = _exec_view(ROOT / "notebook_funnel.py")
     funnel_blob = _blob(funnel_calls)
+    assert "SFDC lead reached" in funnel_blob
     assert "Lead progression" in funnel_blob
     assert "1,102" in funnel_blob or "1102" in funnel_blob
     assert "handed to sales" in funnel_blob or "New" in funnel_blob
     funnel_figs = [c for c in funnel_calls if isinstance(c, go.Figure)]
     assert funnel_figs, "Funnel Chart should open with a visual"
     first = funnel_figs[0]
-    assert "Lead progression" in str(first.layout.title.text)
+    assert "SFDC lead reached" in str(first.layout.title.text)
     assert first.data[0].type == "bar"
     assert first.data[0].orientation == "h"
+    assert [t.name for t in first.data] == ["Lead", "Contact"]
+    assert any("Lead progression" in str(c.layout.title.text) for c in funnel_figs)
     assert not any(
         isinstance(c, pd.DataFrame) and "sfdc_status" in getattr(c, "columns", [])
         for c in funnel_calls
@@ -244,9 +248,18 @@ def test_survey_and_lead_cells_have_pin_labels():
         assert "701cj0000157ynMAAQ" in src
     assert "LeadHistory" in (ROOT / "lean/lead_progression.sql").read_text()
     assert "fct_campaign_member_pipeline" in (ROOT / "lean/lead_sfdc_statuses.sql").read_text()
+    reached_sql = (ROOT / "lean/lead_sfdc_reached.sql").read_text()
+    assert "as_lead" in reached_sql
+    assert "as_contact" in reached_sql
+    assert "ContactHistory" in reached_sql
     blob = _blob(_exec_view(ROOT / "notebook_sfdc_lead_progression.py"))
     assert "1102" in blob or "1,102" in blob
     assert "handed to sales" in blob or "New" in blob
+    reached_blob = _blob(_exec_view(ROOT / "notebook_sfdc_lead_reached.py"))
+    assert "SFDC lead reached" in reached_blob
+    assert "Contact" in reached_blob
+    assert "546" in reached_blob
+    assert "206" in reached_blob
 
 
 def test_attendance_has_meetings_and_feedback():

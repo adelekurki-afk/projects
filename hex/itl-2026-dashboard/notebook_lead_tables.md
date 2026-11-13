@@ -1,6 +1,6 @@
 # Lead progression — Salesforce
 
-Pin **APP: Lead progression** and **APP: Salesforce lead statuses** onto Overview. Live BigQuery. **Run all** then Add to app. Do not Reset layout.
+This is already on Overview: **APP: Funnel Chart** and the Funnel Result. The SQL tables below are extras. **Run all** then refresh the App. Do not Reset layout.
 
 This is **Salesforce Lead/Contact status**, not the CampaignMember attendance funnel (1,119 → 837). That event funnel is still **APP: Event people funnel** if you want it.
 

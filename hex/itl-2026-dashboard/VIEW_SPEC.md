@@ -12,7 +12,7 @@ Same shape as Paid Some LinkedIn: a Result paragraph, then Plotly charts and Hex
 | Staff / speakers / CAB | Tickets 113, speakers 116, CAB 39 | Locked overlays |
 | Attendance % | Came / tickets: 426/487 Partner, 916/1,205 Eco | Locked |
 | Full funnel | Salesforce `lead_funnel` (`salesforce_bq.CampaignMember` + Opportunity) | Live from BQ; App Funnel chart is a 13 Nov snapshot so it does not NameError. Pin **APP: Event people funnel** if you still want 1,119 → 837 |
-| SFDC lead progression | LeadHistory + current `Lead.Status` / `Contact.Status__c` on ITL Free+Paid | Pin **APP: Lead progression** — 1,102 → 314 New → 269 Working → 177 Qualified |
+| SFDC lead progression | LeadHistory + current `Lead.Status` / `Contact.Status__c` on ITL Free+Paid | Already on Overview: **APP: Funnel Chart** + Funnel Result — 1,102 → 314 New → 269 Working → 177 Qualified |
 | Campaign / lead statuses | `CampaignMember.Status` on ITL/Eco/Partner/Meetings; current SFDC status from `fct_campaign_member_pipeline` | Pin **APP: Campaign member statuses** and **APP: Salesforce lead statuses** |
 | Sourced vs influenced | `itl_sourced_influenced_opps` | Live |
 | Expansion / partner / net new / closed | `pipeline_arr` + sourced list Type | Live |

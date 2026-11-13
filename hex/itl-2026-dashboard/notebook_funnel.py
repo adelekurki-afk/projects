@@ -35,6 +35,44 @@ def _euro(n):
     return f"€{int(round(n)):,}"
 
 
+STAGE_COLORS = [CORAL, "#FF8F80", "#E08A7A", "#6B7280"]
+
+
+def _centered_funnel(rows, title, height=340):
+    max_c = max(int(r[1]) for r in rows) or 1
+    fig = go.Figure()
+    for i, r in enumerate(rows):
+        label = str(r[0])
+        count = int(r[1])
+        pct = float(r[2]) if len(r) > 2 else round(100.0 * count / max_c, 1)
+        fig.add_bar(
+            y=[label],
+            x=[count],
+            base=(max_c - count) / 2.0,
+            orientation="h",
+            marker=dict(color=STAGE_COLORS[i % len(STAGE_COLORS)], line=dict(width=0)),
+            text=[f"{count:,}  ({pct}%)"],
+            textposition="inside",
+            insidetextanchor="middle",
+            textfont={"size": 14, "color": "#111827" if i < 3 else "#F9FAFB"},
+            hoverinfo="skip",
+            showlegend=False,
+            width=0.68,
+        )
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
+        height=height,
+        margin=dict(t=52, b=8, l=190, r=16),
+        title=dict(text=title, font=dict(size=16, color=INK)),
+        bargap=0.32,
+        xaxis=dict(visible=False, range=[0, max_c * 1.02], showgrid=False, zeroline=False),
+        yaxis=dict(autorange="reversed", showgrid=False, zeroline=False, ticks="", tickfont=dict(size=13, color=INK)),
+    )
+    return fig
+
+
 funnel_rows = [
     ("Registered", 1119, 100.0),
     ("Attended (Eco Day or Partner Day)", 837, 74.8),
@@ -159,6 +197,22 @@ try:
 except Exception:
     pass
 
+sfdc_rows = [
+    ("ITL Free+Paid", 1102, 100.0),
+    ("New — handed to sales", 314, 28.5),
+    ("Working", 269, 24.4),
+    ("Qualified", 177, 16.1),
+]
+try:
+    sfdc_rows = [
+        (str(r["sfdc_status"]), int(r["people"]), float(r["pct_of_itl"]))
+        for _, r in lead_progression_table.iterrows()
+    ]
+except Exception:
+    pass
+
+display(_centered_funnel(sfdc_rows, "Lead progression · Salesforce status · ITL Free+Paid", 340))
+
 stages = [s for s, _, _ in funnel_rows]
 counts = [c for _, c, _ in funnel_rows]
 pcts = [p for _, _, p in funnel_rows]
@@ -177,7 +231,7 @@ display(
     _theme(
         funnel_fig,
         height=400,
-        title=dict(text="Leads progression · Salesforce CampaignMember", font=dict(size=16, color=INK)),
+        title=dict(text="Event people · CampaignMember attendance", font=dict(size=16, color=INK)),
         margin=dict(t=56, b=20, l=220, r=40),
     )
 )

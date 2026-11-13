@@ -112,7 +112,7 @@ def test_scoreboard_has_day_counts():
     ast.parse(src)
     for needle in (
         "1,269", "426", "916", "1,018",
-        "Salesforce conversion", "Opportunities",
+        "Lead progression", "Opportunities",
     ):
         assert needle in src, needle
     for gone in ("How 426 is built", "Site intent", "3.8M"):
@@ -124,6 +124,7 @@ def test_scoreboard_renders_overview():
     blob = _blob(calls)
     for needle in (
         "1,269", "426", "916", "1,018", "1,119", "837",
+        "1,102", "314", "Working", "Qualified",
         "€2.46M", "€2.43M", "New Business / ENT",
     ):
         assert needle in blob, needle
@@ -198,6 +199,21 @@ def test_four_views_compile_without_sql():
     ):
         calls = _exec_view(ROOT / name)
         assert calls, name
+    funnel_calls = _exec_view(ROOT / "notebook_funnel.py")
+    funnel_blob = _blob(funnel_calls)
+    assert "Lead progression" in funnel_blob
+    assert "1,102" in funnel_blob or "1102" in funnel_blob
+    assert "handed to sales" in funnel_blob or "New" in funnel_blob
+    funnel_figs = [c for c in funnel_calls if isinstance(c, go.Figure)]
+    assert funnel_figs, "Funnel Chart should open with a visual"
+    first = funnel_figs[0]
+    assert "Lead progression" in str(first.layout.title.text)
+    assert first.data[0].type == "bar"
+    assert first.data[0].orientation == "h"
+    assert not any(
+        isinstance(c, pd.DataFrame) and "sfdc_status" in getattr(c, "columns", [])
+        for c in funnel_calls
+    )
 
 
 def test_summary_has_sourced_and_attendance_rate():
@@ -249,7 +265,7 @@ def test_attendance_has_meetings_and_feedback():
 def test_section_markdown_tables_have_numbers():
     checks = {
         "notebook_overlap.md": ("426", "916", "324", "1,018"),
-        "notebook_funnel.md": ("1,119", "837", "20", "70", "6"),
+        "notebook_funnel.md": ("1,102", "314", "Working", "Qualified", "1,119", "837", "20", "70", "6"),
         "notebook_pipeline.md": ("€2,461,063", "New Business", "ENT"),
         "notebook_partner.md": ("426", "916", "391", "878"),
         "notebook_digital.md": ("174,802", "11,428", "84,904"),
@@ -260,7 +276,7 @@ def test_section_markdown_tables_have_numbers():
         "notebook_survey_eco.md": ("9.1", "NPS", "43", "33 promoters"),
         "notebook_survey_partner.md": ("9.1", "n=20", "Solution", "8.5"),
         "notebook_survey_session.md": ("4.8", "66", "24", "36"),
-        "notebook_lead_tables.md": ("1,102", "314", "Working", "Qualified", "Add to app"),
+        "notebook_lead_tables.md": ("1,102", "314", "Working", "Qualified", "Funnel Chart"),
     }
     for name, needles in checks.items():
         src = (ROOT / name).read_text()

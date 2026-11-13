@@ -54,10 +54,10 @@ _STAGE_SHORT = {
     "Closed Won": "Closed Won",
 }
 funnel = [
-    ("Registered", 1118, 100.0),
-    ("Attended", 835, 74.7),
+    ("Registered", 1119, 100.0),
+    ("Attended", 837, 74.8),
     ("Meeting booked", 20, 1.8),
-    ("Opportunity", 57, 5.1),
+    ("Opportunity", 70, 6.3),
     ("Closed Won", 6, 0.5),
 ]
 try:
@@ -73,12 +73,12 @@ except Exception:
     pass
 funnel_max = max((c for _, c, _ in funnel), default=1)
 
-pipe_total, pipe_open, pipe_won = 2421913, 2388273, 33640
-pipe_opps, pipe_won_n, pipe_open_n, pipe_meetings = 27, 3, 24, 1
+pipe_total, pipe_open, pipe_won = 2461063, 2427423, 33640
+pipe_opps, pipe_won_n, pipe_open_n, pipe_meetings = 29, 3, 26, 1
 pipe_mix = [
     ("New Business", "ENT", 5, 834000, 826000, 8000),
-    ("New Business", "MM", 11, 591200, 569200, 22000),
-    ("Expansion", "ENT", 3, 505000, 505000, 0),
+    ("New Business", "MM", 12, 619200, 597200, 22000),
+    ("Expansion", "ENT", 4, 516150, 516150, 0),
     ("Expansion", "MM", 8, 491713, 488073, 3640),
 ]
 try:
@@ -105,8 +105,8 @@ try:
 except Exception:
     pass
 
-src_n, src_amt, src_won, src_won_n = 11, 983000, 6400, 1
-inf_n, inf_amt, inf_won, inf_won_n = 16, 1131341, 25640, 2
+src_n, src_amt, src_won, src_won_n = 12, 1011000, 6400, 1
+inf_n, inf_amt, inf_won, inf_won_n = 18, 1170491, 25640, 2
 try:
     for _, r in itl_attribution_kpis.iterrows():
         bucket = str(r["bucket"])
@@ -139,9 +139,9 @@ try:
 except Exception:
     type_rows = [
         ("Sourced", "Expansion", 6, 666000, 666000, 0),
-        ("Sourced", "New Business", 5, 317000, 310600, 6400),
-        ("Influenced", "New Business", 13, 1081000, 1059000, 22000),
-        ("Influenced", "Expansion", 3, 50341, 46701, 3640),
+        ("Sourced", "New Business", 6, 345000, 338600, 6400),
+        ("Influenced", "New Business", 14, 1109000, 1087000, 22000),
+        ("Influenced", "Expansion", 4, 61491, 57851, 3640),
     ]
 
 funnel_rows = []

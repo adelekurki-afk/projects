@@ -11,7 +11,7 @@ Tabs in App builder: **Summary**, **Attendance**, **Funnel**, **Intent**.
 | Participants per day | Fliplet visits (426 / 916) | Locked |
 | Staff / speakers / CAB | Tickets 113, speakers 116, CAB 39 | Locked overlays |
 | Attendance % | Came / tickets: 426/487 Partner, 916/1,205 Eco | Locked |
-| Full funnel | Salesforce `lead_funnel` | Live |
+| Full funnel | Salesforce `lead_funnel` (`salesforce_bq.CampaignMember` + Opportunity) | Live from BQ; App Funnel chart is a 13 Nov snapshot so it does not NameError |
 | Sourced vs influenced | `itl_sourced_influenced_opps` | Live |
 | Expansion / partner / net new / closed | `pipeline_arr` + sourced list Type | Live |
 
@@ -25,7 +25,7 @@ Tabs in App builder: **Summary**, **Attendance**, **Funnel**, **Intent**.
 | Seniority | Title buckets on Salesforce Attended | SQL |
 | Sessions | Fliplet Scans, User Game Scans, Session Feedback | Door scans 391/878; no named session-scan column |
 | Meetings | [In The Loop_sales meetings](https://docs.google.com/spreadsheets/d/1IqHpjJ0mkhT9rxvMIa6fAdzC-5pzr2zLYi7uA3CSAgI) | 23 people on the sheet |
-| Feedback | [Partner Day Feedback](https://docs.google.com/spreadsheets/d/1DP1XSQFvFQbpdg0B48Z1eK8YVed38O0PXYPsojLDNic) | Partner Day only; no Ecosystem survey found |
+| Feedback | [shared Fliplet workbook](https://docs.google.com/spreadsheets/d/1ZGiFP8wgcpaFESOY7WuDSgwGdztCTivzmwdWK87JsrU) tabs Ecosystem Day Feedback Survey + Partner Day Feedback Survey | Eco recommend 9.1/10 (n=43, NPS 72); Partner overall 8.8/10 (n=23) |
 
 ## Funnel
 

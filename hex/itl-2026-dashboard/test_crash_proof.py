@@ -123,8 +123,8 @@ def test_scoreboard_has_day_counts():
 def test_scoreboard_renders_overview():
     html = _exec_html(ROOT / "notebook_scoreboard.py")
     for needle in (
-        "1,269", "426", "916", "1,018", "1,118", "835",
-        "€2.42M", "€2.39M", "New Business / ENT",
+        "1,269", "426", "916", "1,018", "1,119", "837",
+        "€2.46M", "€2.43M", "New Business / ENT",
     ):
         assert needle in html, needle
     for gone in ("How 426 is built", "3.8M", "Berlin events · conference week"):
@@ -209,6 +209,7 @@ def test_attendance_has_meetings_and_feedback():
         "Attendance",
         "Sales meetings sheet",
         "Partner Day overall",
+        "Ecosystem recommend",
         "Community Lounge",
         "Salesforce Attended",
     ):
@@ -218,8 +219,8 @@ def test_attendance_has_meetings_and_feedback():
 def test_section_markdown_tables_have_numbers():
     checks = {
         "notebook_overlap.md": ("426", "916", "324", "1,018"),
-        "notebook_funnel.md": ("1,118", "835", "20", "57", "6"),
-        "notebook_pipeline.md": ("€2,421,913", "New Business", "ENT"),
+        "notebook_funnel.md": ("1,119", "837", "20", "70", "6"),
+        "notebook_pipeline.md": ("€2,461,063", "New Business", "ENT"),
         "notebook_partner.md": ("426", "916", "391", "878"),
         "notebook_digital.md": ("174,802", "11,428", "84,904"),
         "notebook_participation_tab.md": ("426", "916", "324", "1,018", "391", "878"),

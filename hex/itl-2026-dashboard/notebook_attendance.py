@@ -182,11 +182,26 @@ try:
     )
     display(
         _bars(
-            "Feedback sheets · Partner Day overall 8.6/10 (22 surveys). No Ecosystem Day survey in Drive.",
+            "Feedback · Ecosystem and Partner Day survey tabs",
             [
-                ("Partner Day overall (x10)", 86),
-                ("Session rating (x10, from /5)", 48),
+                ("Ecosystem recommend 9.1/10 (n=43, NPS 72)", 91),
+                ("Partner Day overall 8.8/10 (n=23)", 88),
+                ("Session rating 4.8/5 (n=66, x10)", 48),
             ],
+        )
+    )
+    display(
+        _bars(
+            "Ecosystem Day · more of next year (n=43, pick up to 3)",
+            [
+                ("Business value and ROI", 21),
+                ("Features and roadmap", 21),
+                ("Running n8n at scale", 19),
+                ("Workshops and build-alongs", 19),
+                ("Agents for production", 19),
+                ("Customer case studies", 16),
+            ],
+            "#4F7FB8",
         )
     )
 except Exception as err:

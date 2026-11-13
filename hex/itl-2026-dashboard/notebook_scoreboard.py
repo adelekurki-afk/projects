@@ -54,10 +54,10 @@ _STAGE_SHORT = {
     "Closed Won": "Closed Won",
 }
 funnel = [
-    ("Registered", 1118, 100.0),
-    ("Attended", 835, 74.7),
+    ("Registered", 1119, 100.0),
+    ("Attended", 837, 74.8),
     ("Meeting booked", 20, 1.8),
-    ("Opportunity", 57, 5.1),
+    ("Opportunity", 70, 6.3),
     ("Closed Won", 6, 0.5),
 ]
 try:
@@ -73,12 +73,12 @@ except Exception:
     pass
 funnel_max = max((c for _, c, _ in funnel), default=1)
 
-pipe_total, pipe_open, pipe_won = 2421913, 2388273, 33640
-pipe_opps, pipe_won_n, pipe_open_n, pipe_meetings = 27, 3, 24, 1
+pipe_total, pipe_open, pipe_won = 2461063, 2427423, 33640
+pipe_opps, pipe_won_n, pipe_open_n, pipe_meetings = 29, 3, 26, 1
 pipe_mix = [
     ("New Business", "ENT", 5, 834000, 826000, 8000),
-    ("New Business", "MM", 11, 591200, 569200, 22000),
-    ("Expansion", "ENT", 3, 505000, 505000, 0),
+    ("New Business", "MM", 12, 619200, 597200, 22000),
+    ("Expansion", "ENT", 4, 516150, 516150, 0),
     ("Expansion", "MM", 8, 491713, 488073, 3640),
 ]
 try:

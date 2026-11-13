@@ -11,7 +11,7 @@ The Classic App has three tabs. The four views sit on those tabs — they are no
 | App tab | View |
 | --- | --- |
 | **Overview** | Summary at the top, **Funnel** under it |
-| **Participation** | **Attendance** |
+| **Participation** | **Attendance** — KPI row, how 426 / 916 is built, unique stacked bar, floor scans, Salesforce mix |
 | **Intent** | Website / YouTube / paid search |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.

@@ -191,6 +191,9 @@ def test_four_views_compile_without_sql():
         "notebook_attendance.py",
         "notebook_funnel.py",
         "notebook_intent.py",
+        "notebook_survey_eco.py",
+        "notebook_survey_partner.py",
+        "notebook_survey_session.py",
     ):
         calls = _exec_view(ROOT / name)
         assert calls, name
@@ -203,6 +206,25 @@ def test_summary_has_sourced_and_attendance_rate():
     blob = src + "\n" + _blob(_exec_view(ROOT / "notebook_summary.py"))
     assert "Sourced opps" in blob
     assert "Participants per day" in blob
+
+
+def test_survey_and_lead_cells_have_pin_labels():
+    eco = _blob(_exec_view(ROOT / "notebook_survey_eco.py"))
+    partner = _blob(_exec_view(ROOT / "notebook_survey_partner.py"))
+    session = _blob(_exec_view(ROOT / "notebook_survey_session.py"))
+    for needle in ("Recommend attending In The Loop", "9.1", "NPS", "n8n Agents"):
+        assert needle in eco or needle in (ROOT / "notebook_survey_eco.py").read_text(), needle
+    assert "9.1" in (ROOT / "notebook_survey_eco.py").read_text()
+    assert "n=20" in partner or "n=20" in (ROOT / "notebook_survey_partner.py").read_text()
+    assert "Session score" in session or "Session /5" in (ROOT / "notebook_survey_session.py").read_text()
+    for path in (
+        "lean/lead_campaign_statuses.sql",
+        "lean/lead_sfdc_statuses.sql",
+        "lean/lead_progression.sql",
+    ):
+        src = (ROOT / path).read_text()
+        assert "701cj0000157ynMAAQ" in src or "lead_funnel" in src
+    assert "Contact_or_Lead_Status__c" in (ROOT / "lean/lead_sfdc_statuses.sql").read_text()
 
 
 def test_attendance_has_meetings_and_feedback():
@@ -229,6 +251,10 @@ def test_section_markdown_tables_have_numbers():
         "notebook_participation_tab.md": ("426", "916", "324", "1,018", "391", "878"),
         "notebook_intent_tab.md": ("+33%", "12–18 Oct", "5–11 Oct", "3.8M", "262k"),
         "lean_readout.md": ("426", "916", "1,018", "1,119", "+33%"),
+        "notebook_survey_eco.md": ("9.1", "NPS", "43", "33 promoters"),
+        "notebook_survey_partner.md": ("9.1", "n=20", "Solution", "8.5"),
+        "notebook_survey_session.md": ("4.8", "66", "24", "36"),
+        "notebook_lead_tables.md": ("1,119", "837", "Add to app", "Contact_or_Lead_Status__c"),
     }
     for name, needles in checks.items():
         src = (ROOT / name).read_text()
@@ -272,6 +298,7 @@ if __name__ == "__main__":
     test_participation_tab_html()
     test_intent_tab_explains_timeframes()
     test_four_views_compile_without_sql()
+    test_survey_and_lead_cells_have_pin_labels()
     test_summary_has_sourced_and_attendance_rate()
     test_attendance_has_meetings_and_feedback()
     test_section_markdown_tables_have_numbers()

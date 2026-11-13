@@ -10,8 +10,8 @@ The Classic App has three tabs. The four views sit on those tabs — they are no
 
 | App tab | View |
 | --- | --- |
-| **Overview** | Summary at the top, **Funnel** under it |
-| **Participation** | **Attendance** — KPI row, how 426 / 916 is built, unique stacked bar, floor scans, Salesforce mix |
+| **Overview** | Summary at the top, **Funnel** under it. Pin **APP: Lead progression** / lead-status SQL tables here |
+| **Participation** | **Attendance**. Pin per-survey cells (**Ecosystem Day**, **Partner Day**, **Session feedback**) here |
 | **Intent** | Website / YouTube / paid search |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
@@ -24,11 +24,11 @@ Same shape as Paid Some LinkedIn: a Result paragraph, then Hex-native charts and
 
 `APP: Participation` is self-contained Plotly (no SQL names from later in the notebook). App runs top-to-bottom; a forward reference was red-erroring that cell.
 
-Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniority — a different clock). Fliplet door scans 391 / 878. Zone game scans. n8n sales meetings sheet 23 people. Fliplet booked meetings 1,076. Partner Day survey 8.8/10 (n=23) and Ecosystem Day recommend 9.1/10 (n=43) on the shared Fliplet workbook. No named session-scan column.
+Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniority — a different clock). Fliplet door scans 391 / 878. Zone game scans. n8n sales meetings sheet 23 people. Fliplet booked meetings 1,076. Per-survey cells at the bottom of the notebook: Ecosystem recommend 9.1/10 (n=43, NPS 72), Partner overall 9.1/10 (n=20 after dropping 3 Fillout tests), session score 4.8/5 (n=62). Hex API cannot pin them — Add to app. No named session-scan column.
 
 ## Funnel
 
-Leads progression from BigQuery, AI SDR vs humans (`first_meeting_source` — none of the current ITL sourced/influenced deals are Freddy), opportunities per stage, sourced list, influenced list, closed won.
+Leads progression from BigQuery, AI SDR vs humans (`first_meeting_source` — none of the current ITL sourced/influenced deals are Freddy), opportunities per stage, sourced list, influenced list, closed won. Pin-ready SQL: **APP: Lead progression**, **APP: Campaign member statuses**, **APP: Salesforce lead statuses**, **APP: Opportunity stages**, **APP: Sourced vs influenced**.
 
 ## Intent
 

@@ -14,6 +14,8 @@ Fliplet visits 426 / 916 / 1,018, staff 113, speakers 116, CAB 39, attendance 87
 
 ## Attendance
 
+`APP: Participation` is self-contained Plotly (no SQL names from later in the notebook). App runs top-to-bottom; a forward reference was red-erroring that cell.
+
 Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniority — a different clock). Fliplet door scans 391 / 878. Zone game scans. n8n sales meetings sheet 23 people. Fliplet booked meetings 1,076. Partner Day survey 8.6/10. No Ecosystem Day survey in Drive. No named session-scan column.
 
 ## Funnel

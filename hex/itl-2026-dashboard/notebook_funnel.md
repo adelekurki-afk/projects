@@ -1,5 +1,7 @@
 # Funnel
 
+This sits on the **Overview** tab, under the summary.
+
 Salesforce Free/Paid campaign members, not Fliplet 1,269 / 426 / 916. Snapshot 13 Nov 2026, Europe/Madrid.
 
 ## Result

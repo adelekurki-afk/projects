@@ -1,6 +1,6 @@
 # Attendance
 
-Run **APP: Executive scoreboard**, then **Run all**. Refresh the App. Do not Reset layout.
+This is the Participation tab.
 
 Fliplet is who walked in. Salesforce Attended is a different clock — do not mix the two.
 

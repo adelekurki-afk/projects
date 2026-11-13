@@ -6,7 +6,15 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 
 **Notebook:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
-Four views on that project. After SQL/CODE edits, **Run all** then refresh the App. Markdown on a tab updates without Run all. Do not Reset layout.
+The Classic App has three tabs. The four views sit on those tabs — they are not four extra tabs (the API cannot add one):
+
+| App tab | View |
+| --- | --- |
+| **Overview** | Summary at the top, **Funnel** under it |
+| **Participation** | **Attendance** |
+| **Intent** | Website / YouTube / paid search |
+
+After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
 
 ## Summary
 

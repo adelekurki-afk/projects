@@ -6,29 +6,92 @@ from IPython.display import display
 CORAL = "#FF6D5A"
 BLUE = "#5B8FC7"
 INK = "#9CA3AF"
-ITL_WEEK = "2026-10-12"
 
-
-def _itl_int(value, default=0):
-    try:
-        if value is None:
-            return default
-        return int(value)
-    except Exception:
-        return default
+# Snapshot 13 Nov 2026 Europe/Madrid — baked so the App cell can run before the SQL cells.
+_WEEKLY = pd.DataFrame(
+    [
+        ("2026-06-01", 212181, 58482, 12606),
+        ("2026-06-08", 211254, 58645, 13511),
+        ("2026-06-15", 197717, 54521, 12537),
+        ("2026-06-22", 191155, 49089, 11727),
+        ("2026-06-29", 185104, 49949, 12415),
+        ("2026-07-06", 189926, 49332, 12054),
+        ("2026-07-13", 188846, 47744, 12043),
+        ("2026-07-20", 194738, 48513, 12136),
+        ("2026-07-27", 236602, 56956, 13618),
+        ("2026-08-03", 262172, 61565, 14579),
+        ("2026-08-10", 249628, 57532, 11964),
+        ("2026-08-17", 246108, 54330, 11695),
+        ("2026-08-24", 248937, 60938, 12353),
+        ("2026-08-31", 234251, 57310, 11403),
+        ("2026-09-07", 183289, 45908, 9592),
+        ("2026-09-14", 176849, 45743, 9928),
+        ("2026-09-21", 171052, 43775, 9520),
+        ("2026-09-28", 168643, 44217, 9699),
+        ("2026-10-05", 173571, 45211, 9934),
+        ("2026-10-12", 174802, 45978, 10563),
+        ("2026-10-19", 186284, 47289, 10207),
+        ("2026-10-26", 176581, 43195, 9029),
+        ("2026-11-02", 163038, 40449, 8481),
+    ],
+    columns=["week_start", "n8n_users", "europe_users", "germany_users"],
+)
+_YOUTUBE = pd.DataFrame(
+    [
+        ("2026-07-06", 3248654),
+        ("2026-07-13", 2866279),
+        ("2026-07-20", 2934305),
+        ("2026-07-27", 2757976),
+        ("2026-08-03", 2793957),
+        ("2026-08-10", 2906293),
+        ("2026-08-17", 2599058),
+        ("2026-08-24", 3207865),
+        ("2026-08-31", 4148747),
+        ("2026-09-07", 3928055),
+        ("2026-09-14", 3822707),
+        ("2026-09-21", 3743902),
+        ("2026-09-28", 3595988),
+        ("2026-10-05", 3611676),
+        ("2026-10-12", 3424076),
+        ("2026-10-19", 3189414),
+        ("2026-10-26", 2983691),
+        ("2026-11-02", 2820043),
+    ],
+    columns=["week_start", "views_gained"],
+)
+_PAID = pd.DataFrame(
+    [
+        ("n8n", 56162, 24376, 16650.13),
+        ("ai", 9751, 434, 1161.03),
+        ("claude ai", 2753, 186, 920.24),
+        ("best business ai", 2336, 1283, 1485.32),
+        ("best ai for business", 1381, 735, 647.39),
+        ("n8n ai", 1369, 650, 608.77),
+        ("n8n login", 1247, 627, 295.09),
+        ("n8n workflows", 1109, 468, 621.32),
+        ("ai platforms", 980, 526, 475.23),
+        ("ai for work", 969, 496, 376.33),
+        ("n8n pricing", 855, 538, 648.79),
+        ("ai for businesses", 805, 423, 375.67),
+        ("what is n8n", 757, 52, 58.45),
+        ("n8n cloud", 556, 265, 359.89),
+        ("n8n automation", 395, 118, 93.84),
+    ],
+    columns=["term", "impressions", "clicks", "cost"],
+)
 
 
 def _week(val):
     return str(val)[:10]
 
 
-def _theme(fig, height=340, **kw):
+def _theme(fig, height=320, **kw):
     layout = dict(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
         height=height,
-        margin=dict(t=60, b=40, l=50, r=20),
+        margin=dict(t=56, b=36, l=48, r=16),
         legend=dict(orientation="h", y=1.08, bgcolor="rgba(0,0,0,0)"),
     )
     layout.update(kw)
@@ -40,36 +103,12 @@ def _theme(fig, height=340, **kw):
 
 def _line(df, y_cols, title, y_title):
     fig = go.Figure()
-    colors = {
-        "n8n_users": "#9CA3AF",
-        "europe_users": BLUE,
-        "germany_users": CORAL,
-        "views_gained": CORAL,
-        "videos_published": BLUE,
-        "n8n_videos_published": "#CBD5E1",
-    }
-    names = {
-        "n8n_users": "Worldwide",
-        "europe_users": "Europe",
-        "germany_users": "Germany",
-        "views_gained": "Views gained",
-        "videos_published": "Videos published",
-        "n8n_videos_published": "n8n-related published",
-    }
     x = [_week(v) for v in df["week_start"]]
-    for col in y_cols:
+    for col, color, name in y_cols:
         if col not in df.columns:
             continue
         y = [0 if v != v else float(v) for v in df[col].tolist()]
-        fig.add_trace(
-            go.Scatter(
-                x=x,
-                y=y,
-                mode="lines",
-                name=names.get(col, col),
-                line=dict(color=colors.get(col, CORAL), width=2),
-            )
-        )
+        fig.add_trace(go.Scatter(x=x, y=y, mode="lines", name=name, line=dict(color=color, width=2)))
     fig.add_vrect(
         x0="2026-10-12",
         x1="2026-10-18",
@@ -83,64 +122,67 @@ def _line(df, y_cols, title, y_title):
     return _theme(fig, title=dict(text=title, font=dict(size=16, color=INK)), yaxis_title=y_title)
 
 
+weekly = _WEEKLY.copy()
 try:
     w = intent_weekly.copy()
-    w = w[w["week_start"].astype(str) < "2026-11-09"]
-    display(_line(w, ["n8n_users"], "n8n.io users · worldwide", "Users"))
-    display(_line(w, ["europe_users", "germany_users"], "n8n.io users · Europe and Germany", "Users"))
+    w["week_start"] = w["week_start"].map(_week)
+    w = w[w["week_start"] < "2026-11-09"]
+    if not w.empty:
+        weekly = w
 except Exception:
-    display(pd.DataFrame({"note": ["Run intent_weekly, then Run all."]}))
+    pass
 
+youtube = _YOUTUBE.copy()
 try:
     y = intent_youtube.copy()
-    display(_line(y, ["views_gained"], "YouTube views gained", "Views"))
-    display(_line(y, ["videos_published", "n8n_videos_published"], "YouTube videos published", "Videos"))
+    y["week_start"] = y["week_start"].map(_week)
+    if not y.empty:
+        youtube = y
 except Exception:
-    display(pd.DataFrame({"note": ["Run intent_youtube, then Run all. Views are reliable from July 2026."]}))
+    pass
 
+paid = _PAID.copy()
 try:
-    inst = intent_instances.copy()
-    fig = go.Figure()
-    palette = [CORAL, BLUE, "#CBD5E1", "#94A3B8", "#F59E0B", "#10B981"]
-    types = list(inst["deployment_type"].dropna().unique())
-    for i, dtype in enumerate(sorted(types)):
-        part = inst[inst["deployment_type"] == dtype].sort_values("week_start")
-        fig.add_trace(
-            go.Scatter(
-                x=[_week(v) for v in part["week_start"]],
-                y=part["acquired_instances"],
-                mode="lines",
-                name=str(dtype),
-                line=dict(color=palette[i % len(palette)], width=2),
-            )
-        )
-    fig.add_vrect(
-        x0="2026-10-12",
-        x1="2026-10-18",
-        fillcolor=CORAL,
-        opacity=0.18,
-        line_width=0,
-        annotation_text="ITL week",
-        annotation_position="top left",
-        annotation_font=dict(color=INK, size=11),
+    p = intent_paid_keywords.head(15).copy()
+    p = p.rename(columns={"search_term": "term"})
+    keep = [c for c in ("term", "impressions", "clicks", "cost") if c in p.columns]
+    if keep:
+        paid = p[keep]
+except Exception:
+    pass
+
+display(
+    _line(
+        weekly,
+        [("n8n_users", "#9CA3AF", "Worldwide")],
+        "n8n.io users · worldwide",
+        "Users",
     )
-    display(_theme(fig, height=360, title=dict(text="Acquired instances by type", font=dict(size=16, color=INK)), yaxis_title="Instances"))
-except Exception:
-    display(pd.DataFrame({"note": ["Run intent_instances, then Run all."]}))
-
-try:
-    paid = intent_paid_keywords.head(15).copy()
-    paid = paid.rename(columns={"search_term": "term"})
-    keep = [c for c in ("term", "impressions", "clicks", "cost") if c in paid.columns]
-    display(paid[keep] if keep else paid)
-except Exception:
-    display(pd.DataFrame({"note": ["Run intent_paid_keywords, then Run all. Paid Google Ads terms · 12–18 Oct. Organic SEO / AEO is not in this warehouse."]}))
-
+)
+display(
+    _line(
+        weekly,
+        [("europe_users", BLUE, "Europe"), ("germany_users", CORAL, "Germany")],
+        "n8n.io users · Europe and Germany",
+        "Users",
+    )
+)
+display(
+    _line(
+        youtube,
+        [("views_gained", CORAL, "Views gained")],
+        "YouTube views gained",
+        "Views",
+    )
+)
+display(paid)
 display(
     pd.DataFrame(
         {
             "gap": ["Social posts"],
-            "status": ["No Common Room table exists in this warehouse. Cannot show conference-week social posts until that source is connected."],
+            "status": [
+                "No Common Room table exists in this warehouse. Cannot show conference-week social posts until that source is connected."
+            ],
         }
     )
 )

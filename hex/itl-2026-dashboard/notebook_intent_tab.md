@@ -1,6 +1,6 @@
 # Intent
 
-n8n.io demand around the conference. Coral band is 12–18 Oct vs 5–11 Oct.
+This is the Intent tab. n8n.io demand around the conference. Coral band is 12–18 Oct vs 5–11 Oct.
 
 ## Result
 

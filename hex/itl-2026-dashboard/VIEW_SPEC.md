@@ -2,7 +2,7 @@
 
 Stay on [In the Loop 2026 — Lead & Pipeline Dashboard](https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app). Do not use the seven-cell scratch project.
 
-Same shape as Paid Some LinkedIn: a Result paragraph, then Plotly charts and Hex-native tables. No custom HTML (it vanishes in dark mode). Tabs in the App stay **Overview**, **Participation**, **Intent**.
+Same shape as Paid Some LinkedIn: a Result paragraph, then Plotly charts and Hex-native tables. No custom HTML (it vanishes in dark mode). The App still has three tabs: **Overview** (summary + funnel), **Participation** (attendance), **Intent**. Leftover APP charts (registrant mix, pipeline, staff KPIs, CAB, YouTube landings, role mix) are removed so those views are actually visible.
 
 ## Summary
 

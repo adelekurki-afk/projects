@@ -1,4 +1,5 @@
--- Ever reached each Salesforce status. Pin as APP: SFDC lead reached.
+-- Ever reached each Salesforce status. SQL is the dataframe only.
+-- The App visual is the CODE cell APP: SFDC lead reached (Plotly). Hex cannot chart a SQL pin.
 -- Includes Leads (Lead.Status / LeadHistory) and Contacts (Status__c / ContactHistory).
 WITH itl AS (
   SELECT
@@ -53,6 +54,12 @@ itl_people AS (
   SELECT COUNT(DISTINCT email) AS itl_people FROM itl WHERE email IS NOT NULL
 )
 SELECT
+  c.sfdc_status,
+  REPEAT(CHR(9608), CAST(GREATEST(1, ROUND(COUNT(DISTINCT c.email) / 35)) AS INT64)) AS reached,
+  CAST(COUNT(DISTINCT c.email) AS STRING) AS people_ever_reached,
+  CAST(COUNT(DISTINCT IF(c.src = 'lead', c.email, NULL)) AS STRING) AS as_lead,
+  CAST(COUNT(DISTINCT IF(c.src = 'contact', c.email, NULL)) AS STRING) AS as_contact,
+  CAST(ROUND(100.0 * COUNT(DISTINCT c.email) / p.itl_people, 1) AS STRING) AS pct_of_itl,
   CASE c.sfdc_status
     WHEN 'Suspect' THEN 1
     WHEN 'New' THEN 2
@@ -62,13 +69,8 @@ SELECT
     WHEN 'Unqualified' THEN 6
     ELSE 9
   END AS stage_n,
-  c.sfdc_status,
-  COUNT(DISTINCT IF(c.src = 'lead', c.email, NULL)) AS as_lead,
-  COUNT(DISTINCT IF(c.src = 'contact', c.email, NULL)) AS as_contact,
-  COUNT(DISTINCT c.email) AS people_ever_reached,
-  p.itl_people,
-  ROUND(100.0 * COUNT(DISTINCT c.email) / p.itl_people, 1) AS pct_of_itl
+  p.itl_people
 FROM combined c
 CROSS JOIN itl_people p
-GROUP BY 1, 2, p.itl_people
-ORDER BY stage_n, people_ever_reached DESC
+GROUP BY 1, p.itl_people
+ORDER BY stage_n

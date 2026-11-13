@@ -2,7 +2,7 @@
 
 Stay on [In the Loop 2026 — Lead & Pipeline Dashboard](https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app). Do not use the seven-cell scratch project.
 
-Tabs in App builder: **Summary**, **Attendance**, **Funnel**, **Intent**.
+Same shape as Paid Some LinkedIn: a Result paragraph, then tables. Tabs in App builder: **Summary**, **Attendance**, **Funnel**, **Intent**.
 
 ## Summary
 

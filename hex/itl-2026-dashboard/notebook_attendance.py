@@ -1,208 +1,133 @@
-import plotly.graph_objects as go
-from IPython.display import display
+from IPython.display import display, HTML
 
-# Self-contained. Do not reference Hex dataframes defined later in the notebook —
-# App runs top-to-bottom, and a forward reference red-errors this cell.
+# Self-contained. Do not reference Hex dataframes defined later in the notebook.
 
-
-def _empty(msg):
-    fig = go.Figure()
-    fig.add_annotation(text=msg, showarrow=False, font=dict(size=14, color="#6B7280"))
-    fig.update_layout(
-        height=180,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
-        margin=dict(t=20, b=20, l=20, r=20),
-        font=dict(family="Inter, Arial, sans-serif", color="#333"),
-    )
-    return fig
+ITL_CSS = """
+.itl { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; max-width: 920px; }
+.itl h2 { font-size: 18px; font-weight: 700; margin: 28px 0 8px; letter-spacing: -0.01em; }
+.itl h2:first-child { margin-top: 4px; }
+.itl p { font-size: 14px; line-height: 1.55; color: #4B5563; margin: 0 0 12px; }
+.itl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 4px; }
+.itl th { text-align: left; font-weight: 600; color: #6B7280; padding: 8px 12px 8px 0; border-bottom: 1px solid #E5E7EB; }
+.itl td { padding: 8px 12px 8px 0; border-bottom: 1px solid #F3F4F6; }
+.itl th.n, .itl td.n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+.itl .cap { font-size: 13px; color: #6B7280; margin: 4px 0 20px; }
+"""
 
 
-def _pair(title, left_title, left_rows, right_title, right_rows):
-    from plotly.subplots import make_subplots
-
-    n = max(len(left_rows), len(right_rows), 1)
-    fig = make_subplots(
-        rows=1,
-        cols=2,
-        subplot_titles=(left_title, right_title),
-        horizontal_spacing=0.18,
-    )
-    for col, rows, color in (
-        (1, left_rows, "#FF6D5A"),
-        (2, right_rows, "#4F7FB8"),
-    ):
-        names = [name for name, _ in rows][::-1]
-        vals = [val for _, val in rows][::-1]
-        fig.add_bar(
-            y=names,
-            x=vals,
-            orientation="h",
-            marker_color=color,
-            text=vals,
-            textposition="outside",
-            showlegend=False,
-            row=1,
-            col=col,
-        )
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=16)),
-        height=max(280, 28 * n + 140),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(t=80, b=30, l=20, r=50),
-        font=dict(family="Inter, Arial, sans-serif", color="#333", size=12),
-    )
-    fig.update_xaxes(showgrid=True, gridcolor="#F0F0F0")
-    return fig
+def _c(tag):
+    return "<" + "/" + tag + ">"
 
 
-def _bars(title, rows, color="#FF6D5A"):
-    names = [name for name, _ in rows][::-1]
-    vals = [val for _, val in rows][::-1]
-    fig = go.Figure(
-        go.Bar(
-            y=names,
-            x=vals,
-            orientation="h",
-            marker_color=color,
-            text=vals,
-            textposition="outside",
-        )
-    )
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=16)),
-        height=max(260, 28 * len(rows) + 100),
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(t=60, b=30, l=20, r=50),
-        font=dict(family="Inter, Arial, sans-serif", color="#333", size=12),
-        xaxis=dict(showgrid=True, gridcolor="#F0F0F0"),
-    )
-    return fig
+def _table(headers, rows, caption=""):
+    head = []
+    for i, h in enumerate(headers):
+        head.append(f'<th class="n">{h}{_c("th")}' if i else f"<th>{h}{_c('th')}")
+    body = []
+    for row in rows:
+        cells = []
+        for i, cell in enumerate(row):
+            cls = ' class="n"' if i else ""
+            cells.append(f"<td{cls}>{cell}{_c('td')}")
+        body.append("<tr>" + "".join(cells) + _c("tr"))
+    cap = f'<p class="cap">{caption}{_c("p")}' if caption else ""
+    return "<table><tr>" + "".join(head) + _c("tr") + "".join(body) + _c("table") + cap
 
 
-try:
-    days = go.Figure(
-        go.Bar(
-            x=["Partner Day · 13 Oct", "Ecosystem Day · 14 Oct"],
-            y=[426, 916],
-            marker_color=["#FF6D5A", "#4F7FB8"],
-            text=["426", "916"],
-            textposition="outside",
-        )
-    )
-    days.update_layout(
-        title=dict(
-            text="Attendance · people per day (Fliplet) · 1,018 unique, 324 both days",
-            font=dict(size=16),
-        ),
-        height=300,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(t=60, b=40, l=40, r=20),
-        font=dict(family="Inter, Arial, sans-serif", color="#333"),
-        yaxis=dict(title="People", showgrid=True, gridcolor="#F0F0F0"),
-    )
-    display(days)
-
-    display(
-        _pair(
-            "Region per day · Salesforce Attended (not Fliplet 426 / 916)",
-            "Partner Day",
-            [("EMEA", 194), ("Unknown", 154), ("NA", 48), ("LATAM", 5), ("APAC", 1), ("ANZ", 1)],
-            "Ecosystem Day",
-            [("EMEA", 415), ("Unknown", 358), ("NA", 80), ("APAC", 8), ("LATAM", 4)],
-        )
-    )
-    display(
-        _pair(
-            "Sales segment per day · Salesforce Attended",
-            "Partner Day",
-            [("Unknown", 149), ("MM", 138), ("ENT", 64), ("SMB", 52)],
-            "Ecosystem Day",
-            [("Unknown", 343), ("MM", 304), ("ENT", 158), ("SMB", 60)],
-        )
-    )
-    display(
-        _pair(
-            "Seniority · title on Salesforce Attended",
-            "Partner Day",
-            [
-                ("Exec / founder", 87),
-                ("Manager / lead", 83),
-                ("IC / practitioner", 69),
-                ("Other", 61),
-                ("Director / head of", 42),
-                ("Unknown title", 28),
-                ("Partner / consultant", 28),
-                ("VP", 4),
-            ],
-            "Ecosystem Day",
-            [
-                ("IC / practitioner", 206),
-                ("Manager / lead", 187),
-                ("Other", 145),
-                ("Exec / founder", 130),
-                ("Director / head of", 90),
-                ("Partner / consultant", 56),
-                ("Unknown title", 45),
-                ("VP", 6),
-            ],
-        )
-    )
-    display(
-        _bars(
-            "Attendance to sessions · Fliplet (no named session-scan column)",
-            [
-                ("Community Lounge", 484),
-                ("Cardputer Station", 425),
-                ("Solution Zone n8n", 377),
-                ("Candy Station", 350),
-                ("Coffee Station", 335),
-                ("Solution Zone Exhibitors", 293),
-                ("Connection Zone", 252),
-                ("Session ratings 4.8/5 (n=66)", 66),
-            ],
-        )
-    )
-    display(
-        _bars(
-            "Attendance to meetings",
-            [
-                ("Fliplet booked", 1076),
-                ("Meeting arrivals", 425),
-                ("Sales meetings sheet", 23),
-                ("Salesforce meeting booked", 20),
-            ],
-            "#4F7FB8",
-        )
-    )
-    display(
-        _bars(
-            "Feedback · Ecosystem and Partner Day survey tabs",
-            [
-                ("Ecosystem recommend 9.1/10 (n=43, NPS 72)", 91),
-                ("Partner Day overall 8.8/10 (n=23)", 88),
-                ("Session rating 4.8/5 (n=66, x10)", 48),
-            ],
-        )
-    )
-    display(
-        _bars(
-            "Ecosystem Day · more of next year (n=43, pick up to 3)",
-            [
-                ("Business value and ROI", 21),
-                ("Features and roadmap", 21),
-                ("Running n8n at scale", 19),
-                ("Workshops and build-alongs", 19),
-                ("Agents for production", 19),
-                ("Customer case studies", 16),
-            ],
-            "#4F7FB8",
-        )
-    )
-except Exception as err:
-    display(_empty("Attendance view: " + type(err).__name__))
+body = f"""
+<div class="itl">
+  <h2>People per day{_c("h2")}
+  {_table(
+      ["Day", "Came", "How built"],
+      [
+          ("Partner Day · 13 Oct", "426", "391 door + 35 badge"),
+          ("Ecosystem Day · 14 Oct", "916", "878 door + 38 green YES"),
+          ("Unique people", "1,018", "324 both days · 102 Partner only · 592 Eco only"),
+      ],
+      "Fliplet visits. Salesforce Attended is a different clock.",
+  )}
+  <h2>Region per day · Salesforce Attended{_c("h2")}
+  {_table(
+      ["Region", "Partner Day", "Ecosystem Day"],
+      [
+          ("EMEA", "194", "415"),
+          ("Unknown", "154", "358"),
+          ("NA", "48", "80"),
+          ("LATAM", "5", "4"),
+          ("APAC", "1", "8"),
+          ("ANZ", "1", "—"),
+      ],
+      "Not Fliplet 426 / 916.",
+  )}
+  <h2>Sales segment per day · Salesforce Attended{_c("h2")}
+  {_table(
+      ["Segment", "Partner Day", "Ecosystem Day"],
+      [
+          ("Unknown", "149", "343"),
+          ("MM", "138", "304"),
+          ("ENT", "64", "158"),
+          ("SMB", "52", "60"),
+      ],
+  )}
+  <h2>Seniority · title on Salesforce Attended{_c("h2")}
+  {_table(
+      ["Seniority", "Partner Day", "Ecosystem Day"],
+      [
+          ("Exec / founder", "87", "130"),
+          ("Manager / lead", "83", "187"),
+          ("IC / practitioner", "69", "206"),
+          ("Other", "61", "145"),
+          ("Director / head of", "42", "90"),
+          ("Unknown title", "28", "45"),
+          ("Partner / consultant", "28", "56"),
+          ("VP", "4", "6"),
+      ],
+  )}
+  <h2>Attendance to sessions · Fliplet{_c("h2")}
+  {_table(
+      ["Zone or signal", "Scans"],
+      [
+          ("Community Lounge", "484"),
+          ("Cardputer Station", "425"),
+          ("Solution Zone n8n", "377"),
+          ("Candy Station", "350"),
+          ("Coffee Station", "335"),
+          ("Solution Zone Exhibitors", "293"),
+          ("Connection Zone", "252"),
+          ("Session ratings 4.8/5 (n=66)", "66"),
+      ],
+      "No named session-scan column in the workbook.",
+  )}
+  <h2>Attendance to meetings{_c("h2")}
+  {_table(
+      ["Clock", "Count"],
+      [
+          ("Fliplet booked", "1,076"),
+          ("Meeting arrivals", "425"),
+          ("Sales meetings sheet", "23"),
+          ("Salesforce meeting booked", "20"),
+      ],
+  )}
+  <h2>Feedback · Ecosystem and Partner Day survey tabs{_c("h2")}
+  {_table(
+      ["Survey", "Score"],
+      [
+          ("Ecosystem recommend (n=43, NPS 72)", "9.1 / 10"),
+          ("Partner Day overall (n=23)", "8.8 / 10"),
+          ("Session rating (n=66)", "4.8 / 5"),
+      ],
+  )}
+  {_table(
+      ["Ecosystem Day · more of next year (n=43, pick up to 3)", "Mentions"],
+      [
+          ("Business value and ROI", "21"),
+          ("Features and roadmap", "21"),
+          ("Running n8n at scale", "19"),
+          ("Workshops and build-alongs", "19"),
+          ("Agents for production", "19"),
+          ("Customer case studies", "16"),
+      ],
+  )}
+{_c("div")}
+"""
+display(HTML("<style>" + ITL_CSS + _c("style") + body))

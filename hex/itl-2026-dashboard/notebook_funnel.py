@@ -1,10 +1,19 @@
-import plotly.graph_objects as go
 from IPython.display import display, HTML
 
-# Self-contained Salesforce funnel. App runs top-to-bottom; SQL cells later
-# in the notebook are not available here. Numbers are from BQ on 13 Nov 2026
-# (Europe/Madrid). Run lead_funnel / pipeline_arr / itl_sourced_influenced_opps
-# in the notebook to refresh, then replace the baked fallbacks.
+# Self-contained Salesforce funnel. App runs top-to-bottom; SQL later in the
+# notebook is not available here. Numbers from BQ on 13 Nov 2026 (Europe/Madrid).
+
+ITL_CSS = """
+.itl { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; max-width: 920px; }
+.itl h2 { font-size: 18px; font-weight: 700; margin: 28px 0 8px; letter-spacing: -0.01em; }
+.itl h2:first-child { margin-top: 4px; }
+.itl p { font-size: 14px; line-height: 1.55; color: #4B5563; margin: 0 0 12px; }
+.itl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 4px; }
+.itl th { text-align: left; font-weight: 600; color: #6B7280; padding: 8px 12px 8px 0; border-bottom: 1px solid #E5E7EB; }
+.itl td { padding: 8px 12px 8px 0; border-bottom: 1px solid #F3F4F6; }
+.itl th.n, .itl td.n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+.itl .cap { font-size: 13px; color: #6B7280; margin: 4px 0 20px; }
+"""
 
 
 def _euro(n):
@@ -12,11 +21,30 @@ def _euro(n):
         n = float(n)
     except Exception:
         n = 0
-    if n >= 1_000_000:
+    if abs(n) >= 1_000_000:
         return f"€{n / 1_000_000:.2f}M"
     if abs(n) >= 10_000:
         return f"€{n / 1_000:.0f}k"
     return f"€{int(round(n)):,}"
+
+
+def _c(tag):
+    return "<" + "/" + tag + ">"
+
+
+def _table(headers, rows, caption=""):
+    head = []
+    for i, h in enumerate(headers):
+        head.append(f'<th class="n">{h}{_c("th")}' if i else f"<th>{h}{_c('th')}")
+    body = []
+    for row in rows:
+        cells = []
+        for i, cell in enumerate(row):
+            cls = ' class="n"' if i else ""
+            cells.append(f"<td{cls}>{cell}{_c('td')}")
+        body.append("<tr>" + "".join(cells) + _c("tr"))
+    cap = f'<p class="cap">{caption}{_c("p")}' if caption else ""
+    return "<table><tr>" + "".join(head) + _c("tr") + "".join(body) + _c("table") + cap
 
 
 funnel_rows = [
@@ -144,127 +172,49 @@ try:
 except Exception:
     pass
 
-css = """
-.itl-funnel { font-family: Inter, Arial, sans-serif; color:#111827; max-width:1100px; }
-.itl-kicker { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#FF6D5A; margin:0 0 6px 0; }
-.itl-title { font-size:26px; font-weight:700; margin:0 0 6px 0; }
-.itl-sub { font-size:14px; color:#6B7280; margin:0 0 16px 0; }
-.itl-strip { display:grid; grid-template-columns:repeat(4,minmax(140px,1fr)); gap:12px; margin:0 0 16px 0; }
-.itl-tile { border:1px solid #E5E7EB; border-radius:10px; background:#fff; padding:16px 18px 14px; }
-.itl-val { font-size:28px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
-.itl-val.accent { color:#FF6D5A; }
-.itl-label { margin-top:8px; font-size:13px; color:#6B7280; font-weight:600; }
-.itl-hint { margin-top:4px; font-size:11px; color:#9CA3AF; }
-.itl-note { margin:12px 0 8px; font-size:13px; color:#6B7280; padding:12px 14px; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; }
+
+def _opp_rows(rows):
+    return [
+        (account, opp_type, stage, _euro(amount), segment)
+        for account, opp_type, stage, amount, segment in rows
+    ]
+
+
+body = f"""
+<div class="itl">
+  <h2>Leads progression{_c("h2")}
+  {_table(
+      ["Stage", "People", "% of registered"],
+      [(s, f"{c:,}", f"{p:.1f}%") for s, c, p in funnel_rows],
+      "70 is people on an account with a NB/Expansion opp created from 12 Oct, not 70 opportunities.",
+  )}
+  <h2>Sourced vs influenced{_c("h2")}
+  {_table(
+      ["Bucket", "Opps", "Amount", "Won"],
+      [
+          ("Sourced", f"{src_n}", _euro(src_amt), f"{src_won_n} · {_euro(src_won)}"),
+          ("Influenced", f"{inf_n}", _euro(inf_amt), f"{inf_won_n} · {_euro(inf_won)}"),
+          ("NB + Expansion pipeline", f"{pipe_opps}", _euro(pipe_total), f"{pipe_won_n} · {_euro(pipe_won)}"),
+      ],
+      f"Open pipeline {_euro(pipe_open)}. No Partner-typed opportunities — net new is New Business.",
+  )}
+  <h2>First meeting source{_c("h2")}
+  {_table(
+      ["Path", "Opps", "Amount"],
+      [(name, f"{n}", _euro(amt)) for name, n, amt in sdr_rows],
+      "ITL sourced + influenced NB/Expansion deals. AI SDR (Freddy) is not set on these 30.",
+  )}
+  <h2>Opportunities per Salesforce stage{_c("h2")}
+  {_table(
+      ["Attribution", "Stage", "Opps"],
+      [(b, s, f"{n}") for b, s, n in stage_rows],
+  )}
+  <h2>Opportunities sourced · {len(sourced)}{_c("h2")}
+  {_table(["Account", "Type", "Stage", "Amount", "Segment"], _opp_rows(sourced))}
+  <h2>Opportunities influenced · {len(influenced)}{_c("h2")}
+  {_table(["Account", "Type", "Stage", "Amount", "Segment"], _opp_rows(influenced))}
+  <h2>Closed won on this list · {len(won)}{_c("h2")}
+  {_table(["Account", "Type", "Stage", "Amount", "Segment"], _opp_rows(won))}
+{_c("div")}
 """
-header = f"""
-<style>{css}</style>
-<div class="itl-funnel">
-  <div class="itl-kicker">In the Loop 2026 · live from BigQuery</div>
-  <h1 class="itl-title">Funnel</h1>
-  <p class="itl-sub">Salesforce Free/Paid campaign members, not Fliplet 1,269 / 426 / 916. Snapshot 13 Nov 2026, Europe/Madrid.</p>
-  <div class="itl-strip">
-    <div class="itl-tile"><div class="itl-val accent">{src_n}</div><div class="itl-label">Sourced opps</div><div class="itl-hint">{_euro(src_amt)} · {src_won_n} won {_euro(src_won)}</div></div>
-    <div class="itl-tile"><div class="itl-val">{inf_n}</div><div class="itl-label">Influenced opps</div><div class="itl-hint">{_euro(inf_amt)} · {inf_won_n} won {_euro(inf_won)}</div></div>
-    <div class="itl-tile"><div class="itl-val">{_euro(pipe_total)}</div><div class="itl-label">NB + Expansion</div><div class="itl-hint">From 12 Oct · {pipe_opps} opps</div></div>
-    <div class="itl-tile"><div class="itl-val">{_euro(pipe_won)}</div><div class="itl-label">Closed won</div><div class="itl-hint">{pipe_won_n} deals on that clock</div></div>
-  </div>
-  <div class="itl-note">70 people sit on an account with a NB/Expansion opp created from 12 Oct. That is not 70 opportunities. Pipeline below is 29 NB+Expansion deals / {_euro(pipe_open)} open. No Partner-typed opportunities — net new is New Business. AI SDR (Freddy) is not set on these 30 sourced+influenced deals.</div>
-</div>
-"""
-display(HTML(header))
-
-stages = [s for s, _, _ in funnel_rows]
-counts = [c for _, c, _ in funnel_rows]
-pcts = [p for _, _, p in funnel_rows]
-fig = go.Figure(
-    go.Funnel(
-        y=stages,
-        x=counts,
-        text=[f"{c:,} ({p}%)" for c, p in zip(counts, pcts)],
-        textinfo="text",
-        textfont={"size": 14},
-        marker=dict(
-            color=["#FF6D5A", "#FF8F80", "#FFB3A7", "#FFC8BF", "#2D2D2D"],
-            line=dict(width=1, color="white"),
-        ),
-        connector=dict(line=dict(color="#E0E0E0", dash="dot", width=2)),
-    )
-)
-fig.update_layout(
-    title=dict(text="Leads progression · Salesforce CampaignMember", font=dict(size=18)),
-    height=420,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin={"t": 60, "b": 20, "l": 260, "r": 60},
-    font={"family": "Inter, Arial, sans-serif", "color": "#333"},
-)
-display(fig)
-
-sdr_fig = go.Figure(
-    go.Bar(
-        x=[n for n, _, _ in sdr_rows],
-        y=[c for _, c, _ in sdr_rows],
-        marker_color="#FF6D5A",
-        text=[c for _, c, _ in sdr_rows],
-        textposition="outside",
-    )
-)
-sdr_fig.update_layout(
-    title=dict(text="ITL sourced + influenced · first meeting source", font=dict(size=18)),
-    height=320,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=dict(t=60, b=40, l=40, r=20),
-    font=dict(family="Inter, Arial, sans-serif", color="#333"),
-    yaxis=dict(title="Opportunities", showgrid=True, gridcolor="#F0F0F0"),
-)
-display(sdr_fig)
-
-stage_order = []
-for _, stage, _ in stage_rows:
-    if stage not in stage_order:
-        stage_order.append(stage)
-stage_fig = go.Figure()
-for bucket, color in (("Sourced", "#FF6D5A"), ("Influenced", "#4F7FB8")):
-    x = [sum(n for b, s, n in stage_rows if b == bucket and s == stage) for stage in stage_order]
-    stage_fig.add_bar(name=bucket, y=list(reversed(stage_order)), x=list(reversed(x)), orientation="h", marker_color=color)
-stage_fig.update_layout(
-    barmode="stack",
-    title=dict(text="Opportunities per Salesforce stage", font=dict(size=18)),
-    height=360,
-    paper_bgcolor="white",
-    plot_bgcolor="white",
-    margin=dict(t=60, b=40, l=180, r=20),
-    font=dict(family="Inter, Arial, sans-serif", color="#333"),
-    legend=dict(orientation="h", y=1.08),
-    xaxis=dict(title="Opps", showgrid=True, gridcolor="#F0F0F0"),
-)
-display(stage_fig)
-
-
-def _opp_table(rows, title):
-    body_rows = []
-    for account, opp_type, stage, amount, segment in rows:
-        body_rows.append(
-            "<tr>"
-            f"<td>{account}</td><td>{opp_type}</td><td>{stage}</td>"
-            f'<td class="num">{_euro(amount)}</td><td>{segment}</td>'
-            "</tr>"
-        )
-    body = "\n".join(body_rows) if body_rows else "<tr><td colspan='5'>No rows</td></tr>"
-    return (
-        f'<h3 style="font-family:Inter,Arial,sans-serif;font-size:16px;margin:24px 0 8px 0">{title} · {len(rows)}</h3>'
-        '<table style="width:100%;border-collapse:collapse;font:13px Inter,Arial,sans-serif">'
-        '<tr><th style="text-align:left;border-bottom:1px solid #E5E7EB;padding:6px 8px">Account</th>'
-        '<th style="text-align:left;border-bottom:1px solid #E5E7EB;padding:6px 8px">Type</th>'
-        '<th style="text-align:left;border-bottom:1px solid #E5E7EB;padding:6px 8px">Stage</th>'
-        '<th style="text-align:right;border-bottom:1px solid #E5E7EB;padding:6px 8px">Amount</th>'
-        '<th style="text-align:left;border-bottom:1px solid #E5E7EB;padding:6px 8px">Segment</th></tr>'
-        f"{body}</table>"
-    )
-
-
-display(HTML(_opp_table(sourced, "Opportunities sourced")))
-display(HTML(_opp_table(influenced, "Opportunities influenced")))
-display(HTML(_opp_table(won, "Closed won on this list")))
+display(HTML("<style>" + ITL_CSS + _c("style") + body))

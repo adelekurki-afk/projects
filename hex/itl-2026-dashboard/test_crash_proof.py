@@ -196,11 +196,11 @@ def test_four_views_compile_without_sql():
 
 def test_summary_has_sourced_and_attendance_rate():
     src = (ROOT / "notebook_summary.py").read_text()
-    for needle in ("Summary", "426", "916", "87%", "76%", "Sourced", "Influenced", "113"):
+    for needle in ("426", "916", "87%", "76%", "Sourced", "Influenced", "113"):
         assert needle in src, needle
     html = _exec_html(ROOT / "notebook_summary.py")
-    assert "Summary" in html
     assert "Sourced opps" in html
+    assert "Participants per day" in html
 
 
 def test_attendance_has_meetings_and_feedback():

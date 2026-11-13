@@ -10,7 +10,7 @@ Four views on that project. After SQL/CODE edits, **Run all** then refresh the A
 
 ## Summary
 
-Fliplet visits 426 / 916 / 1,018, staff 113, speakers 116, CAB 39, attendance 87% Partner / 76% Eco of tickets. Salesforce funnel is live from BigQuery (`salesforce_bq` CampaignMember / Opportunity). Sourced vs influenced. New Business vs Expansion (no Partner-typed opps).
+Same shape as Paid Some LinkedIn: a Result paragraph, then live tables. Fliplet visits 426 / 916 / 1,018, staff 113, speakers 116, CAB 39, attendance 87% Partner / 76% Eco of tickets. Salesforce funnel is live from BigQuery (`salesforce_bq` CampaignMember / Opportunity). Sourced vs influenced. New Business vs Expansion (no Partner-typed opps).
 
 ## Attendance
 

@@ -62,11 +62,15 @@ def _line(df, y_cols, title, y_title):
 
 
 display(HTML(
-    '<div style="font-family:Inter,Arial,sans-serif">'
-    '<div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#FF6D5A">In the Loop 2026</div>'
-    '<h1 style="font-size:26px;margin:4px 0 8px 0">Intent</h1>'
-    '<p style="color:#6B7280;font-size:14px">Longer-term demand. Coral band is conference week 12–18 Oct.</p>'
-    '</div>'
+    '<div style="font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;max-width:920px">'
+    '<p style="font-size:15px;line-height:1.55;color:#374151;margin:0 0 18px">'
+    "Intent is longer-term demand. "
+    "Berlin website events <b>+33%</b> in the conference week (12–18 Oct vs 5–11 Oct); "
+    "worldwide n8n.io users were <b>+1%</b>. Public sites Jun–Nov: <b>3.8M</b> users, "
+    "<b>1.0M</b> Europe, <b>219k</b> Germany. Organic SEO / AEO is not in this warehouse. "
+    "No Common Room table for social posts."
+    "</p>"
+    "</div>"
 ))
 
 try:

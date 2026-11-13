@@ -1,30 +1,15 @@
 from IPython.display import display, HTML
 
 ITL_CSS = """
-.itl-dash { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:#111827; max-width: 1100px; }
-.itl-kicker { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#FF6D5A; margin:0 0 6px 0; }
-.itl-title { font-size:28px; font-weight:700; margin:0 0 6px 0; }
-.itl-sub { font-size:14px; color:#6B7280; margin:0 0 22px 0; }
-.itl-ch { font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#6B7280; margin:28px 0 12px 0; padding-top:18px; border-top:1px solid #E5E7EB; }
-.itl-ch:first-of-type { border-top:none; margin-top:8px; padding-top:0; }
-.itl-strip { display:grid; grid-template-columns:repeat(4, minmax(140px, 1fr)); gap:12px; margin:0 0 16px 0; }
-.itl-tile { border:1px solid #E5E7EB; border-radius:10px; background:#fff; padding:16px 18px 14px; }
-.itl-val { font-size:32px; font-weight:700; color:#111827; line-height:1.1; font-variant-numeric:tabular-nums; }
-.itl-val.accent { color:#FF6D5A; }
-.itl-label { margin-top:8px; font-size:13px; color:#6B7280; font-weight:600; }
-.itl-hint { margin-top:4px; font-size:11px; color:#9CA3AF; }
-.itl-cwrap { border:1px solid #E5E7EB; border-radius:10px; padding:16px 18px 12px; margin:0 0 16px 0; background:#fff; }
-.itl-crow { display:grid; grid-template-columns:160px 1fr 130px; gap:10px; align-items:center; margin:7px 0; font-size:13px; }
-.itl-tbl { width:100%; border-collapse:collapse; font-size:13px; }
-.itl-tbl th { text-align:left; color:#6B7280; font-weight:600; padding:6px 8px; border-bottom:1px solid #E5E7EB; }
-.itl-tbl th.num { text-align:right; }
-.itl-tbl td { padding:7px 8px; border-bottom:1px solid #F3F4F6; }
-.itl-tbl td.num { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
-.itl-cname { color:#374151; }
-.itl-cbar { background:#F3F4F6; border-radius:4px; height:10px; overflow:hidden; }
-.itl-cbar span { display:block; height:100%; border-radius:4px; }
-.itl-cnum { text-align:right; font-variant-numeric:tabular-nums; font-weight:600; color:#111827; font-size:12px; }
-.itl-note { margin-top:8px; font-size:13px; color:#6B7280; padding:12px 14px; background:#F9FAFB; border:1px solid #E5E7EB; border-radius:8px; }
+.itl { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; max-width: 920px; }
+.itl h2 { font-size: 18px; font-weight: 700; margin: 28px 0 8px; letter-spacing: -0.01em; }
+.itl h2:first-child { margin-top: 4px; }
+.itl p { font-size: 14px; line-height: 1.55; color: #4B5563; margin: 0 0 12px; }
+.itl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 4px; }
+.itl th { text-align: left; font-weight: 600; color: #6B7280; padding: 8px 12px 8px 0; border-bottom: 1px solid #E5E7EB; }
+.itl td { padding: 8px 12px 8px 0; border-bottom: 1px solid #F3F4F6; }
+.itl th.n, .itl td.n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+.itl .cap { font-size: 13px; color: #6B7280; margin: 4px 0 20px; }
 """
 
 
@@ -44,6 +29,25 @@ def _euro(n):
     if abs(n) >= 10_000:
         return f"€{n / 1_000:.0f}k"
     return f"€{n:,}"
+
+
+def _c(tag):
+    return "<" + "/" + tag + ">"
+
+
+def _table(headers, rows, caption=""):
+    head = []
+    for i, h in enumerate(headers):
+        head.append(f'<th class="n">{h}{_c("th")}' if i else f"<th>{h}{_c('th')}")
+    body = []
+    for row in rows:
+        cells = []
+        for i, cell in enumerate(row):
+            cls = ' class="n"' if i else ""
+            cells.append(f"<td{cls}>{cell}{_c('td')}")
+        body.append("<tr>" + "".join(cells) + _c("tr"))
+    cap = f'<p class="cap">{caption}{_c("p")}' if caption else ""
+    return "<table><tr>" + "".join(head) + _c("tr") + "".join(body) + _c("table") + cap
 
 
 _STAGE_SHORT = {
@@ -71,7 +75,6 @@ try:
     ]
 except Exception:
     pass
-funnel_max = max((c for _, c, _ in funnel), default=1)
 
 pipe_total, pipe_open, pipe_won = 2461063, 2427423, 33640
 pipe_opps, pipe_won_n, pipe_open_n, pipe_meetings = 29, 3, 26, 1
@@ -105,56 +108,37 @@ try:
 except Exception:
     pass
 
-funnel_rows = []
-for name, count, pct in funnel:
-    width = 100.0 * count / funnel_max if funnel_max else 0
-    funnel_rows.append(
-        f'<div class="itl-crow"><div class="itl-cname">{name}</div>'
-        f'<div class="itl-cbar"><span style="width:{width:.1f}%;background:#FF6D5A"></span></div>'
-        f'<div class="itl-cnum">{count:,} · {pct:.1f}%</div></div>'
-    )
-funnel_html = "\n".join(funnel_rows)
-
-mix_rows = []
-for opp_type, segment, n_opps, total, open_amt, won_amt in pipe_mix:
-    mix_rows.append(
-        "<tr>"
-        f"<td>{opp_type} / {segment}</td>"
-        f'<td class="num">{n_opps}</td>'
-        f'<td class="num">{_euro(total)}</td>'
-        f'<td class="num">{_euro(open_amt)}</td>'
-        f'<td class="num">{_euro(won_amt)}</td>'
-        "</tr>"
-    )
-mix_html = "\n".join(mix_rows)
-
 body = f"""
-<div class="itl-dash">
-  <div class="itl-kicker">In the Loop 2026</div>
-  <h1 class="itl-title">Overview</h1>
-  <div class="itl-ch">Visits</div>
-  <div class="itl-strip">
-    <div class="itl-tile"><div class="itl-val">1,269</div><div class="itl-label">Registered</div><div class="itl-hint">Paid + Free unique email</div></div>
-    <div class="itl-tile"><div class="itl-val accent">426</div><div class="itl-label">Partner Day</div><div class="itl-hint">13 Oct · door + badge</div></div>
-    <div class="itl-tile"><div class="itl-val accent">916</div><div class="itl-label">Ecosystem Day</div><div class="itl-hint">14 Oct · door + green YES</div></div>
-    <div class="itl-tile"><div class="itl-val">1,018</div><div class="itl-label">Unique people</div><div class="itl-hint">Either day · 324 came both</div></div>
-  </div>
-
-  <div class="itl-ch">Salesforce conversion</div>
-  <div class="itl-cwrap">{funnel_html}</div>
-  <div class="itl-ch">Opportunities</div>
-  <div class="itl-strip">
-    <div class="itl-tile"><div class="itl-val accent">{_euro(pipe_total)}</div><div class="itl-label">Total pipeline</div><div class="itl-hint">NB + Expansion from 12 Oct</div></div>
-    <div class="itl-tile"><div class="itl-val">{_euro(pipe_open)}</div><div class="itl-label">Open</div><div class="itl-hint">{pipe_open_n} deals</div></div>
-    <div class="itl-tile"><div class="itl-val">{_euro(pipe_won)}</div><div class="itl-label">Closed Won</div><div class="itl-hint">{pipe_won_n} deals</div></div>
-    <div class="itl-tile"><div class="itl-val">{pipe_opps}</div><div class="itl-label">Opportunities</div><div class="itl-hint">{pipe_meetings} from meetings booked</div></div>
-  </div>
-  <div class="itl-cwrap">
-    <table class="itl-tbl">
-      <tr><th>Type / segment</th><th class="num">Opps</th><th class="num">Total</th><th class="num">Open</th><th class="num">Won</th></tr>
-      {mix_html}
-    </table>
-  </div>
-</div>
+<div class="itl">
+  <h2>Visits{_c("h2")}
+  {_table(
+      ["Metric", "People", "How built"],
+      [
+          ("Registered", "1,269", "Paid + Free unique email"),
+          ("Came · Partner Day", "426", "13 Oct · 391 door + 35 badge"),
+          ("Came · Ecosystem Day", "916", "14 Oct · 878 door + 38 green YES"),
+          ("Unique people", "1,018", "426 + 916 − 324 both days"),
+          ("Staff tickets", "113", "Overlay, not extra headcount"),
+          ("Programme speakers", "116", "Overlay, not extra headcount"),
+          ("CAB overlay", "39", "11 members · 28 guests"),
+      ],
+      "Locked Fliplet counts. People who came both days are in both 426 and 916.",
+  )}
+  <h2>Salesforce conversion{_c("h2")}
+  {_table(
+      ["Stage", "People", "% of registered"],
+      [(name, f"{count:,}", f"{pct:.1f}%") for name, count, pct in funnel],
+      "Free/Paid CampaignMember, not Fliplet 1,269 / 426 / 916.",
+  )}
+  <h2>Opportunities{_c("h2")}
+  {_table(
+      ["Type / segment", "Opps", "Total", "Open", "Won"],
+      [
+          (f"{opp_type} / {segment}", f"{n_opps}", _euro(total), _euro(open_amt), _euro(won_amt))
+          for opp_type, segment, n_opps, total, open_amt, won_amt in pipe_mix
+      ],
+      f"{pipe_opps} NB + Expansion from 12 Oct · {_euro(pipe_total)} total · {_euro(pipe_open)} open · {_euro(pipe_won)} won ({pipe_won_n} deals). {pipe_meetings} from meetings booked.",
+  )}
+{_c("div")}
 """
-display(HTML("<style>" + ITL_CSS + "</style>" + body))
+display(HTML("<style>" + ITL_CSS + _c("style") + body))

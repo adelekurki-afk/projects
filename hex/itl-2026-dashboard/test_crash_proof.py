@@ -194,6 +194,7 @@ def test_four_views_compile_without_sql():
         "notebook_survey_eco.py",
         "notebook_survey_partner.py",
         "notebook_survey_session.py",
+        "notebook_sfdc_lead_progression.py",
     ):
         calls = _exec_view(ROOT / name)
         assert calls, name
@@ -221,10 +222,15 @@ def test_survey_and_lead_cells_have_pin_labels():
         "lean/lead_campaign_statuses.sql",
         "lean/lead_sfdc_statuses.sql",
         "lean/lead_progression.sql",
+        "lean/lead_sfdc_reached.sql",
     ):
         src = (ROOT / path).read_text()
-        assert "701cj0000157ynMAAQ" in src or "lead_funnel" in src
-    assert "Contact_or_Lead_Status__c" in (ROOT / "lean/lead_sfdc_statuses.sql").read_text()
+        assert "701cj0000157ynMAAQ" in src
+    assert "LeadHistory" in (ROOT / "lean/lead_progression.sql").read_text()
+    assert "fct_campaign_member_pipeline" in (ROOT / "lean/lead_sfdc_statuses.sql").read_text()
+    blob = _blob(_exec_view(ROOT / "notebook_sfdc_lead_progression.py"))
+    assert "1102" in blob or "1,102" in blob
+    assert "handed to sales" in blob or "New" in blob
 
 
 def test_attendance_has_meetings_and_feedback():
@@ -254,7 +260,7 @@ def test_section_markdown_tables_have_numbers():
         "notebook_survey_eco.md": ("9.1", "NPS", "43", "33 promoters"),
         "notebook_survey_partner.md": ("9.1", "n=20", "Solution", "8.5"),
         "notebook_survey_session.md": ("4.8", "66", "24", "36"),
-        "notebook_lead_tables.md": ("1,119", "837", "Add to app", "Contact_or_Lead_Status__c"),
+        "notebook_lead_tables.md": ("1,102", "314", "Working", "Qualified", "Add to app"),
     }
     for name, needles in checks.items():
         src = (ROOT / name).read_text()

@@ -28,7 +28,7 @@ Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniori
 
 ## Funnel
 
-Leads progression from BigQuery, AI SDR vs humans (`first_meeting_source` — none of the current ITL sourced/influenced deals are Freddy), opportunities per stage, sourced list, influenced list, closed won. Pin-ready SQL: **APP: Lead progression**, **APP: Campaign member statuses**, **APP: Salesforce lead statuses**, **APP: Opportunity stages**, **APP: Sourced vs influenced**.
+Salesforce **lead progression** is Lead/Contact status on ITL Free+Paid (1,102 → 314 New → 269 Working → 177 Qualified), not the CampaignMember attendance funnel. Pin **APP: Lead progression**, **APP: Salesforce lead statuses**, **APP: Campaign member statuses**. Event people 1,119 → 837 is **APP: Event people funnel**. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
 
 ## Intent
 

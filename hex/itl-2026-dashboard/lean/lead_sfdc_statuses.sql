@@ -1,16 +1,33 @@
--- Salesforce lead/contact status for ITL 2026 Free+Paid members. Pin as APP: Salesforce lead statuses.
+-- Current Salesforce Lead/Contact status for ITL Free+Paid. Pin as APP: Salesforce lead statuses.
+WITH itl AS (
+  SELECT
+    LOWER(TRIM(email)) AS email,
+    member_status AS ticket,
+    person_type,
+    is_converted,
+    COALESCE(NULLIF(TRIM(lead_status), ''), '(blank)') AS sfdc_status
+  FROM `n8n-telemetry.marts.fct_campaign_member_pipeline`
+  WHERE campaign_id = '701cj0000157ynMAAQ'
+    AND member_status IN ('Free', 'Paid')
+)
 SELECT
-  COALESCE(NULLIF(TRIM(cm.Contact_or_Lead_Status__c), ''), '(blank)') AS lead_status,
-  cm.Status AS ticket,
+  CASE sfdc_status
+    WHEN 'Suspect' THEN 1
+    WHEN 'New' THEN 2
+    WHEN 'Working' THEN 3
+    WHEN 'Qualified' THEN 4
+    WHEN 'Nurturing' THEN 5
+    WHEN 'Unqualified' THEN 6
+    ELSE 9
+  END AS stage_n,
+  sfdc_status,
   COUNT(*) AS members,
-  COUNT(DISTINCT LOWER(TRIM(COALESCE(cm.Email, l.Email, ct.Email)))) AS unique_emails
-FROM `n8n-telemetry.salesforce_bq.CampaignMember` cm
-LEFT JOIN `n8n-telemetry.salesforce_bq.Lead` l
-  ON l.Id = cm.LeadId AND l.IsDeleted = FALSE
-LEFT JOIN `n8n-telemetry.salesforce_bq.Contact` ct
-  ON ct.Id = cm.ContactId AND ct.IsDeleted = FALSE
-WHERE cm.IsDeleted = FALSE
-  AND cm.CampaignId = '701cj0000157ynMAAQ'
-  AND cm.Status IN ('Free', 'Paid')
+  COUNT(DISTINCT email) AS people,
+  COUNTIF(ticket = 'Free') AS free_tickets,
+  COUNTIF(ticket = 'Paid') AS paid_tickets,
+  COUNTIF(person_type = 'lead') AS still_lead,
+  COUNTIF(person_type = 'contact' OR is_converted IS TRUE) AS converted_contact,
+  ROUND(100.0 * COUNT(DISTINCT email) / SUM(COUNT(DISTINCT email)) OVER(), 1) AS pct_of_itl
+FROM itl
 GROUP BY 1, 2
-ORDER BY members DESC
+ORDER BY stage_n, people DESC

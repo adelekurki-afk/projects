@@ -1,69 +1,84 @@
-from IPython.display import display, HTML
+import pandas as pd
+import plotly.graph_objects as go
+from IPython.display import display
 
-ITL_CSS = """
-.itl-dash { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:#111827; max-width: 1100px; }
-.itl-kicker { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#FF6D5A; margin:0 0 4px 0; }
-.itl-title { font-size:26px; font-weight:700; margin:0 0 16px 0; }
-.itl-ch { font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#9CA3AF; margin:22px 0 10px 0; }
-.itl-days { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-@media (max-width: 700px) { .itl-days { grid-template-columns:1fr; } }
-.itl-day { border:1px solid #E5E7EB; border-radius:12px; padding:18px 20px 16px; background:#fff; }
-.itl-day h3 { margin:0 0 4px 0; font-size:12px; color:#6B7280; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
-.itl-day .big { font-size:52px; font-weight:700; color:#FF6D5A; line-height:1; font-variant-numeric:tabular-nums; }
-.itl-stack { display:flex; height:28px; border-radius:6px; overflow:hidden; margin-top:14px; font-size:11px; font-weight:600; color:#fff; }
-.itl-stack span { display:flex; align-items:center; justify-content:center; }
-.itl-overlap { display:flex; height:40px; border-radius:8px; overflow:hidden; color:#fff; font-size:12px; font-weight:700; }
-.itl-overlap span { display:flex; align-items:center; justify-content:center; }
-.itl-leg { display:flex; flex-wrap:wrap; gap:14px; font-size:12px; color:#6B7280; margin-top:8px; }
-.itl-dot { display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:6px; vertical-align:middle; }
-.itl-strip-3 { display:grid; grid-template-columns:repeat(3, minmax(120px, 1fr)); gap:12px; }
-.itl-tile { border:1px solid #E5E7EB; border-radius:10px; background:#fff; padding:14px 16px; }
-.itl-val { font-size:28px; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
-.itl-label { margin-top:6px; font-size:12px; color:#6B7280; font-weight:600; }
-.itl-hint { margin-top:2px; font-size:11px; color:#9CA3AF; }
-"""
+CORAL = "#FF6D5A"
+BLUE = "#5B8FC7"
+MUTED = "#94A3B8"
+INK = "#9CA3AF"
 
-body = """
-<div class="itl-dash">
-  <div class="itl-kicker">In the Loop 2026</div>
-  <h1 class="itl-title">Participation</h1>
-  <div class="itl-days">
-    <div class="itl-day">
-      <h3>Partner Day · 13 Oct</h3>
-      <div class="big">426</div>
-      <div class="itl-stack">
-        <span style="width:91.8%;background:#FF6D5A"></span>
-        <span style="width:8.2%;background:#FDBA74"></span>
-      </div>
-      <div class="itl-leg"><span><i class="itl-dot" style="background:#FF6D5A"></i>391 door</span><span><i class="itl-dot" style="background:#FDBA74"></i>35 badge</span></div>
-    </div>
-    <div class="itl-day">
-      <h3>Ecosystem Day · 14 Oct</h3>
-      <div class="big">916</div>
-      <div class="itl-stack">
-        <span style="width:95.9%;background:#FF6D5A"></span>
-        <span style="width:4.1%;background:#FDBA74"></span>
-      </div>
-      <div class="itl-leg"><span><i class="itl-dot" style="background:#FF6D5A"></i>878 door</span><span><i class="itl-dot" style="background:#FDBA74"></i>38 green YES</span></div>
-    </div>
-  </div>
-  <div class="itl-ch">1,018 unique people</div>
-  <div class="itl-overlap">
-    <span style="width:10.0%;background:#94A3B8">102</span>
-    <span style="width:31.8%;background:#FF6D5A">324 both</span>
-    <span style="width:58.2%;background:#4F7FB8">592</span>
-  </div>
-  <div class="itl-leg">
-    <span><i class="itl-dot" style="background:#94A3B8"></i>Partner only 102</span>
-    <span><i class="itl-dot" style="background:#FF6D5A"></i>Both days 324</span>
-    <span><i class="itl-dot" style="background:#4F7FB8"></i>Ecosystem only 592</span>
-  </div>
-  <div class="itl-ch">Overlays · inside 426 / 916</div>
-  <div class="itl-strip-3">
-    <div class="itl-tile"><div class="itl-val">113</div><div class="itl-label">Staff tickets</div><div class="itl-hint">Not extra headcount</div></div>
-    <div class="itl-tile"><div class="itl-val">116</div><div class="itl-label">Programme speakers</div><div class="itl-hint">Not extra headcount</div></div>
-    <div class="itl-tile"><div class="itl-val">39</div><div class="itl-label">CAB</div><div class="itl-hint">11 members · 28 guests</div></div>
-  </div>
-</div>
-"""
-display(HTML("<style>" + ITL_CSS + "</style>" + body))
+
+def _theme(fig, height=300, **kw):
+    layout = dict(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
+        height=height,
+        margin=dict(t=52, b=28, l=8, r=20),
+        legend=dict(orientation="h", y=1.14, bgcolor="rgba(0,0,0,0)"),
+    )
+    layout.update(kw)
+    fig.update_layout(**layout)
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK)
+    fig.update_yaxes(showgrid=False, zeroline=False, color=INK)
+    return fig
+
+
+days = go.Figure(
+    go.Bar(
+        x=["Partner Day · 13 Oct", "Ecosystem Day · 14 Oct"],
+        y=[426, 916],
+        marker_color=[CORAL, BLUE],
+        text=["426", "916"],
+        textposition="outside",
+        textfont={"color": INK},
+        cliponaxis=False,
+    )
+)
+display(
+    _theme(
+        days,
+        height=280,
+        title=dict(text="Participation · 1,018 unique people", font=dict(size=16, color=INK)),
+        yaxis_title="People",
+    )
+)
+
+split = go.Figure()
+split.add_bar(name="Door", x=["Partner Day", "Ecosystem Day"], y=[391, 878], marker_color=CORAL)
+split.add_bar(name="Badge / green YES", x=["Partner Day", "Ecosystem Day"], y=[35, 38], marker_color="#FDBA74")
+display(
+    _theme(
+        split,
+        height=280,
+        barmode="stack",
+        title=dict(text="How 426 and 916 are built", font=dict(size=16, color=INK)),
+        yaxis_title="People",
+    )
+)
+
+overlap = go.Figure(
+    go.Bar(
+        x=["Partner only", "Both days", "Ecosystem only"],
+        y=[102, 324, 592],
+        marker_color=[MUTED, CORAL, BLUE],
+        text=["102", "324", "592"],
+        textposition="outside",
+        textfont={"color": INK},
+        cliponaxis=False,
+    )
+)
+display(_theme(overlap, height=260, title=dict(text="Who came which days", font=dict(size=16, color=INK))))
+
+overlays = pd.DataFrame(
+    {
+        "overlay": ["Staff tickets", "Programme speakers", "CAB"],
+        "people": [113, 116, 39],
+        "note": [
+            "Inside 426 / 916, not extra headcount",
+            "Inside 426 / 916, not extra headcount",
+            "11 members · 28 guests",
+        ],
+    }
+)
+display(overlays)

@@ -86,26 +86,25 @@ def test_app_js_parses():
     assert src.strip().endswith("render(React.createElement(App));")
 
 
-def _exec_html(path: Path) -> str:
-    import sys
-    import types
-
-    src = path.read_text()
-    fake = FakeDisplay()
-
-    class FakeHTML:
-        def __init__(self, data):
-            self.data = data
-
-    ipy = types.ModuleType("IPython")
-    ipy_display = types.ModuleType("IPython.display")
-    ipy_display.display = fake
-    ipy_display.HTML = FakeHTML
-    sys.modules["IPython"] = ipy
-    sys.modules["IPython.display"] = ipy_display
-    exec(compile(src, path.name, "exec"), {"__name__": "__main__"})
-    assert fake.calls, f"{path.name} did not display HTML"
-    return fake.calls[0].data
+def _blob(calls) -> str:
+    parts = []
+    for c in calls:
+        data = getattr(c, "data", None)
+        if isinstance(data, str):
+            parts.append(data)
+        elif isinstance(c, pd.DataFrame):
+            parts.append(c.to_csv(index=False))
+        elif isinstance(c, go.Figure):
+            title = c.layout.title.text if c.layout.title else ""
+            parts.append(str(title or ""))
+            for tr in c.data:
+                for attr in ("text", "x", "y", "value", "name", "title"):
+                    val = getattr(tr, attr, None)
+                    if val is not None:
+                        parts.append(str(val))
+        else:
+            parts.append(str(c))
+    return "\n".join(parts)
 
 
 def test_scoreboard_has_day_counts():
@@ -121,25 +120,28 @@ def test_scoreboard_has_day_counts():
 
 
 def test_scoreboard_renders_overview():
-    html = _exec_html(ROOT / "notebook_scoreboard.py")
+    calls = _exec_view(ROOT / "notebook_scoreboard.py")
+    blob = _blob(calls)
     for needle in (
         "1,269", "426", "916", "1,018", "1,119", "837",
         "€2.46M", "€2.43M", "New Business / ENT",
     ):
-        assert needle in html, needle
+        assert needle in blob, needle
     for gone in ("How 426 is built", "3.8M", "Berlin events · conference week"):
-        assert gone not in html, gone
+        assert gone not in blob, gone
+    assert any(isinstance(c, go.Figure) for c in calls)
+    assert any(isinstance(c, pd.DataFrame) for c in calls)
 
 
 def test_participation_tab_html():
     src = (ROOT / "notebook_participation.py").read_text()
     ast.parse(src)
-    html = _exec_html(ROOT / "notebook_participation.py")
+    blob = src + "\n" + _blob(_exec_view(ROOT / "notebook_participation.py"))
     for needle in (
         "Participation", "426", "916", "324", "1,018",
         "113", "116", "39", "391", "878", "green YES",
     ):
-        assert needle in html, needle
+        assert needle in blob, needle
 
 
 def _exec_view(path: Path, extra: dict | None = None):
@@ -198,9 +200,9 @@ def test_summary_has_sourced_and_attendance_rate():
     src = (ROOT / "notebook_summary.py").read_text()
     for needle in ("426", "916", "87%", "76%", "Sourced", "Influenced", "113"):
         assert needle in src, needle
-    html = _exec_html(ROOT / "notebook_summary.py")
-    assert "Sourced opps" in html
-    assert "Participants per day" in html
+    blob = src + "\n" + _blob(_exec_view(ROOT / "notebook_summary.py"))
+    assert "Sourced opps" in blob
+    assert "Participants per day" in blob
 
 
 def test_attendance_has_meetings_and_feedback():

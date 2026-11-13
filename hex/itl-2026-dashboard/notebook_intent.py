@@ -1,6 +1,11 @@
+# Intent · 12–18 Oct conference week · YouTube · Common Room · Paid Google Ads
+import pandas as pd
 import plotly.graph_objects as go
-from IPython.display import display, HTML
+from IPython.display import display
 
+CORAL = "#FF6D5A"
+BLUE = "#5B8FC7"
+INK = "#9CA3AF"
 ITL_WEEK = "2026-10-12"
 
 
@@ -17,13 +22,40 @@ def _week(val):
     return str(val)[:10]
 
 
+def _theme(fig, height=340, **kw):
+    layout = dict(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
+        height=height,
+        margin=dict(t=60, b=40, l=50, r=20),
+        legend=dict(orientation="h", y=1.08, bgcolor="rgba(0,0,0,0)"),
+    )
+    layout.update(kw)
+    fig.update_layout(**layout)
+    fig.update_xaxes(showgrid=False, color=INK)
+    fig.update_yaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK)
+    return fig
+
+
 def _line(df, y_cols, title, y_title):
     fig = go.Figure()
-    colors = {"n8n_users": "#6B7280", "europe_users": "#4F7FB8", "germany_users": "#FF6D5A",
-              "views_gained": "#FF6D5A", "videos_published": "#4F7FB8", "n8n_videos_published": "#111827"}
-    names = {"n8n_users": "Worldwide", "europe_users": "Europe", "germany_users": "Germany",
-             "views_gained": "Views gained", "videos_published": "Videos published",
-             "n8n_videos_published": "n8n-related published"}
+    colors = {
+        "n8n_users": "#9CA3AF",
+        "europe_users": BLUE,
+        "germany_users": CORAL,
+        "views_gained": CORAL,
+        "videos_published": BLUE,
+        "n8n_videos_published": "#CBD5E1",
+    }
+    names = {
+        "n8n_users": "Worldwide",
+        "europe_users": "Europe",
+        "germany_users": "Germany",
+        "views_gained": "Views gained",
+        "videos_published": "Videos published",
+        "n8n_videos_published": "n8n-related published",
+    }
     x = [_week(v) for v in df["week_start"]]
     for col in y_cols:
         if col not in df.columns:
@@ -35,43 +67,21 @@ def _line(df, y_cols, title, y_title):
                 y=y,
                 mode="lines",
                 name=names.get(col, col),
-                line=dict(color=colors.get(col, "#111827"), width=2),
+                line=dict(color=colors.get(col, CORAL), width=2),
             )
         )
     fig.add_vrect(
         x0="2026-10-12",
         x1="2026-10-18",
-        fillcolor="#FF6D5A",
-        opacity=0.15,
+        fillcolor=CORAL,
+        opacity=0.18,
         line_width=0,
         annotation_text="ITL week",
         annotation_position="top left",
+        annotation_font=dict(color=INK, size=11),
     )
-    fig.update_layout(
-        title=dict(text=title, font=dict(size=18)),
-        height=340,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(t=60, b=40, l=50, r=20),
-        font=dict(family="Inter, Arial, sans-serif", color="#333"),
-        legend=dict(orientation="h", y=1.08),
-        yaxis=dict(title=y_title, showgrid=True, gridcolor="#F0F0F0"),
-        xaxis=dict(showgrid=False),
-    )
-    return fig
+    return _theme(fig, title=dict(text=title, font=dict(size=16, color=INK)), yaxis_title=y_title)
 
-
-display(HTML(
-    '<div style="font-family:Inter,-apple-system,BlinkMacSystemFont,sans-serif;max-width:920px">'
-    '<p style="font-size:15px;line-height:1.55;color:#374151;margin:0 0 18px">'
-    "Intent is longer-term demand. "
-    "Berlin website events <b>+33%</b> in the conference week (12–18 Oct vs 5–11 Oct); "
-    "worldwide n8n.io users were <b>+1%</b>. Public sites Jun–Nov: <b>3.8M</b> users, "
-    "<b>1.0M</b> Europe, <b>219k</b> Germany. Organic SEO / AEO is not in this warehouse. "
-    "No Common Room table for social posts."
-    "</p>"
-    "</div>"
-))
 
 try:
     w = intent_weekly.copy()
@@ -79,19 +89,19 @@ try:
     display(_line(w, ["n8n_users"], "n8n.io users · worldwide", "Users"))
     display(_line(w, ["europe_users", "germany_users"], "n8n.io users · Europe and Germany", "Users"))
 except Exception:
-    display(HTML("<p>Run intent_weekly, then Run all.</p>"))
+    display(pd.DataFrame({"note": ["Run intent_weekly, then Run all."]}))
 
 try:
     y = intent_youtube.copy()
     display(_line(y, ["views_gained"], "YouTube views gained", "Views"))
     display(_line(y, ["videos_published", "n8n_videos_published"], "YouTube videos published", "Videos"))
 except Exception:
-    display(HTML("<p>Run intent_youtube, then Run all. Views are reliable from July 2026.</p>"))
+    display(pd.DataFrame({"note": ["Run intent_youtube, then Run all. Views are reliable from July 2026."]}))
 
 try:
     inst = intent_instances.copy()
     fig = go.Figure()
-    palette = ["#FF6D5A", "#4F7FB8", "#111827", "#94A3B8", "#F59E0B", "#10B981"]
+    palette = [CORAL, BLUE, "#CBD5E1", "#94A3B8", "#F59E0B", "#10B981"]
     types = list(inst["deployment_type"].dropna().unique())
     for i, dtype in enumerate(sorted(types)):
         part = inst[inst["deployment_type"] == dtype].sort_values("week_start")
@@ -104,53 +114,33 @@ try:
                 line=dict(color=palette[i % len(palette)], width=2),
             )
         )
-    fig.add_vrect(x0="2026-10-12", x1="2026-10-18", fillcolor="#FF6D5A", opacity=0.15, line_width=0,
-                  annotation_text="ITL week", annotation_position="top left")
-    fig.update_layout(
-        title=dict(text="Acquired instances by type", font=dict(size=18)),
-        height=360,
-        paper_bgcolor="white",
-        plot_bgcolor="white",
-        margin=dict(t=60, b=40, l=50, r=20),
-        font=dict(family="Inter, Arial, sans-serif", color="#333"),
-        legend=dict(orientation="h", y=1.08),
-        yaxis=dict(title="Instances", showgrid=True, gridcolor="#F0F0F0"),
+    fig.add_vrect(
+        x0="2026-10-12",
+        x1="2026-10-18",
+        fillcolor=CORAL,
+        opacity=0.18,
+        line_width=0,
+        annotation_text="ITL week",
+        annotation_position="top left",
+        annotation_font=dict(color=INK, size=11),
     )
-    display(fig)
+    display(_theme(fig, height=360, title=dict(text="Acquired instances by type", font=dict(size=16, color=INK)), yaxis_title="Instances"))
 except Exception:
-    display(HTML("<p>Run intent_instances, then Run all.</p>"))
+    display(pd.DataFrame({"note": ["Run intent_instances, then Run all."]}))
 
 try:
-    rows = []
-    for _, r in intent_paid_keywords.head(15).iterrows():
-        rows.append(
-            "<tr>"
-            f"<td>{r['search_term']}</td>"
-            f'<td style="text-align:right">{_itl_int(r["impressions"]):,}</td>'
-            f'<td style="text-align:right">{_itl_int(r["clicks"]):,}</td>'
-            f'<td style="text-align:right">{float(r["cost"]):.0f}</td>'
-            "</tr>"
-        )
-    display(HTML(
-        '<h3 style="font-family:Inter,Arial,sans-serif;font-size:16px">Paid Google Ads terms · 12–18 Oct</h3>'
-        '<p style="font-family:Inter,Arial,sans-serif;color:#6B7280;font-size:13px">'
-        "Organic SEO / AEO is not in this warehouse (no Search Console). Paid search terms are the closest signal."
-        "</p>"
-        '<table style="width:100%;border-collapse:collapse;font:13px Inter,Arial,sans-serif">'
-        '<tr><th style="text-align:left;border-bottom:1px solid #E5E7EB;padding:6px 8px">Term</th>'
-        '<th style="text-align:right;border-bottom:1px solid #E5E7EB;padding:6px 8px">Impr.</th>'
-        '<th style="text-align:right;border-bottom:1px solid #E5E7EB;padding:6px 8px">Clicks</th>'
-        '<th style="text-align:right;border-bottom:1px solid #E5E7EB;padding:6px 8px">Cost</th></tr>'
-        + "".join(rows)
-        + "</table>"
-    ))
+    paid = intent_paid_keywords.head(15).copy()
+    paid = paid.rename(columns={"search_term": "term"})
+    keep = [c for c in ("term", "impressions", "clicks", "cost") if c in paid.columns]
+    display(paid[keep] if keep else paid)
 except Exception:
-    display(HTML("<p>Run intent_paid_keywords, then Run all.</p>"))
+    display(pd.DataFrame({"note": ["Run intent_paid_keywords, then Run all. Paid Google Ads terms · 12–18 Oct. Organic SEO / AEO is not in this warehouse."]}))
 
-display(HTML(
-    '<div style="margin-top:18px;padding:12px 14px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;'
-    'font-family:Inter,Arial,sans-serif;font-size:13px;color:#6B7280">'
-    "<b>Social posts.</b> No Common Room table exists in this warehouse. "
-    "Cannot show conference-week social posts until that source is connected."
-    "</div>"
-))
+display(
+    pd.DataFrame(
+        {
+            "gap": ["Social posts"],
+            "status": ["No Common Room table exists in this warehouse. Cannot show conference-week social posts until that source is connected."],
+        }
+    )
+)

@@ -1,16 +1,27 @@
-from IPython.display import display, HTML
+import pandas as pd
+import plotly.graph_objects as go
+from IPython.display import display
 
-ITL_CSS = """
-.itl { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; max-width: 920px; }
-.itl h2 { font-size: 18px; font-weight: 700; margin: 28px 0 8px; letter-spacing: -0.01em; }
-.itl h2:first-child { margin-top: 4px; }
-.itl p { font-size: 14px; line-height: 1.55; color: #4B5563; margin: 0 0 12px; }
-.itl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 4px; }
-.itl th { text-align: left; font-weight: 600; color: #6B7280; padding: 8px 12px 8px 0; border-bottom: 1px solid #E5E7EB; }
-.itl td { padding: 8px 12px 8px 0; border-bottom: 1px solid #F3F4F6; }
-.itl th.n, .itl td.n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
-.itl .cap { font-size: 13px; color: #6B7280; margin: 4px 0 20px; }
-"""
+CORAL = "#FF6D5A"
+BLUE = "#5B8FC7"
+INK = "#9CA3AF"
+
+
+def _theme(fig, height=300, axes=True, **kw):
+    layout = dict(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
+        height=height,
+        margin=dict(t=52, b=28, l=8, r=16),
+        legend=dict(orientation="h", y=1.14, bgcolor="rgba(0,0,0,0)"),
+    )
+    layout.update(kw)
+    fig.update_layout(**layout)
+    if axes:
+        fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK)
+        fig.update_yaxes(showgrid=False, zeroline=False, color=INK)
+    return fig
 
 
 def _itl_int(value, default):
@@ -24,30 +35,11 @@ def _itl_int(value, default):
 
 def _euro(n):
     n = int(round(float(n)))
-    if n >= 1_000_000:
+    if abs(n) >= 1_000_000:
         return f"€{n / 1_000_000:.2f}M"
     if abs(n) >= 10_000:
         return f"€{n / 1_000:.0f}k"
     return f"€{n:,}"
-
-
-def _c(tag):
-    return "<" + "/" + tag + ">"
-
-
-def _table(headers, rows, caption=""):
-    head = []
-    for i, h in enumerate(headers):
-        head.append(f'<th class="n">{h}{_c("th")}' if i else f"<th>{h}{_c('th')}")
-    body = []
-    for row in rows:
-        cells = []
-        for i, cell in enumerate(row):
-            cls = ' class="n"' if i else ""
-            cells.append(f"<td{cls}>{cell}{_c('td')}")
-        body.append("<tr>" + "".join(cells) + _c("tr"))
-    cap = f'<p class="cap">{caption}{_c("p")}' if caption else ""
-    return "<table><tr>" + "".join(head) + _c("tr") + "".join(body) + _c("table") + cap
 
 
 _STAGE_SHORT = {
@@ -77,7 +69,7 @@ except Exception:
     pass
 
 pipe_total, pipe_open, pipe_won = 2461063, 2427423, 33640
-pipe_opps, pipe_won_n, pipe_open_n, pipe_meetings = 29, 3, 26, 1
+pipe_opps, pipe_won_n, pipe_meetings = 29, 3, 1
 pipe_mix = [
     ("New Business", "ENT", 5, 834000, 826000, 8000),
     ("New Business", "MM", 12, 619200, 597200, 22000),
@@ -91,7 +83,6 @@ try:
     pipe_won = int(round(float(df["closed_won_amount"].sum())))
     pipe_opps = int(df["opp_count"].sum())
     pipe_won_n = int(df["closed_won_count"].sum())
-    pipe_open_n = int(df["open_opp_count"].sum())
     if "opps_from_meetings" in df.columns:
         pipe_meetings = int(df["opps_from_meetings"].sum())
     pipe_mix = [
@@ -108,37 +99,109 @@ try:
 except Exception:
     pass
 
-body = f"""
-<div class="itl">
-  <h2>Visits{_c("h2")}
-  {_table(
-      ["Metric", "People", "How built"],
-      [
-          ("Registered", "1,269", "Paid + Free unique email"),
-          ("Came · Partner Day", "426", "13 Oct · 391 door + 35 badge"),
-          ("Came · Ecosystem Day", "916", "14 Oct · 878 door + 38 green YES"),
-          ("Unique people", "1,018", "426 + 916 − 324 both days"),
-          ("Staff tickets", "113", "Overlay, not extra headcount"),
-          ("Programme speakers", "116", "Overlay, not extra headcount"),
-          ("CAB overlay", "39", "11 members · 28 guests"),
-      ],
-      "Locked Fliplet counts. People who came both days are in both 426 and 916.",
-  )}
-  <h2>Salesforce conversion{_c("h2")}
-  {_table(
-      ["Stage", "People", "% of registered"],
-      [(name, f"{count:,}", f"{pct:.1f}%") for name, count, pct in funnel],
-      "Free/Paid CampaignMember, not Fliplet 1,269 / 426 / 916.",
-  )}
-  <h2>Opportunities{_c("h2")}
-  {_table(
-      ["Type / segment", "Opps", "Total", "Open", "Won"],
-      [
-          (f"{opp_type} / {segment}", f"{n_opps}", _euro(total), _euro(open_amt), _euro(won_amt))
-          for opp_type, segment, n_opps, total, open_amt, won_amt in pipe_mix
-      ],
-      f"{pipe_opps} NB + Expansion from 12 Oct · {_euro(pipe_total)} total · {_euro(pipe_open)} open · {_euro(pipe_won)} won ({pipe_won_n} deals). {pipe_meetings} from meetings booked.",
-  )}
-{_c("div")}
-"""
-display(HTML("<style>" + ITL_CSS + _c("style") + body))
+kpis = go.Figure()
+for i, (value, title, color, fmt, prefix, suffix) in enumerate(
+    (
+        (1018, "Unique people", CORAL, ",", "", ""),
+        (426, "Partner Day", CORAL, ",", "", ""),
+        (916, "Ecosystem Day", BLUE, ",", "", ""),
+        (pipe_total / 1_000_000, "NB + Expansion", CORAL, ".2f", "€", "M"),
+    )
+):
+    kpis.add_trace(
+        go.Indicator(
+            mode="number",
+            value=value,
+            number={
+                "font": {"size": 36, "color": color},
+                "valueformat": fmt,
+                "prefix": prefix,
+                "suffix": suffix,
+            },
+            title={"text": title, "font": {"size": 13, "color": INK}},
+            domain={"x": [i * 0.25, i * 0.25 + 0.24], "y": [0, 1]},
+        )
+    )
+display(_theme(kpis, height=160, axes=False))
+
+stages = [s for s, _, _ in funnel][::-1]
+counts = [c for _, c, _ in funnel][::-1]
+conv = go.Figure(
+    go.Bar(
+        y=stages,
+        x=counts,
+        orientation="h",
+        marker_color=CORAL,
+        text=[f"{c:,}" for c in counts],
+        textposition="outside",
+        textfont={"color": INK},
+        cliponaxis=False,
+    )
+)
+display(
+    _theme(
+        conv,
+        height=280,
+        title=dict(text="Salesforce conversion", font=dict(size=16, color=INK)),
+        xaxis_title="People",
+    )
+)
+
+mix = go.Figure()
+labels = [f"{t} / {s}" for t, s, _, _, _, _ in pipe_mix]
+mix.add_bar(name="Open", x=labels, y=[o for *_, o, _ in pipe_mix], marker_color=BLUE)
+mix.add_bar(name="Won", x=labels, y=[w for *_, w in pipe_mix], marker_color=CORAL)
+display(
+    _theme(
+        mix,
+        height=300,
+        barmode="stack",
+        title=dict(text="Opportunities · NB + Expansion from 12 Oct", font=dict(size=16, color=INK)),
+        yaxis_title="€",
+    )
+)
+
+visits = pd.DataFrame(
+    {
+        "metric": [
+            "Registered",
+            "Came · Partner Day",
+            "Came · Ecosystem Day",
+            "Unique people",
+            "Staff tickets",
+            "Programme speakers",
+            "CAB overlay",
+        ],
+        "people": ["1,269", "426", "916", "1,018", "113", "116", "39"],
+        "how_built": [
+            "Paid + Free unique email",
+            "13 Oct · 391 door + 35 badge",
+            "14 Oct · 878 door + 38 green YES",
+            "426 + 916 − 324 both days",
+            "Overlay, not extra headcount",
+            "Overlay, not extra headcount",
+            "11 members · 28 guests",
+        ],
+    }
+)
+display(visits)
+
+pipe_summary = pd.DataFrame(
+    {
+        "metric": ["NB + Expansion total", "Open", "Won"],
+        "amount": [_euro(pipe_total), _euro(pipe_open), _euro(pipe_won)],
+        "opps": [pipe_opps, "", pipe_won_n],
+    }
+)
+display(pipe_summary)
+
+opps = pd.DataFrame(
+    {
+        "type_segment": [f"{t} / {s}" for t, s, *_ in pipe_mix],
+        "opps": [n for _, _, n, *_ in pipe_mix],
+        "total": [_euro(total) for _, _, _, total, *_ in pipe_mix],
+        "open": [_euro(open_amt) for *_, open_amt, _ in pipe_mix],
+        "won": [_euro(won) for *_, won in pipe_mix],
+    }
+)
+display(opps)

@@ -1,16 +1,27 @@
-from IPython.display import display, HTML
+import pandas as pd
+import plotly.graph_objects as go
+from IPython.display import display
 
-ITL_CSS = """
-.itl { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; max-width: 920px; }
-.itl h2 { font-size: 18px; font-weight: 700; margin: 28px 0 8px; letter-spacing: -0.01em; }
-.itl h2:first-child { margin-top: 4px; }
-.itl p { font-size: 14px; line-height: 1.55; color: #4B5563; margin: 0 0 12px; }
-.itl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 4px; }
-.itl th { text-align: left; font-weight: 600; color: #6B7280; padding: 8px 12px 8px 0; border-bottom: 1px solid #E5E7EB; }
-.itl td { padding: 8px 12px 8px 0; border-bottom: 1px solid #F3F4F6; }
-.itl th.n, .itl td.n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
-.itl .cap { font-size: 13px; color: #6B7280; margin: 4px 0 20px; }
-"""
+CORAL = "#FF6D5A"
+BLUE = "#5B8FC7"
+INK = "#9CA3AF"
+
+
+def _theme(fig, height=300, axes=True, **kw):
+    layout = dict(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
+        height=height,
+        margin=dict(t=52, b=28, l=8, r=16),
+        legend=dict(orientation="h", y=1.14, bgcolor="rgba(0,0,0,0)"),
+    )
+    layout.update(kw)
+    fig.update_layout(**layout)
+    if axes:
+        fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK)
+        fig.update_yaxes(showgrid=False, zeroline=False, color=INK)
+    return fig
 
 
 def _itl_int(value, default):
@@ -29,25 +40,6 @@ def _euro(n):
     if abs(n) >= 10_000:
         return f"€{n / 1_000:.0f}k"
     return f"€{n:,}"
-
-
-def _c(tag):
-    return "<" + "/" + tag + ">"
-
-
-def _table(headers, rows, caption=""):
-    head = []
-    for i, h in enumerate(headers):
-        head.append(f'<th class="n">{h}{_c("th")}' if i else f"<th>{h}{_c('th')}")
-    body = []
-    for row in rows:
-        cells = []
-        for i, cell in enumerate(row):
-            cls = ' class="n"' if i else ""
-            cells.append(f"<td{cls}>{cell}{_c('td')}")
-        body.append("<tr>" + "".join(cells) + _c("tr"))
-    cap = f'<p class="cap">{caption}{_c("p")}' if caption else ""
-    return "<table><tr>" + "".join(head) + _c("tr") + "".join(body) + _c("table") + cap
 
 
 _STAGE_SHORT = {
@@ -144,53 +136,109 @@ except Exception:
         ("Influenced", "Expansion", 4, 61491, 57851, 3640),
     ]
 
-body = f"""
-<div class="itl">
-  <h2>Participants per day{_c("h2")}
-  {_table(
-      ["Metric", "People", "Note"],
-      [
-          ("Registered", "1,269", "Paid + Free unique email"),
-          ("Partner Day", "426", "13 Oct · 87% of 487 tickets"),
-          ("Ecosystem Day", "916", "14 Oct · 76% of 1,205 tickets"),
-          ("Unique people", "1,018", "324 came both days"),
-          ("Staff tickets", "113", "Inside 426 / 916, not extra"),
-          ("Speakers", "116", "Programme overlay"),
-          ("CAB", "39", "11 members · 28 guests"),
-      ],
-      "Fliplet visits. Unique attendance is 80% of 1,269 registered.",
-  )}
-  <h2>Full funnel · Salesforce{_c("h2")}
-  {_table(
-      ["Stage", "People", "% of registered"],
-      [(name, f"{count:,}", f"{pct:.1f}%") for name, count, pct in funnel],
-      "Free/Paid registered is not Fliplet 1,269. Attended is not 426 / 916.",
-  )}
-  <h2>Sourced vs influenced{_c("h2")}
-  {_table(
-      ["Bucket", "Opps", "Total", "Won"],
-      [
-          ("Sourced opps", f"{src_n}", _euro(src_amt), f"{src_won_n} · {_euro(src_won)}"),
-          ("Influenced", f"{inf_n}", _euro(inf_amt), f"{inf_won_n} · {_euro(inf_won)}"),
-          ("NB + Expansion", f"{pipe_opps}", _euro(pipe_total), f"{pipe_won_n} · {_euro(pipe_won)}"),
-      ],
-      "No Partner-typed opportunities — net new is New Business. Full lists are on the Funnel tab.",
-  )}
-  {_table(
-      ["Attribution", "Type", "Opps", "Total", "Open", "Won"],
-      [
-          (bucket, opp_type, f"{n_opps}", _euro(total), _euro(open_amt), _euro(won_amt))
-          for bucket, opp_type, n_opps, total, open_amt, won_amt in type_rows
-      ],
-  )}
-  <h2>NB + Expansion by segment{_c("h2")}
-  {_table(
-      ["Type / segment", "Opps", "Total", "Open", "Won"],
-      [
-          (f"{opp_type} / {segment}", f"{n_opps}", _euro(total), _euro(open_amt), _euro(won_amt))
-          for opp_type, segment, n_opps, total, open_amt, won_amt in pipe_mix
-      ],
-  )}
-{_c("div")}
-"""
-display(HTML("<style>" + ITL_CSS + _c("style") + body))
+days = go.Figure(
+    go.Bar(
+        x=["Partner Day · 87% of 487 tickets", "Ecosystem Day · 76% of 1,205 tickets"],
+        y=[426, 916],
+        marker_color=[CORAL, BLUE],
+        text=["426", "916"],
+        textposition="outside",
+        textfont={"color": INK},
+        cliponaxis=False,
+    )
+)
+display(
+    _theme(
+        days,
+        height=280,
+        title=dict(text="Participants per day", font=dict(size=16, color=INK)),
+        yaxis_title="People",
+    )
+)
+
+attr = go.Figure()
+attr.add_bar(
+    name="Total",
+    x=["Sourced opps", "Influenced", "NB + Expansion"],
+    y=[src_amt, inf_amt, pipe_total],
+    marker_color=CORAL,
+)
+display(
+    _theme(
+        attr,
+        height=280,
+        title=dict(text="Sourced vs influenced vs pipeline", font=dict(size=16, color=INK)),
+        yaxis_title="€",
+    )
+)
+
+participants = pd.DataFrame(
+    {
+        "metric": [
+            "Registered",
+            "Partner Day",
+            "Ecosystem Day",
+            "Unique people",
+            "Staff tickets",
+            "Speakers",
+            "CAB",
+        ],
+        "people": ["1,269", "426", "916", "1,018", "113", "116", "39"],
+        "note": [
+            "Paid + Free unique email",
+            "13 Oct · 87% of 487 tickets",
+            "14 Oct · 76% of 1,205 tickets",
+            "324 came both days",
+            "Inside 426 / 916, not extra",
+            "Programme overlay",
+            "11 members · 28 guests",
+        ],
+    }
+)
+display(participants)
+
+sf = pd.DataFrame(
+    {
+        "stage": [name for name, _, _ in funnel],
+        "people": [f"{count:,}" for _, count, _ in funnel],
+        "pct_of_registered": [f"{pct:.1f}%" for _, _, pct in funnel],
+    }
+)
+display(sf)
+
+attribution = pd.DataFrame(
+    {
+        "bucket": ["Sourced opps", "Influenced", "NB + Expansion"],
+        "opps": [src_n, inf_n, pipe_opps],
+        "total": [_euro(src_amt), _euro(inf_amt), _euro(pipe_total)],
+        "won": [
+            f"{src_won_n} · {_euro(src_won)}",
+            f"{inf_won_n} · {_euro(inf_won)}",
+            f"{pipe_won_n} · {_euro(pipe_won)}",
+        ],
+    }
+)
+display(attribution)
+
+mix = pd.DataFrame(
+    {
+        "attribution": [r[0] for r in type_rows],
+        "type": [r[1] for r in type_rows],
+        "opps": [r[2] for r in type_rows],
+        "total": [_euro(r[3]) for r in type_rows],
+        "open": [_euro(r[4]) for r in type_rows],
+        "won": [_euro(r[5]) for r in type_rows],
+    }
+)
+display(mix)
+
+segment = pd.DataFrame(
+    {
+        "type_segment": [f"{t} / {s}" for t, s, *_ in pipe_mix],
+        "opps": [n for _, _, n, *_ in pipe_mix],
+        "total": [_euro(total) for _, _, _, total, *_ in pipe_mix],
+        "open": [_euro(open_amt) for *_, open_amt, _ in pipe_mix],
+        "won": [_euro(won) for *_, won in pipe_mix],
+    }
+)
+display(segment)

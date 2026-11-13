@@ -1,19 +1,26 @@
-from IPython.display import display, HTML
+import pandas as pd
+import plotly.graph_objects as go
+from IPython.display import display
 
-# Self-contained Salesforce funnel. App runs top-to-bottom; SQL later in the
-# notebook is not available here. Numbers from BQ on 13 Nov 2026 (Europe/Madrid).
+CORAL = "#FF6D5A"
+BLUE = "#5B8FC7"
+INK = "#9CA3AF"
 
-ITL_CSS = """
-.itl { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; max-width: 920px; }
-.itl h2 { font-size: 18px; font-weight: 700; margin: 28px 0 8px; letter-spacing: -0.01em; }
-.itl h2:first-child { margin-top: 4px; }
-.itl p { font-size: 14px; line-height: 1.55; color: #4B5563; margin: 0 0 12px; }
-.itl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 0 0 4px; }
-.itl th { text-align: left; font-weight: 600; color: #6B7280; padding: 8px 12px 8px 0; border-bottom: 1px solid #E5E7EB; }
-.itl td { padding: 8px 12px 8px 0; border-bottom: 1px solid #F3F4F6; }
-.itl th.n, .itl td.n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
-.itl .cap { font-size: 13px; color: #6B7280; margin: 4px 0 20px; }
-"""
+
+def _theme(fig, height=320, **kw):
+    layout = dict(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
+        height=height,
+        margin=dict(t=56, b=28, l=12, r=20),
+        legend=dict(orientation="h", y=1.12, bgcolor="rgba(0,0,0,0)"),
+    )
+    layout.update(kw)
+    fig.update_layout(**layout)
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK)
+    fig.update_yaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK)
+    return fig
 
 
 def _euro(n):
@@ -26,25 +33,6 @@ def _euro(n):
     if abs(n) >= 10_000:
         return f"€{n / 1_000:.0f}k"
     return f"€{int(round(n)):,}"
-
-
-def _c(tag):
-    return "<" + "/" + tag + ">"
-
-
-def _table(headers, rows, caption=""):
-    head = []
-    for i, h in enumerate(headers):
-        head.append(f'<th class="n">{h}{_c("th")}' if i else f"<th>{h}{_c('th')}")
-    body = []
-    for row in rows:
-        cells = []
-        for i, cell in enumerate(row):
-            cls = ' class="n"' if i else ""
-            cells.append(f"<td{cls}>{cell}{_c('td')}")
-        body.append("<tr>" + "".join(cells) + _c("tr"))
-    cap = f'<p class="cap">{caption}{_c("p")}' if caption else ""
-    return "<table><tr>" + "".join(head) + _c("tr") + "".join(body) + _c("table") + cap
 
 
 funnel_rows = [
@@ -130,7 +118,6 @@ influenced = [
     ("Rakuten", "New Business", "Meeting Booked", 0, "ENT"),
 ]
 won = [row for row in sourced + influenced if row[2].startswith("Closed Won")]
-
 try:
     src_df = itl_sourced_influenced_opps
     sourced = [
@@ -172,49 +159,95 @@ try:
 except Exception:
     pass
 
+stages = [s for s, _, _ in funnel_rows]
+counts = [c for _, c, _ in funnel_rows]
+pcts = [p for _, _, p in funnel_rows]
+funnel_fig = go.Figure(
+    go.Funnel(
+        y=stages,
+        x=counts,
+        text=[f"{c:,} ({p}%)" for c, p in zip(counts, pcts)],
+        textinfo="text",
+        textfont={"size": 13, "color": "#F9FAFB"},
+        marker=dict(color=[CORAL, "#FF8F80", "#E08A7A", "#C97B6E", "#6B7280"], line=dict(width=0)),
+        connector=dict(line=dict(color="rgba(156,163,175,0.35)", dash="dot", width=2)),
+    )
+)
+display(
+    _theme(
+        funnel_fig,
+        height=400,
+        title=dict(text="Leads progression · Salesforce CampaignMember", font=dict(size=16, color=INK)),
+        margin=dict(t=56, b=20, l=220, r=40),
+    )
+)
 
-def _opp_rows(rows):
-    return [
-        (account, opp_type, stage, _euro(amount), segment)
-        for account, opp_type, stage, amount, segment in rows
-    ]
+sdr_fig = go.Figure(
+    go.Bar(
+        x=[n for n, _, _ in sdr_rows],
+        y=[c for _, c, _ in sdr_rows],
+        marker_color=CORAL,
+        text=[c for _, c, _ in sdr_rows],
+        textposition="outside",
+        textfont={"color": INK},
+        cliponaxis=False,
+    )
+)
+display(
+    _theme(
+        sdr_fig,
+        height=280,
+        title=dict(text="First meeting source · sourced + influenced", font=dict(size=16, color=INK)),
+        yaxis_title="Opportunities",
+    )
+)
+
+stage_order = []
+for _, stage, _ in stage_rows:
+    if stage not in stage_order:
+        stage_order.append(stage)
+stage_fig = go.Figure()
+for bucket, color in (("Sourced", CORAL), ("Influenced", BLUE)):
+    x = [sum(n for b, s, n in stage_rows if b == bucket and s == stage) for stage in stage_order]
+    stage_fig.add_bar(
+        name=bucket,
+        y=list(reversed(stage_order)),
+        x=list(reversed(x)),
+        orientation="h",
+        marker_color=color,
+    )
+display(
+    _theme(
+        stage_fig,
+        height=320,
+        barmode="stack",
+        title=dict(text="Opportunities per Salesforce stage", font=dict(size=16, color=INK)),
+        xaxis_title="Opps",
+    )
+)
 
 
-body = f"""
-<div class="itl">
-  <h2>Leads progression{_c("h2")}
-  {_table(
-      ["Stage", "People", "% of registered"],
-      [(s, f"{c:,}", f"{p:.1f}%") for s, c, p in funnel_rows],
-      "70 is people on an account with a NB/Expansion opp created from 12 Oct, not 70 opportunities.",
-  )}
-  <h2>Sourced vs influenced{_c("h2")}
-  {_table(
-      ["Bucket", "Opps", "Amount", "Won"],
-      [
-          ("Sourced", f"{src_n}", _euro(src_amt), f"{src_won_n} · {_euro(src_won)}"),
-          ("Influenced", f"{inf_n}", _euro(inf_amt), f"{inf_won_n} · {_euro(inf_won)}"),
-          ("NB + Expansion pipeline", f"{pipe_opps}", _euro(pipe_total), f"{pipe_won_n} · {_euro(pipe_won)}"),
-      ],
-      f"Open pipeline {_euro(pipe_open)}. No Partner-typed opportunities — net new is New Business.",
-  )}
-  <h2>First meeting source{_c("h2")}
-  {_table(
-      ["Path", "Opps", "Amount"],
-      [(name, f"{n}", _euro(amt)) for name, n, amt in sdr_rows],
-      "ITL sourced + influenced NB/Expansion deals. AI SDR (Freddy) is not set on these 30.",
-  )}
-  <h2>Opportunities per Salesforce stage{_c("h2")}
-  {_table(
-      ["Attribution", "Stage", "Opps"],
-      [(b, s, f"{n}") for b, s, n in stage_rows],
-  )}
-  <h2>Opportunities sourced · {len(sourced)}{_c("h2")}
-  {_table(["Account", "Type", "Stage", "Amount", "Segment"], _opp_rows(sourced))}
-  <h2>Opportunities influenced · {len(influenced)}{_c("h2")}
-  {_table(["Account", "Type", "Stage", "Amount", "Segment"], _opp_rows(influenced))}
-  <h2>Closed won on this list · {len(won)}{_c("h2")}
-  {_table(["Account", "Type", "Stage", "Amount", "Segment"], _opp_rows(won))}
-{_c("div")}
-"""
-display(HTML("<style>" + ITL_CSS + _c("style") + body))
+def _opp_df(rows):
+    return pd.DataFrame(
+        {
+            "account": [r[0] for r in rows],
+            "type": [r[1] for r in rows],
+            "stage": [r[2] for r in rows],
+            "amount": [_euro(r[3]) for r in rows],
+            "segment": [r[4] for r in rows],
+        }
+    )
+
+
+kpis = pd.DataFrame(
+    {
+        "bucket": ["Sourced", "Influenced", "NB + Expansion pipeline"],
+        "opps": [src_n, inf_n, pipe_opps],
+        "amount": [_euro(src_amt), _euro(inf_amt), _euro(pipe_total)],
+        "won": [f"{src_won_n} · {_euro(src_won)}", f"{inf_won_n} · {_euro(inf_won)}", f"{pipe_won_n} · {_euro(pipe_won)}"],
+    }
+)
+display(kpis)
+display(_opp_df(sourced))
+display(_opp_df(influenced))
+display(_opp_df(won))

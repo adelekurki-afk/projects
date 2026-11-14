@@ -28,7 +28,7 @@ Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniori
 
 ## Funnel
 
-Salesforce **lead reached** is Lead/Contact status on ITL Free+Paid (1,102 people; 314 New, 269 Working, 177 Qualified), plus the same statuses by sales segment and region. It is written into **APP: Funnel Chart** on Overview. Event people 1,119 → 837 stays as the CampaignMember funnel on that same chart. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
+Salesforce **lead reached** is Lead/Contact status on ITL Free+Paid (1,102 people; 314 New, 269 Working, 177 Qualified), plus the same statuses by sales segment and region as **two charts**, not one combined figure. It is written into **APP: Funnel Chart** on Overview. Ticket sales (Paid + Free) is the daily + cumulative diagram from In The Loop Registrations: 1,151 registrations / 1,043 unique people vs an 850 unique-people goal. Event people 1,119 → 837 stays as the CampaignMember funnel on that same chart. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
 
 ## Intent
 

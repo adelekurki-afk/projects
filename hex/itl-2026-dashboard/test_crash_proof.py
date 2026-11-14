@@ -138,6 +138,7 @@ def test_scoreboard_renders_overview():
     for needle in (
         "1,269", "426", "916", "1,018", "1,119", "837",
         "€2.46M", "€2.43M", "New Business / ENT",
+        "Ticket sales",
     ):
         assert needle in blob, needle
     for gone in ("How 426 is built", "3.8M", "Berlin events · conference week"):
@@ -159,6 +160,7 @@ def test_participation_tab_html():
     for needle in (
         "Participation", "426", "916", "324", "1,018",
         "113", "116", "39", "391", "878", "green YES",
+        "Ticket sales", "1,151", "1,043", "850", "Ambassadors",
     ):
         assert needle in blob, needle
 
@@ -232,17 +234,24 @@ def test_four_views_compile_without_sql():
     assert first.data[0].type == "table"
     assert "#87003C" in str(first.data[0].header.fill.color)
     assert "ENT" in str(first.data[0].header.values)
-    pair = next(
+    seg = next(
         c
         for c in funnel_figs
         if c.data and getattr(c.data[0], "type", None) == "bar" and "ENT" in [t.name for t in c.data]
     )
-    assert pair.data[0].orientation == "h"
-    assert "DACH" in [t.name for t in pair.data]
+    assert seg.data[0].orientation == "h"
+    assert "DACH" not in [t.name for t in seg.data]
+    reg = next(
+        c
+        for c in funnel_figs
+        if c.data and getattr(c.data[0], "type", None) == "bar" and "DACH" in [t.name for t in c.data]
+    )
+    assert "ENT" not in [t.name for t in reg.data]
     titles = [str(c.layout.title.text) for c in funnel_figs]
     assert any([t.name for t in c.data] == ["Lead", "Contact"] for c in funnel_figs)
     assert any("sales segment" in t for t in titles)
     assert any("region" in t for t in titles)
+    assert not any("sales segment and region" in t for t in titles)
     assert not any("Lead progression" in t for t in titles)
     tables = [
         c

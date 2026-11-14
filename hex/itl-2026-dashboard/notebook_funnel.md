@@ -2,7 +2,7 @@
 
 This sits on the **Overview** tab, under the summary.
 
-**APP: Funnel Chart** opens with the sales-segment and region tables, then the same numbers as grouped bars. Snapshot 14 Nov 2026, 09:57 Europe/Madrid.
+**APP: Funnel Chart** opens with the sales-segment and region tables, then each split as its own grouped bar chart (not one combined figure). Snapshot 14 Nov 2026.
 
 ## Result
 

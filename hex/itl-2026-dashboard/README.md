@@ -6,14 +6,15 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 
 **Notebook:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
-The Classic App now has a **Registration** tab as well. Hex Classic App only shows the **first** chart in a CODE cell, so ticket sales has one cell per chart:
+Dashboard tables live in **sections of native Hex tables** (SQL or a CODE cell that ends on a dataframe). Add the section header plus the tables under it to a tab, then use the chart icon to restyle the same table as a bar, line, or stacked area.
 
-| App tab | View |
+| App tab | Pin these |
 | --- | --- |
-| **Overview** | Summary at the top, **Funnel** under it. SFDC lead reached (Lead vs Contact, sales segment, region) is already in **APP: Funnel Chart** |
-| **Participation** | **Attendance**. Pin per-survey cells (**Ecosystem Day**, **Partner Day**, **Session feedback**) here |
-| **Registration** | Ticket sales. Pin **APP: Registration Result**, **APP: Ticket sales daily**, **APP: Ticket sales mix**, **APP: Ticket sales vs goal** |
-| **Intent** | Website / YouTube / paid search |
+| **Overview** | **APP: Section · Overview tables** plus visits / pipeline / opportunities tables. Funnel stays under the summary. |
+| **Participation** | **APP: Section · Participation tables** plus role mix / also on site / staff / speakers. Survey tables are **APP: Section · Feedback tables**. |
+| **Registration** | **APP: Section · Registration tables** plus ticket sales / mix / vs goal. Native tables, not Plotly. |
+| **Funnel** | **APP: Section · Funnel tables** plus the SFDC / event-people SQL tables. |
+| **Intent** | **APP: Section · Intent tables** plus weekly / YouTube / instances / paid search. |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
 

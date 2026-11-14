@@ -163,22 +163,32 @@ def test_participation_tab_html():
         assert needle in blob, needle
 
 
-def test_ticket_sales_are_one_figure_each():
-    daily = _exec_view(ROOT / "notebook_ticket_daily.py")
-    mix = _exec_view(ROOT / "notebook_ticket_mix.py")
-    table = _exec_view(ROOT / "notebook_ticket_table.py")
-    all_three = _exec_view(ROOT / "notebook_tickets.py")
-    assert len(daily) == 1 and daily[0].data[0].type == "bar"
-    assert "Ticket sales · daily and cumulative" in str(daily[0].layout.title.text)
-    assert len(mix) == 1 and "Ambassadors" in [t.name for t in mix[0].data]
-    assert len(table) == 1 and table[0].data[0].type == "table"
-    blob = _blob(all_three)
-    for needle in ("1,151", "1,043", "850", "652", "General Admission"):
-        assert needle in blob, needle
-    assert len(all_three) == 3
+def test_ticket_sales_are_native_tables():
+    daily = _exec_ns(ROOT / "notebook_ticket_daily.py")["ticket_sales"]
+    mix = _exec_ns(ROOT / "notebook_ticket_mix.py")["ticket_sales_mix"]
+    table = _exec_ns(ROOT / "notebook_ticket_table.py")["ticket_vs_goal"]
+    bundled = _exec_ns(ROOT / "notebook_tickets.py")
+    assert isinstance(daily, pd.DataFrame) and len(daily) == 73
+    assert int(daily.iloc[-1]["unique_people"]) == 1043
+    assert int(daily.iloc[-1]["registrations"]) == 1151
+    assert list(mix.columns) == [
+        "day",
+        "general_admission",
+        "expert_strategic",
+        "node_partners",
+        "ambassadors",
+    ]
+    assert int(mix.iloc[-1]["general_admission"]) == 652
+    people = int(table.loc[table["ticket_type"].eq("Total unique people"), "people"].iloc[0])
+    assert people == 1043
+    assert int(bundled["ticket_sales_daily"].iloc[-1]["unique_people"]) == 1043
+    sql = (ROOT / "lean/ticket_sales.sql").read_text()
+    assert "FROM UNNEST" in sql
+    assert "pace_to_850" in sql
+    assert "2026-10-10" in sql
 
 
-def _exec_view(path: Path, extra: dict | None = None):
+def _prep_exec(path: Path, extra: dict | None = None):
     import sys
     import types
 
@@ -197,11 +207,23 @@ def _exec_view(path: Path, extra: dict | None = None):
     ipy_display.Markdown = FakeHTML
     sys.modules["IPython"] = ipy
     sys.modules["IPython.display"] = ipy_display
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
     env = {"__name__": "__main__"}
     if extra:
         env.update(extra)
     exec(compile(src, path.name, "exec"), env)
+    return env, fake
+
+
+def _exec_view(path: Path, extra: dict | None = None):
+    _, fake = _prep_exec(path, extra)
     return fake.calls
+
+
+def _exec_ns(path: Path, extra: dict | None = None):
+    env, _ = _prep_exec(path, extra)
+    return env
 
 
 def test_intent_tab_explains_timeframes():
@@ -349,7 +371,9 @@ def test_section_markdown_tables_have_numbers():
         "notebook_digital.md": ("174,802", "11,428", "84,904"),
         "notebook_overview.md": ("426", "916", "1,018", "1,119", "€2.46M"),
         "notebook_participation_tab.md": ("426", "916", "324", "1,018", "391", "878"),
-        "notebook_registration.md": ("1,151", "1,043", "850", "652", "123%"),
+        "notebook_registration.md": ("1,151", "1,043", "850", "652", "123%", "chart icon"),
+        "tables/section_registration.md": ("Registration", "chart icon"),
+        "tables/section_funnel.md": ("Funnel", "restyle"),
         "notebook_intent_tab.md": ("+33%", "12–18 Oct", "5–11 Oct", "3.8M", "262k"),
         "lean_readout.md": ("426", "916", "1,018", "1,119", "+33%"),
         "notebook_survey_eco.md": ("9.1", "NPS", "43", "33 promoters"),
@@ -382,12 +406,39 @@ def test_cab_roles_traffic_are_split_and_crash_proof():
         assert src.strip().endswith("fig")
 
 
+def test_native_section_tables_are_dataframes():
+    expected = {
+        "tables/visits.py": ("visits", 8, "people"),
+        "tables/pipeline_summary.py": ("pipeline_summary", 3, "amount_eur"),
+        "tables/opps_by_segment.py": ("opportunities_by_segment", 4, "total_eur"),
+        "tables/role_mix.py": ("role_mix", 12, "partner_day"),
+        "tables/also_on_site.py": ("also_on_site", 10, "value"),
+        "tables/staff_by_crew.py": ("staff_by_crew", 5, "registered"),
+        "tables/speakers_by_day.py": ("speakers_by_day", 2, "speakers"),
+        "tables/paid_search.py": ("paid_search_terms", 15, "impressions"),
+        "tables/eco_parts.py": ("eco_programme_parts", 8, "mean_5"),
+        "tables/eco_ops.py": ("eco_operations", 6, "mean_5"),
+        "tables/eco_who.py": ("eco_who_answered", 8, "n"),
+        "tables/partner_tracks.py": ("partner_tracks", 3, "attended"),
+        "tables/session_ratings.py": ("session_ratings", 12, "session_mean"),
+        "tables/attribution_kpis.py": ("attribution_kpis", 3, "amount_eur"),
+    }
+    for name, (var, rows, col) in expected.items():
+        env = _exec_ns(ROOT / name)
+        frame = env[var]
+        assert isinstance(frame, pd.DataFrame), name
+        assert len(frame) == rows, name
+        assert col in frame.columns, name
+        leftover = env.get("display")
+        if leftover is not None and getattr(leftover, "calls", None):
+            figs = [c for c in leftover.calls if isinstance(c, go.Figure)]
+            assert not figs, f"{name} still builds a Plotly figure"
+
+
 def test_app_tables_use_n8n_pink():
     for name in (
         "notebook_scoreboard.py",
         "notebook_funnel.py",
-        "notebook_tickets.py",
-        "notebook_ticket_table.py",
         "notebook_participation.py",
         "notebook_attendance.py",
         "notebook_intent.py",
@@ -430,7 +481,8 @@ if __name__ == "__main__":
     test_scoreboard_has_day_counts()
     test_scoreboard_renders_overview()
     test_participation_tab_html()
-    test_ticket_sales_are_one_figure_each()
+    test_ticket_sales_are_native_tables()
+    test_native_section_tables_are_dataframes()
     test_intent_tab_explains_timeframes()
     test_four_views_compile_without_sql()
     test_survey_and_lead_cells_have_pin_labels()

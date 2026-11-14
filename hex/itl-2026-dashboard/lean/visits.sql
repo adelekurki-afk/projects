@@ -1,6 +1,7 @@
 -- Locked Fliplet visits. Not Salesforce Attended.
 SELECT * FROM UNNEST([
-  STRUCT('Came · Partner Day' AS metric, 426 AS people, '13 Oct · 391 door + 35 badge' AS how_built),
+  STRUCT('Registered' AS metric, 1269 AS people, 'Paid + Free unique email' AS how_built),
+  STRUCT('Came · Partner Day', 426, '13 Oct · 391 door + 35 badge'),
   STRUCT('Came · Ecosystem Day', 916, '14 Oct · 878 door + 38 green YES'),
   STRUCT('Unique people', 1018, '426 + 916 − 324 both days'),
   STRUCT('Both days', 324, 'Inside both 426 and 916'),

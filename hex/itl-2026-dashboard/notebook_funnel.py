@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
+from plotly.subplots import make_subplots
 
 PINK = "#FF91AC"
 PINK_MID = "#FFBCCA"
@@ -97,38 +98,71 @@ def _reached_grouped(rows, title):
     return fig
 
 
-def _reached_by_dim(rows, series_order, colors, title):
+def _dim_table(rows, series_order):
     statuses = [s for s in STATUS_ORDER if any(str(r[0]) == s for r in rows)]
     lookup = {(str(r[0]), str(r[1])): int(r[2]) for r in rows}
-    fig = go.Figure()
+    data = {"status": statuses}
     for name in series_order:
-        xs = [lookup.get((st, name), 0) for st in statuses]
+        data[name] = [lookup.get((st, name), 0) for st in statuses]
+    return pd.DataFrame(data)
+
+
+def _reached_pair(segment_rows, region_rows):
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        subplot_titles=("Sales segment", "Region"),
+        vertical_spacing=0.14,
+    )
+    statuses = [s for s in STATUS_ORDER if any(str(r[0]) == s for r in segment_rows + region_rows)]
+    seg_lookup = {(str(r[0]), str(r[1])): int(r[2]) for r in segment_rows}
+    reg_lookup = {(str(r[0]), str(r[1])): int(r[2]) for r in region_rows}
+    for name in SEGMENT_ORDER:
+        xs = [seg_lookup.get((st, name), 0) for st in statuses]
         fig.add_bar(
             name=name,
             y=statuses,
             x=xs,
             orientation="h",
-            marker=dict(color=colors.get(name, PINK), line=dict(width=0)),
+            marker=dict(color=SEGMENT_COLORS.get(name, PINK), line=dict(width=0)),
             text=[f"{v:,}" if v else "" for v in xs],
             textposition="outside",
-            textfont={"size": 11, "color": INK},
             cliponaxis=False,
             hoverinfo="skip",
+            legendgroup="segment",
+            row=1,
+            col=1,
+        )
+    for name in REGION_ORDER:
+        xs = [reg_lookup.get((st, name), 0) for st in statuses]
+        fig.add_bar(
+            name=name,
+            y=statuses,
+            x=xs,
+            orientation="h",
+            marker=dict(color=REGION_COLORS.get(name, PINK), line=dict(width=0)),
+            text=[f"{v:,}" if v else "" for v in xs],
+            textposition="outside",
+            cliponaxis=False,
+            hoverinfo="skip",
+            legendgroup="region",
+            row=2,
+            col=1,
         )
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Inter, Arial, sans-serif", color=INK, size=13),
-        height=400,
-        margin=dict(t=56, b=28, l=110, r=56),
-        title=dict(text=title, font=dict(size=16, color=INK)),
+        height=760,
+        margin=dict(t=72, b=28, l=110, r=56),
+        title=dict(text="SFDC lead reached · sales segment and region", font=dict(size=16, color=INK)),
         barmode="group",
         bargap=0.28,
         bargroupgap=0.06,
-        legend=dict(orientation="h", y=1.1, bgcolor="rgba(0,0,0,0)"),
-        xaxis=dict(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK, title="People ever reached"),
-        yaxis=dict(autorange="reversed", showgrid=False, zeroline=False, ticks="", tickfont=dict(size=13, color=INK)),
+        legend=dict(orientation="h", y=1.08, bgcolor="rgba(0,0,0,0)"),
     )
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", zeroline=False, color=INK, title="People ever reached")
+    fig.update_yaxes(autorange="reversed", showgrid=False, zeroline=False, ticks="", tickfont=dict(size=13, color=INK))
     return fig
 
 
@@ -350,9 +384,10 @@ try:
 except Exception:
     pass
 
+display(_dim_table(segment_rows, SEGMENT_ORDER))
+display(_dim_table(region_rows, REGION_ORDER))
+display(_reached_pair(segment_rows, region_rows))
 display(_reached_grouped(reached_rows, "SFDC lead reached · Lead and Contact"))
-display(_reached_by_dim(segment_rows, SEGMENT_ORDER, SEGMENT_COLORS, "SFDC lead reached · sales segment"))
-display(_reached_by_dim(region_rows, REGION_ORDER, REGION_COLORS, "SFDC lead reached · region"))
 
 stages = [s for s, _, _ in funnel_rows]
 counts = [c for _, c, _ in funnel_rows]

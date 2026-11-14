@@ -2,6 +2,7 @@
 # Live from sfdc_lead_reached when that SQL has already run; otherwise baked snapshot.
 # Includes Leads (Lead.Status / LeadHistory) and Contacts (Status__c / ContactHistory).
 # Grouped, not stacked: the same person can appear in both bars after conversion.
+import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
 
@@ -28,6 +29,53 @@ try:
         for _, r in sfdc_lead_reached.iterrows()
         if str(r["sfdc_status"]) in ("Suspect", "New", "Working", "Qualified", "Nurturing", "Unqualified")
     ]
+except Exception:
+    pass
+
+display(
+    pd.DataFrame(
+        {
+            "status": ["Suspect", "New", "Working", "Qualified", "Nurturing", "Unqualified"],
+            "ENT": [57, 143, 78, 50, 2, 2],
+            "MM": [169, 147, 147, 109, 8, 7],
+            "SMB": [441, 21, 39, 17, 19, 9],
+            "Unknown": [19, 3, 5, 1, 1, 1],
+        }
+    )
+)
+display(
+    pd.DataFrame(
+        {
+            "status": ["Suspect", "New", "Working", "Qualified", "Nurturing", "Unqualified"],
+            "DACH": [270, 186, 179, 102, 13, 14],
+            "North EMEA": [43, 38, 23, 21, 4, 1],
+            "South EMEA": [54, 13, 14, 14, 5, 0],
+            "US": [36, 15, 29, 25, 2, 0],
+            "Other": [283, 62, 24, 15, 6, 4],
+        }
+    )
+)
+try:
+    live = sfdc_lead_reached
+    if "ENT" in live.columns:
+        display(
+            live[
+                [
+                    "sfdc_status",
+                    "people_ever_reached",
+                    "as_lead",
+                    "as_contact",
+                    "ENT",
+                    "MM",
+                    "SMB",
+                    "DACH",
+                    "North_EMEA",
+                    "South_EMEA",
+                    "US",
+                    "Other",
+                ]
+            ]
+        )
 except Exception:
     pass
 

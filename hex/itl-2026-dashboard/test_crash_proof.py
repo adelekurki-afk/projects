@@ -208,18 +208,19 @@ def test_four_views_compile_without_sql():
     funnel_figs = [c for c in funnel_calls if isinstance(c, go.Figure)]
     assert funnel_figs, "Funnel Chart should open with a visual"
     first = funnel_figs[0]
-    assert "SFDC lead reached" in str(first.layout.title.text)
+    assert "sales segment" in str(first.layout.title.text)
     assert first.data[0].type == "bar"
     assert first.data[0].orientation == "h"
-    assert [t.name for t in first.data] == ["Lead", "Contact"]
+    assert "ENT" in [t.name for t in first.data]
+    assert "DACH" in [t.name for t in first.data]
     titles = [str(c.layout.title.text) for c in funnel_figs]
+    assert any([t.name for t in c.data] == ["Lead", "Contact"] for c in funnel_figs)
     assert any("sales segment" in t for t in titles)
     assert any("region" in t for t in titles)
     assert not any("Lead progression" in t for t in titles)
-    assert not any(
-        isinstance(c, pd.DataFrame) and "sfdc_status" in getattr(c, "columns", [])
-        for c in funnel_calls
-    )
+    tables = [c for c in funnel_calls if isinstance(c, pd.DataFrame) and "status" in list(getattr(c, "columns", []))]
+    assert any("ENT" in list(t.columns) for t in tables)
+    assert any("DACH" in list(t.columns) for t in tables)
 
 
 def test_summary_has_sourced_and_attendance_rate():
@@ -255,6 +256,9 @@ def test_survey_and_lead_cells_have_pin_labels():
     assert "as_lead" in reached_sql
     assert "as_contact" in reached_sql
     assert "ContactHistory" in reached_sql
+    assert "ENT" in reached_sql
+    assert "DACH" in reached_sql
+    assert "market_segment" in reached_sql
     dim_sql = (ROOT / "lean/lead_sfdc_reached_dims.sql").read_text()
     assert "market_segment" in dim_sql
     assert "sub_region" in dim_sql

@@ -1,4 +1,5 @@
 # SFDC lead reached by sales segment and region. Live from sfdc_lead_reached_dims when SQL has run.
+import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
 
@@ -125,5 +126,16 @@ def _reached_by_dim(rows, series_order, colors, title):
     return fig
 
 
+def _dim_table(rows, series_order):
+    statuses = [s for s in STATUS_ORDER if any(str(r[0]) == s for r in rows)]
+    lookup = {(str(r[0]), str(r[1])): int(r[2]) for r in rows}
+    data = {"status": statuses}
+    for name in series_order:
+        data[name] = [lookup.get((st, name), 0) for st in statuses]
+    return pd.DataFrame(data)
+
+
+display(_dim_table(segment_rows, SEGMENT_ORDER))
+display(_dim_table(region_rows, REGION_ORDER))
 display(_reached_by_dim(segment_rows, SEGMENT_ORDER, SEGMENT_COLORS, "SFDC lead reached · sales segment"))
 display(_reached_by_dim(region_rows, REGION_ORDER, REGION_COLORS, "SFDC lead reached · region"))

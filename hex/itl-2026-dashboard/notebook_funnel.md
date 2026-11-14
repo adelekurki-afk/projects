@@ -2,18 +2,42 @@
 
 This sits on the **Overview** tab, under the summary.
 
-**APP: SFDC lead reached** is Salesforce Lead **and** Contact status, not Fliplet 1,269 / 426 / 916 and not the CampaignMember attendance funnel. Snapshot 14 Nov 2026, 08:30 Europe/Madrid.
+**APP: Funnel Chart** opens with the sales-segment and region tables, then the same numbers as grouped bars. Snapshot 14 Nov 2026, 09:57 Europe/Madrid.
 
 ## Result
 
-**1,102** ITL Free+Paid people. Contacts are included on the first chart (pink Lead, deep pink Contact). Same person can appear in both after conversion, so those bars are grouped, not stacked.
+**1,102** ITL Free+Paid people. Contacts are included (pink Lead, deep pink Contact).
 
-Ever reached: Suspect **686** (546 Lead / 140 Contact), New **314**, Working **269**, Qualified **177**.
+Ever reached: Suspect **686**, New **314**, Working **269**, Qualified **177**.
 
-By sales segment (unique people ever in each status): New is **ENT 143 / MM 147 / SMB 21**. Qualified is **MM 109 / ENT 50 / SMB 17**. SMB is mostly still Suspect (**441**).
+### Sales segment
 
-By region (Salesforce sub-region; US offices rolled up): New is **DACH 186 / Other 62 / North EMEA 38 / US 15 / South EMEA 13**. Qualified is **DACH 102 / US 25 / North EMEA 21 / Other 15 / South EMEA 14**.
+| status | ENT | MM | SMB | Unknown |
+| --- | --- | --- | --- | --- |
+| Suspect | 57 | 169 | 441 | 19 |
+| New | 143 | 147 | 21 | 3 |
+| Working | 78 | 147 | 39 | 5 |
+| Qualified | 50 | 109 | 17 | 1 |
+| Nurturing | 2 | 8 | 19 | 1 |
+| Unqualified | 2 | 7 | 9 | 1 |
 
-Event people (CampaignMember, a different clock): **1,119** registered → **837** attended → **20** meetings booked → **70** people on an opp → **6** closed won. Sourced **12 / €1.01M** (1 won). Influenced **18 / €1.17M** (2 won). Pipeline from 12 Oct is **€2.46M** (29 NB+Expansion opps).
+SMB is mostly still Suspect (**441**).
 
-70 is people on those accounts, not 70 opportunities. Segment and region sit on **APP: Funnel Chart**. The charts are baked so this cell still runs before the SQL.
+### Region
+
+Salesforce sub-region; US offices rolled up.
+
+| status | DACH | North EMEA | South EMEA | US | Other |
+| --- | --- | --- | --- | --- | --- |
+| Suspect | 270 | 43 | 54 | 36 | 283 |
+| New | 186 | 38 | 13 | 15 | 62 |
+| Working | 179 | 23 | 14 | 29 | 24 |
+| Qualified | 102 | 21 | 14 | 25 | 15 |
+| Nurturing | 13 | 4 | 5 | 2 | 6 |
+| Unqualified | 14 | 1 | 0 | 0 | 4 |
+
+Qualified is **DACH 102**.
+
+Event people (CampaignMember, a different clock): **1,119** registered → **837** attended → **20** meetings booked → **70** people on an opp → **6** closed won. Sourced **12 / €1.01M**. Influenced **18 / €1.17M**. Pipeline from 12 Oct is **€2.46M** (29 NB+Expansion opps).
+
+**Run all**, then refresh. Do not Reset layout.

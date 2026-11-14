@@ -1,6 +1,6 @@
-# Lead progression — Salesforce
+# SFDC lead reached — Salesforce
 
-The pink grouped chart is **APP: SFDC lead reached** (CODE, Plotly). Hex cannot turn a SQL pin into a chart. If the App still shows the empty SQL table, add the CODE cell to the App and remove the SQL table. Overview still has the same chart on **Funnel Chart**. **Run all**, then refresh. Do not Reset layout.
+The pink grouped chart is **APP: SFDC lead reached** (CODE, Plotly), plus sales-segment and region splits on **Funnel Chart**. Hex cannot turn a SQL pin into a chart. **Run all**, then refresh. Do not Reset layout.
 
 Contacts count via `Contact.Status__c` and ContactHistory. This is not the CampaignMember attendance funnel (1,119 → 837).
 

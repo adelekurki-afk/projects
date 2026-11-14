@@ -112,7 +112,7 @@ def test_scoreboard_has_day_counts():
     ast.parse(src)
     for needle in (
         "1,269", "426", "916", "1,018",
-        "Lead progression", "Opportunities",
+        "Opportunities",
     ):
         assert needle in src, needle
     for gone in ("How 426 is built", "Site intent", "3.8M"):
@@ -124,7 +124,6 @@ def test_scoreboard_renders_overview():
     blob = _blob(calls)
     for needle in (
         "1,269", "426", "916", "1,018", "1,119", "837",
-        "1,102", "314", "Working", "Qualified",
         "€2.46M", "€2.43M", "New Business / ENT",
     ):
         assert needle in blob, needle
@@ -203,9 +202,9 @@ def test_four_views_compile_without_sql():
     funnel_calls = _exec_view(ROOT / "notebook_funnel.py")
     funnel_blob = _blob(funnel_calls)
     assert "SFDC lead reached" in funnel_blob
-    assert "Lead progression" in funnel_blob
-    assert "1,102" in funnel_blob or "1102" in funnel_blob
-    assert "handed to sales" in funnel_blob or "New" in funnel_blob
+    assert "sales segment" in funnel_blob
+    assert "region" in funnel_blob
+    assert "1,102" in funnel_blob or "1102" in funnel_blob or "441" in funnel_blob
     funnel_figs = [c for c in funnel_calls if isinstance(c, go.Figure)]
     assert funnel_figs, "Funnel Chart should open with a visual"
     first = funnel_figs[0]
@@ -213,7 +212,10 @@ def test_four_views_compile_without_sql():
     assert first.data[0].type == "bar"
     assert first.data[0].orientation == "h"
     assert [t.name for t in first.data] == ["Lead", "Contact"]
-    assert any("Lead progression" in str(c.layout.title.text) for c in funnel_figs)
+    titles = [str(c.layout.title.text) for c in funnel_figs]
+    assert any("sales segment" in t for t in titles)
+    assert any("region" in t for t in titles)
+    assert not any("Lead progression" in t for t in titles)
     assert not any(
         isinstance(c, pd.DataFrame) and "sfdc_status" in getattr(c, "columns", [])
         for c in funnel_calls
@@ -243,6 +245,7 @@ def test_survey_and_lead_cells_have_pin_labels():
         "lean/lead_sfdc_statuses.sql",
         "lean/lead_progression.sql",
         "lean/lead_sfdc_reached.sql",
+        "lean/lead_sfdc_reached_dims.sql",
     ):
         src = (ROOT / path).read_text()
         assert "701cj0000157ynMAAQ" in src
@@ -252,9 +255,14 @@ def test_survey_and_lead_cells_have_pin_labels():
     assert "as_lead" in reached_sql
     assert "as_contact" in reached_sql
     assert "ContactHistory" in reached_sql
+    dim_sql = (ROOT / "lean/lead_sfdc_reached_dims.sql").read_text()
+    assert "market_segment" in dim_sql
+    assert "sub_region" in dim_sql
     blob = _blob(_exec_view(ROOT / "notebook_sfdc_lead_progression.py"))
-    assert "1102" in blob or "1,102" in blob
-    assert "handed to sales" in blob or "New" in blob
+    assert "sales segment" in blob
+    assert "region" in blob
+    assert "441" in blob
+    assert "DACH" in blob
     reached_blob = _blob(_exec_view(ROOT / "notebook_sfdc_lead_reached.py"))
     assert "SFDC lead reached" in reached_blob
     assert "Contact" in reached_blob

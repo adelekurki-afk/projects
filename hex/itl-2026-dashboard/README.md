@@ -10,7 +10,7 @@ The Classic App has three tabs. The four views sit on those tabs — they are no
 
 | App tab | View |
 | --- | --- |
-| **Overview** | Summary at the top, **Funnel** under it. SFDC lead progression is already in **APP: Funnel Chart** |
+| **Overview** | Summary at the top, **Funnel** under it. SFDC lead reached (Lead vs Contact, sales segment, region) is already in **APP: Funnel Chart** |
 | **Participation** | **Attendance**. Pin per-survey cells (**Ecosystem Day**, **Partner Day**, **Session feedback**) here |
 | **Intent** | Website / YouTube / paid search |
 
@@ -28,7 +28,7 @@ Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniori
 
 ## Funnel
 
-Salesforce **lead progression** is Lead/Contact status on ITL Free+Paid (1,102 → 314 New → 269 Working → 177 Qualified). It is written into **APP: Funnel Chart** and the Funnel Result already on Overview — Hex cannot pin the extra SQL cells. Event people 1,119 → 837 stays as the second funnel on that same chart. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
+Salesforce **lead reached** is Lead/Contact status on ITL Free+Paid (1,102 people; 314 New, 269 Working, 177 Qualified), plus the same statuses by sales segment and region. It is written into **APP: Funnel Chart** on Overview. Event people 1,119 → 837 stays as the CampaignMember funnel on that same chart. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
 
 ## Intent
 

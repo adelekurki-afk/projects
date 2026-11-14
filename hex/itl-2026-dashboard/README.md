@@ -6,15 +6,18 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 
 **Notebook:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
-Dashboard tables live in **sections of native Hex tables** (SQL or a CODE cell that ends on a dataframe). Add the section header plus the tables under it to a tab, then use the chart icon to restyle the same table as a bar, line, or stacked area.
+Dashboard tables live in **CODE cells labeled `Table · …` at the top of the notebook**. The App Outline **Table** filter only lists Hex **Table display** cells (Add cell → Table). SQL queries, notebook sections, and Python cells do not show there, and the API cannot create Table display cells.
 
-| App tab | Pin these |
+Run the `Table ·` cells, then **Add cell → Table** and pick the dataframe (`visits`, `pipeline_summary`, `role_mix`, …). Those Table cells appear in Outline. Drag onto a tab, then use the chart icon to restyle as a bar, line, or stacked area. The three Registration cards are Charts — search `Table ·` with the type filter cleared if you want the Python cells themselves.
+
+| App tab | Pin these from Outline (`Table ·`) |
 | --- | --- |
-| **Overview** | **APP: Section · Overview tables** plus visits / pipeline / opportunities tables. Funnel stays under the summary. |
-| **Participation** | **APP: Section · Participation tables** plus role mix / also on site / staff / speakers. Survey tables are **APP: Section · Feedback tables**. |
-| **Registration** | **APP: Section · Registration tables** plus ticket sales / mix / vs goal. Native tables, not Plotly. |
-| **Funnel** | **APP: Section · Funnel tables** plus the SFDC / event-people SQL tables. |
-| **Intent** | **APP: Section · Intent tables** plus weekly / YouTube / instances / paid search. |
+| **Overview** | Visits, Pipeline summary, Opportunities |
+| **Participation** | Role mix, Attendance by region, Also on site, Staff by crew, Speakers by day |
+| **Registration** | Ticket sales daily / mix / vs goal (already pinned) |
+| **Funnel** | SFDC lead reached, Event people funnel, Sourced vs influenced |
+| **Intent** | Weekly n8n.io users, YouTube views, Paid search terms |
+| **Feedback** | Eco programme parts, Eco operations, Eco who answered, Partner tracks, Session ratings |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
 

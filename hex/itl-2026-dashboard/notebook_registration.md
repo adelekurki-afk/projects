@@ -2,7 +2,7 @@
 
 This is the Registration tab. Paid + Free ticket sales from In The Loop Registrations · Pacing (Detailed). Expired and Cancelled are out. Last real day **10 Oct**.
 
-These are **native Hex tables**. Add **APP: Section · Registration tables** plus the ticket tables under it. Click the **chart icon** on a table to restyle (daily as bar, mix as stacked area, vs goal as table or bars). Same table, different look.
+These are **native Hex tables**. Ticket sales daily / mix / vs goal are already on this tab. Other dashboard tables live at the top of the notebook as **Table ·** CODE cells. In Edit app, filter Outline to **Table** (the three cards here are Charts) and search `Table ·`. Chart icon restyles the same table.
 
 ## Result
 

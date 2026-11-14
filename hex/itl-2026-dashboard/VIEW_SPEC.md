@@ -2,7 +2,7 @@
 
 Stay on [In the Loop 2026 — Lead & Pipeline Dashboard](https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app). Do not use the seven-cell scratch project.
 
-Same shape as Paid Some LinkedIn: a Result paragraph, then Hex-native tables grouped in sections so the App builder can restyle the same table (bar / line / stacked area) without rewriting Plotly. No custom HTML (it vanishes in dark mode). Tabs: **Overview**, **Participation**, **Funnel**, **Intent**, **Feedback**, **Registration**. Leftover APP charts (registrant mix, pipeline, staff KPIs, CAB, YouTube landings, role mix) are removed so those views are actually visible. Plotly CODE cells only show their first `display()`; section tables are one native dataframe per cell.
+Same shape as Paid Some LinkedIn: a Result paragraph, then Hex-native tables so the App builder can restyle the same table (bar / line / stacked area) without rewriting Plotly. No custom HTML (it vanishes in dark mode). Tabs: **Overview**, **Participation**, **Funnel**, **Intent**, **Feedback**, **Registration**. Leftover APP charts (registrant mix, pipeline, staff KPIs, CAB, YouTube landings, role mix) are removed so those views are actually visible. Plotly CODE cells only show their first `display()`. App Outline does not list SQL queries or notebook sections — pin the **Table ·** CODE cells at the top of the notebook (one dataframe per cell).
 
 ## Summary
 

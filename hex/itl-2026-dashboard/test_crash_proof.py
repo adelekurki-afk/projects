@@ -372,6 +372,7 @@ def test_section_markdown_tables_have_numbers():
         "notebook_overview.md": ("426", "916", "1,018", "1,119", "€2.46M"),
         "notebook_participation_tab.md": ("426", "916", "324", "1,018", "391", "878"),
         "notebook_registration.md": ("1,151", "1,043", "850", "652", "123%", "chart icon"),
+        "tables/section_outline.md": ("Tables", "Outline"),
         "tables/section_registration.md": ("Registration", "chart icon"),
         "tables/section_funnel.md": ("Funnel", "restyle"),
         "notebook_intent_tab.md": ("+33%", "12–18 Oct", "5–11 Oct", "3.8M", "262k"),
@@ -422,6 +423,11 @@ def test_native_section_tables_are_dataframes():
         "tables/partner_tracks.py": ("partner_tracks", 3, "attended"),
         "tables/session_ratings.py": ("session_ratings", 12, "session_mean"),
         "tables/attribution_kpis.py": ("attribution_kpis", 3, "amount_eur"),
+        "tables/sfdc_lead_reached.py": ("sfdc_lead_reached_table", 6, "people_ever_reached"),
+        "tables/event_people.py": ("event_people_funnel_table", 5, "people"),
+        "tables/weekly_users.py": ("weekly_n8n_users", 23, "n8n_users"),
+        "tables/youtube_views.py": ("youtube_views", 18, "views_gained"),
+        "tables/attendance_region.py": ("attendance_region", 6, "partner_day"),
     }
     for name, (var, rows, col) in expected.items():
         env = _exec_ns(ROOT / name)

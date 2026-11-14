@@ -1,6 +1,6 @@
 # Overview
 
-This tab is the **summary**, then the **funnel**. Attendance is the **Participation** tab. Website demand is the **Intent** tab.
+This tab is the **summary**, then the **funnel**. Attendance is the **Participation** tab. Ticket sales is the **Registration** tab. Website demand is the **Intent** tab.
 
 Physical visits are Fliplet. Conversion and pipeline are Salesforce. Website numbers are GA4 on n8n.io. These are three clocks — do not add them.
 

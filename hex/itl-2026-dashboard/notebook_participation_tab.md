@@ -1,6 +1,6 @@
 # Attendance
 
-This is the Participation tab. Fliplet is who walked in. Salesforce Attended is a different clock — do not mix the two.
+This is the Participation tab. Fliplet is who walked in. Salesforce Attended is a different clock — do not mix the two. Ticket sales is on the **Registration** tab.
 
 ## Result
 

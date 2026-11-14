@@ -6,12 +6,13 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 
 **Notebook:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
-The Classic App has three tabs. The four views sit on those tabs — they are not four extra tabs (the API cannot add one):
+The Classic App now has a **Registration** tab as well. Hex Classic App only shows the **first** chart in a CODE cell, so ticket sales has one cell per chart:
 
 | App tab | View |
 | --- | --- |
 | **Overview** | Summary at the top, **Funnel** under it. SFDC lead reached (Lead vs Contact, sales segment, region) is already in **APP: Funnel Chart** |
 | **Participation** | **Attendance**. Pin per-survey cells (**Ecosystem Day**, **Partner Day**, **Session feedback**) here |
+| **Registration** | Ticket sales. Pin **APP: Registration Result**, **APP: Ticket sales daily**, **APP: Ticket sales mix**, **APP: Ticket sales vs goal** |
 | **Intent** | Website / YouTube / paid search |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
@@ -28,7 +29,7 @@ Locked Fliplet headcount, then Salesforce Attended mix (region, segment, seniori
 
 ## Funnel
 
-Salesforce **lead reached** is Lead/Contact status on ITL Free+Paid (1,102 people; 314 New, 269 Working, 177 Qualified), plus the same statuses by sales segment and region as **two charts**, not one combined figure. It is written into **APP: Funnel Chart** on Overview. Ticket sales (Paid + Free) is the daily + cumulative diagram from In The Loop Registrations: 1,151 registrations / 1,043 unique people vs an 850 unique-people goal. Event people 1,119 → 837 stays as the CampaignMember funnel on that same chart. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
+Salesforce **lead reached** is Lead/Contact status on ITL Free+Paid (1,102 people; 314 New, 269 Working, 177 Qualified), plus the same statuses by sales segment and region as **two charts**, not one combined figure. It is written into **APP: Funnel Chart** on Overview. Ticket sales (Paid + Free) lives on the **Registration** tab: 1,151 registrations / 1,043 unique people vs an 850 unique-people goal. Event people 1,119 → 837 stays as the CampaignMember funnel on Overview. AI SDR vs humans, opportunity stages, sourced vs influenced stay as they were.
 
 ## Intent
 

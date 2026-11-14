@@ -138,7 +138,6 @@ def test_scoreboard_renders_overview():
     for needle in (
         "1,269", "426", "916", "1,018", "1,119", "837",
         "€2.46M", "€2.43M", "New Business / ENT",
-        "Ticket sales",
     ):
         assert needle in blob, needle
     for gone in ("How 426 is built", "3.8M", "Berlin events · conference week"):
@@ -160,9 +159,23 @@ def test_participation_tab_html():
     for needle in (
         "Participation", "426", "916", "324", "1,018",
         "113", "116", "39", "391", "878", "green YES",
-        "Ticket sales", "1,151", "1,043", "850", "Ambassadors",
     ):
         assert needle in blob, needle
+
+
+def test_ticket_sales_are_one_figure_each():
+    daily = _exec_view(ROOT / "notebook_ticket_daily.py")
+    mix = _exec_view(ROOT / "notebook_ticket_mix.py")
+    table = _exec_view(ROOT / "notebook_ticket_table.py")
+    all_three = _exec_view(ROOT / "notebook_tickets.py")
+    assert len(daily) == 1 and daily[0].data[0].type == "bar"
+    assert "Ticket sales · daily and cumulative" in str(daily[0].layout.title.text)
+    assert len(mix) == 1 and "Ambassadors" in [t.name for t in mix[0].data]
+    assert len(table) == 1 and table[0].data[0].type == "table"
+    blob = _blob(all_three)
+    for needle in ("1,151", "1,043", "850", "652", "General Admission"):
+        assert needle in blob, needle
+    assert len(all_three) == 3
 
 
 def _exec_view(path: Path, extra: dict | None = None):
@@ -336,6 +349,7 @@ def test_section_markdown_tables_have_numbers():
         "notebook_digital.md": ("174,802", "11,428", "84,904"),
         "notebook_overview.md": ("426", "916", "1,018", "1,119", "€2.46M"),
         "notebook_participation_tab.md": ("426", "916", "324", "1,018", "391", "878"),
+        "notebook_registration.md": ("1,151", "1,043", "850", "652", "123%"),
         "notebook_intent_tab.md": ("+33%", "12–18 Oct", "5–11 Oct", "3.8M", "262k"),
         "lean_readout.md": ("426", "916", "1,018", "1,119", "+33%"),
         "notebook_survey_eco.md": ("9.1", "NPS", "43", "33 promoters"),
@@ -372,6 +386,8 @@ def test_app_tables_use_n8n_pink():
     for name in (
         "notebook_scoreboard.py",
         "notebook_funnel.py",
+        "notebook_tickets.py",
+        "notebook_ticket_table.py",
         "notebook_participation.py",
         "notebook_attendance.py",
         "notebook_intent.py",
@@ -414,6 +430,7 @@ if __name__ == "__main__":
     test_scoreboard_has_day_counts()
     test_scoreboard_renders_overview()
     test_participation_tab_html()
+    test_ticket_sales_are_one_figure_each()
     test_intent_tab_explains_timeframes()
     test_four_views_compile_without_sql()
     test_survey_and_lead_cells_have_pin_labels()

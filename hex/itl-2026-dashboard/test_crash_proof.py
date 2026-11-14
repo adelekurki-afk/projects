@@ -173,6 +173,26 @@ def test_one_figure_chart_library():
         assert kinds & {"bar", "scatter", "funnel", "indicator", "table"}, (path.name, kinds)
 
 
+def test_sfdc_charts_are_separate_visuals():
+    contact = _exec_view(ROOT / "charts/sfdc_lead_contact.py")
+    segment = _exec_view(ROOT / "charts/sfdc_segment.py")
+    region = _exec_view(ROOT / "charts/sfdc_region.py")
+    partner = _exec_view(ROOT / "charts/partner_vs_eco.py")
+    contact_fig = next(c for c in contact if isinstance(c, go.Figure))
+    segment_fig = next(c for c in segment if isinstance(c, go.Figure))
+    region_fig = next(c for c in region if isinstance(c, go.Figure))
+    partner_fig = next(c for c in partner if isinstance(c, go.Figure))
+    assert [t.name for t in contact_fig.data] == ["Lead", "Contact"]
+    assert "ENT" in [t.name for t in segment_fig.data]
+    assert "DACH" not in [t.name for t in segment_fig.data]
+    assert "DACH" in [t.name for t in region_fig.data]
+    assert "ENT" not in [t.name for t in region_fig.data]
+    assert {t.name for t in partner_fig.data} == {"Partner Day", "Ecosystem Day"}
+    assert "TICKET" not in (ROOT / "charts/partner_vs_eco.py").read_text()
+    assert "sales segment and region" not in (ROOT / "charts/sfdc_segment.py").read_text()
+    assert "sales segment and region" not in (ROOT / "charts/sfdc_region.py").read_text()
+
+
 def test_ticket_sales_are_charts():
     daily_calls = _exec_view(ROOT / "notebook_ticket_daily.py")
     mix_calls = _exec_view(ROOT / "notebook_ticket_mix.py")
@@ -494,6 +514,7 @@ if __name__ == "__main__":
     test_scoreboard_renders_overview()
     test_participation_tab_html()
     test_one_figure_chart_library()
+    test_sfdc_charts_are_separate_visuals()
     test_ticket_sales_are_charts()
     test_native_section_tables_are_dataframes()
     test_intent_tab_explains_timeframes()

@@ -34,4 +34,11 @@ fig = go.Figure()
 fig.add_bar(name="Lead", y=[r[0] for r in rows], x=[r[1] for r in rows], orientation="h", marker=dict(color=PINK, line=dict(width=0)), text=[f"{r[1]:,}" for r in rows], textposition="outside", textfont={"size": 12, "color": INK}, cliponaxis=False, width=0.36)
 fig.add_bar(name="Contact", y=[r[0] for r in rows], x=[r[2] for r in rows], orientation="h", marker=dict(color=PINK_DEEP, line=dict(width=0)), text=[f"{r[2]:,}" for r in rows], textposition="outside", textfont={"size": 12, "color": INK}, cliponaxis=False, width=0.36)
 fig.update_layout(barmode="group", bargap=0.28, bargroupgap=0.08, yaxis=dict(autorange="reversed"))
-display(_theme(fig, height=380, title=dict(text="SFDC lead reached · Lead and Contact", font=dict(size=16, color=INK)), xaxis_title="People ever reached", margin=dict(t=56, b=28, l=110, r=64)))
+display(_theme(
+    fig,
+    height=400,
+    title=dict(text="SFDC lead reached · Lead and Contact", font=dict(size=16, color=INK)),
+    xaxis_title="People ever reached",
+    legend=dict(orientation="h", y=-0.18, x=0, bgcolor="rgba(0,0,0,0)", font=dict(size=12)),
+    margin=dict(t=52, b=80, l=110, r=64),
+))

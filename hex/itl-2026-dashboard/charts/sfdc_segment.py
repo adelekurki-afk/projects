@@ -41,4 +41,11 @@ fig = go.Figure()
 for name, xs in series.items():
     fig.add_bar(name=name, y=statuses, x=xs, orientation="h", marker=dict(color=colors[name], line=dict(width=0)), text=[f"{v:,}" if v else "" for v in xs], textposition="outside", textfont={"size": 11, "color": INK}, cliponaxis=False)
 fig.update_layout(barmode="group", bargap=0.28, yaxis=dict(autorange="reversed"))
-display(_theme(fig, height=400, title=dict(text="SFDC lead reached · sales segment", font=dict(size=16, color=INK)), xaxis_title="People ever reached", margin=dict(t=56, b=28, l=110, r=56)))
+display(_theme(
+    fig,
+    height=430,
+    title=dict(text="SFDC lead reached · sales segment", font=dict(size=16, color=INK)),
+    xaxis_title="People ever reached",
+    legend=dict(orientation="h", y=-0.22, x=0, bgcolor="rgba(0,0,0,0)", font=dict(size=12)),
+    margin=dict(t=52, b=88, l=110, r=56),
+))

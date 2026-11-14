@@ -2,7 +2,7 @@
 
 Stay on [In the Loop 2026 — Lead & Pipeline Dashboard](https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx?projectView=app&view=app). Do not use the seven-cell scratch project.
 
-Same shape as Paid Some LinkedIn: a Result paragraph, then Hex-native tables so the App builder can restyle the same table (bar / line / stacked area) without rewriting Plotly. No custom HTML (it vanishes in dark mode). Tabs: **Overview**, **Participation**, **Funnel**, **Intent**, **Feedback**, **Registration**. Leftover APP charts (registrant mix, pipeline, staff KPIs, CAB, YouTube landings, role mix) are removed so those views are actually visible. Plotly CODE cells only show their first `display()`. App Outline does not list SQL queries or notebook sections — pin the **Table ·** CODE cells at the top of the notebook (one dataframe per cell).
+Plotly CODE cells only show their first `display()`, so every visual is its own `APP: Chart ·` or ticket cell. Tabs: **Overview**, **Participation**, **Funnel**, **Intent**, **Feedback**, **Registration**. SQL / `Table ·` cells stay in Outline if you want to restyle a native table. No custom HTML (it vanishes in dark mode). Do not Reset layout.
 
 ## Summary
 
@@ -13,7 +13,7 @@ Same shape as Paid Some LinkedIn: a Result paragraph, then Hex-native tables so 
 | Attendance % | Came / tickets: 426/487 Partner, 916/1,205 Eco | Locked |
 | Full funnel | Salesforce `lead_funnel` (`salesforce_bq.CampaignMember` + Opportunity) | Live from BQ; App Funnel chart is a 13 Nov snapshot so it does not NameError. Pin **APP: Event people funnel** if you still want 1,119 → 837 |
 | SFDC lead reached | LeadHistory + ContactHistory `Status__c` + current `Lead.Status` / `Contact.Status__c` on ITL Free+Paid | Overview Funnel markdown tables + **APP: Funnel Chart** (segment chart and region chart as separate figures) + **APP: SFDC lead reached** SQL (wide STRING columns ENT/MM/SMB/DACH/…) |
-| Ticket sales | In The Loop Registrations · Pacing (Detailed). Paid + Free, Expired/Cancelled excluded | Registration tab. Pin **APP: Section · Registration tables** plus **APP: Table · Ticket sales**, **APP: Table · Ticket mix**, **APP: Table · Ticket vs goal**. Last real day 2026-10-10: 1,151 registrations, 1,043 unique people |
+| Ticket sales | In The Loop Registrations · Pacing (Detailed). Paid + Free, Expired/Cancelled excluded | Registration tab. **APP: Ticket sales daily / mix / vs goal** are Plotly visuals (bars+line, stacked area, branded table). Last real day 2026-10-10: 1,151 registrations, 1,043 unique people |
 | Campaign / lead statuses | `CampaignMember.Status` on ITL/Eco/Partner/Meetings; current SFDC status from `fct_campaign_member_pipeline` | Pin **APP: Campaign member statuses** and **APP: Salesforce lead statuses** |
 | Sourced vs influenced | `itl_sourced_influenced_opps` | Live |
 | Expansion / partner / net new / closed | `pipeline_arr` + sourced list Type | Live |

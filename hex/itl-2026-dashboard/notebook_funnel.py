@@ -397,12 +397,6 @@ try:
 except Exception:
     pass
 
-display(_dim_table(segment_rows, SEGMENT_ORDER, "SFDC lead reached · sales segment"))
-display(_dim_table(region_rows, REGION_ORDER, "SFDC lead reached · region"))
-display(_reached_by_dim(segment_rows, SEGMENT_ORDER, SEGMENT_COLORS, "SFDC lead reached · sales segment"))
-display(_reached_by_dim(region_rows, REGION_ORDER, REGION_COLORS, "SFDC lead reached · region"))
-display(_reached_grouped(reached_rows, "SFDC lead reached · Lead and Contact"))
-
 stages = [s for s, _, _ in funnel_rows]
 counts = [c for _, c, _ in funnel_rows]
 pcts = [p for _, _, p in funnel_rows]
@@ -425,6 +419,11 @@ display(
         margin=dict(t=56, b=20, l=220, r=40),
     )
 )
+display(_reached_grouped(reached_rows, "SFDC lead reached · Lead and Contact"))
+display(_reached_by_dim(segment_rows, SEGMENT_ORDER, SEGMENT_COLORS, "SFDC lead reached · sales segment"))
+display(_reached_by_dim(region_rows, REGION_ORDER, REGION_COLORS, "SFDC lead reached · region"))
+display(_dim_table(segment_rows, SEGMENT_ORDER, "SFDC lead reached · sales segment"))
+display(_dim_table(region_rows, REGION_ORDER, "SFDC lead reached · region"))
 
 sdr_fig = go.Figure(
     go.Bar(

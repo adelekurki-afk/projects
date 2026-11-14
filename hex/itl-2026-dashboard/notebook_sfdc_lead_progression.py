@@ -174,7 +174,7 @@ def _dim_table(rows, series_order, title):
     return _brand_table(pd.DataFrame(data), title)
 
 
-display(_dim_table(segment_rows, SEGMENT_ORDER, "SFDC lead reached · sales segment"))
-display(_dim_table(region_rows, REGION_ORDER, "SFDC lead reached · region"))
 display(_reached_by_dim(segment_rows, SEGMENT_ORDER, SEGMENT_COLORS, "SFDC lead reached · sales segment"))
 display(_reached_by_dim(region_rows, REGION_ORDER, REGION_COLORS, "SFDC lead reached · region"))
+display(_dim_table(segment_rows, SEGMENT_ORDER, "SFDC lead reached · sales segment"))
+display(_dim_table(region_rows, REGION_ORDER, "SFDC lead reached · region"))

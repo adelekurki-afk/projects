@@ -163,25 +163,33 @@ def test_participation_tab_html():
         assert needle in blob, needle
 
 
-def test_ticket_sales_are_native_tables():
-    daily = _exec_ns(ROOT / "notebook_ticket_daily.py")["ticket_sales"]
-    mix = _exec_ns(ROOT / "notebook_ticket_mix.py")["ticket_sales_mix"]
-    table = _exec_ns(ROOT / "notebook_ticket_table.py")["ticket_vs_goal"]
+def test_one_figure_chart_library():
+    for path in sorted((ROOT / "charts").glob("*.py")):
+        calls = _exec_view(path)
+        figs = [c for c in calls if isinstance(c, go.Figure)]
+        assert figs, path.name
+        assert path.read_text().count("\ndisplay(") == 1, path.name
+        kinds = {getattr(tr, "type", None) for fig in figs for tr in fig.data}
+        assert kinds & {"bar", "scatter", "funnel", "indicator", "table"}, (path.name, kinds)
+
+
+def test_ticket_sales_are_charts():
+    daily_calls = _exec_view(ROOT / "notebook_ticket_daily.py")
+    mix_calls = _exec_view(ROOT / "notebook_ticket_mix.py")
+    table_calls = _exec_view(ROOT / "notebook_ticket_table.py")
+    daily_fig = next(c for c in daily_calls if isinstance(c, go.Figure))
+    mix_fig = next(c for c in mix_calls if isinstance(c, go.Figure))
+    table_fig = next(c for c in table_calls if isinstance(c, go.Figure))
+    assert daily_fig.data[0].type == "bar"
+    assert any(getattr(tr, "yaxis", None) == "y2" for tr in daily_fig.data)
+    assert any(getattr(tr, "stackgroup", None) == "tickets" for tr in mix_fig.data)
+    assert table_fig.data[0].type == "table"
+    assert "#87003C" in str(table_fig.data[0].header.fill.color)
+    blob = _blob(table_calls)
+    assert "1,043" in blob or "1043" in blob
     bundled = _exec_ns(ROOT / "notebook_tickets.py")
-    assert isinstance(daily, pd.DataFrame) and len(daily) == 73
-    assert int(daily.iloc[-1]["unique_people"]) == 1043
-    assert int(daily.iloc[-1]["registrations"]) == 1151
-    assert list(mix.columns) == [
-        "day",
-        "general_admission",
-        "expert_strategic",
-        "node_partners",
-        "ambassadors",
-    ]
-    assert int(mix.iloc[-1]["general_admission"]) == 652
-    people = int(table.loc[table["ticket_type"].eq("Total unique people"), "people"].iloc[0])
-    assert people == 1043
     assert int(bundled["ticket_sales_daily"].iloc[-1]["unique_people"]) == 1043
+    assert int(bundled["ticket_sales_daily"].iloc[-1]["registrations"]) == 1151
     sql = (ROOT / "lean/ticket_sales.sql").read_text()
     assert "FROM UNNEST" in sql
     assert "pace_to_850" in sql
@@ -265,10 +273,8 @@ def test_four_views_compile_without_sql():
     funnel_figs = [c for c in funnel_calls if isinstance(c, go.Figure)]
     assert funnel_figs, "Funnel Chart should open with a visual"
     first = funnel_figs[0]
-    assert "sales segment" in str(first.layout.title.text)
-    assert first.data[0].type == "table"
-    assert "#87003C" in str(first.data[0].header.fill.color)
-    assert "ENT" in str(first.data[0].header.values)
+    assert first.data[0].type == "funnel"
+    assert "Event people" in str(first.layout.title.text)
     seg = next(
         c
         for c in funnel_figs
@@ -487,7 +493,8 @@ if __name__ == "__main__":
     test_scoreboard_has_day_counts()
     test_scoreboard_renders_overview()
     test_participation_tab_html()
-    test_ticket_sales_are_native_tables()
+    test_one_figure_chart_library()
+    test_ticket_sales_are_charts()
     test_native_section_tables_are_dataframes()
     test_intent_tab_explains_timeframes()
     test_four_views_compile_without_sql()

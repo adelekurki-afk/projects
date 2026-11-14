@@ -6,18 +6,16 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 
 **Notebook:** https://eu.hex.tech/n8n/hex/In-the-Loop-2026-Lead-Pipeline-Dashboard-034uXvUxSyRkGfmaNynnVx/draft/logic
 
-Dashboard tables live in **CODE cells labeled `Table · …` at the top of the notebook**. The App Outline **Table** filter only lists Hex **Table display** cells (Add cell → Table). SQL queries, notebook sections, and Python cells do not show there, and the API cannot create Table display cells.
+**Visuals first.** Each Plotly CODE cell is one figure (`APP: Ticket sales …` and `APP: Chart · …`). Classic App only shows the first `display()`. Filter Outline to **Chart** and drag those cells onto a tab. SQL / `Table ·` cells stay available if you want to restyle a native table.
 
-Run the `Table ·` cells, then **Add cell → Table** and pick the dataframe (`visits`, `pipeline_summary`, `role_mix`, …). Those Table cells appear in Outline. Drag onto a tab, then use the chart icon to restyle as a bar, line, or stacked area. The three Registration cards are Charts — search `Table ·` with the type filter cleared if you want the Python cells themselves.
-
-| App tab | Pin these from Outline (`Table ·`) |
+| App tab | Pin these from Outline (Chart) |
 | --- | --- |
-| **Overview** | Visits, Pipeline summary, Opportunities |
-| **Participation** | Role mix, Attendance by region, Also on site, Staff by crew, Speakers by day |
-| **Registration** | Ticket sales daily / mix / vs goal (already pinned) |
-| **Funnel** | SFDC lead reached, Event people funnel, Sourced vs influenced |
-| **Intent** | Weekly n8n.io users, YouTube views, Paid search terms |
-| **Feedback** | Eco programme parts, Eco operations, Eco who answered, Partner tracks, Session ratings |
+| **Overview** | Event people funnel, Pipeline mix, SFDC Lead vs Contact, SFDC by sales segment, SFDC by region |
+| **Participation** | Attendance KPIs, How visits are built, Who came which days, Floor scans, Role mix, Staff by crew, Speakers by day |
+| **Registration** | **APP: Ticket sales daily / mix / vs goal** (already on the tab) |
+| **Funnel** | Event people funnel, SFDC Lead vs Contact, SFDC by sales segment / region |
+| **Intent** | n8n.io worldwide, Europe and Germany, YouTube views, Paid search |
+| **Feedback** | Eco recommend, Eco operations, Partner Day overall, Session scores |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
 

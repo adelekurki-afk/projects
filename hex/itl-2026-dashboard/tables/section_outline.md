@@ -1,6 +1,6 @@
 # Tables
 
-The App Outline **Table** filter only lists Hex **Table display** cells. SQL queries and Python cells do not show there. The API cannot create Table display cells, so these CODE cells expose named dataframes for you to attach.
+Plotly visuals live in `APP: Ticket sales` and `APP: Chart ·` CODE cells. Filter Outline to **Chart** to drag them. The App Outline **Table** filter only lists Hex **Table display** cells. SQL queries and Python cells do not show there. The API cannot create Table display cells, so these CODE cells expose named dataframes for you to attach.
 
 **To make them appear in Outline**
 

@@ -102,6 +102,19 @@ def _blob(calls) -> str:
                     val = getattr(tr, attr, None)
                     if val is not None:
                         parts.append(str(val))
+                if getattr(tr, "type", None) == "table":
+                    header = getattr(tr, "header", None)
+                    cells = getattr(tr, "cells", None)
+                    if header is not None:
+                        parts.append(str(getattr(header, "values", "")))
+                        fill = getattr(header, "fill", None)
+                        if fill is not None:
+                            parts.append(str(getattr(fill, "color", "")))
+                    if cells is not None:
+                        parts.append(str(getattr(cells, "values", "")))
+                        fill = getattr(cells, "fill", None)
+                        if fill is not None:
+                            parts.append(str(getattr(fill, "color", "")))
         else:
             parts.append(str(c))
     return "\n".join(parts)
@@ -130,7 +143,13 @@ def test_scoreboard_renders_overview():
     for gone in ("How 426 is built", "3.8M", "Berlin events · conference week"):
         assert gone not in blob, gone
     assert any(isinstance(c, go.Figure) for c in calls)
-    assert any(isinstance(c, pd.DataFrame) for c in calls)
+    tables = [
+        c
+        for c in calls
+        if isinstance(c, go.Figure) and c.data and getattr(c.data[0], "type", None) == "table"
+    ]
+    assert tables
+    assert "#87003C" in str(tables[0].data[0].header.fill.color)
 
 
 def test_participation_tab_html():
@@ -160,6 +179,7 @@ def _exec_view(path: Path, extra: dict | None = None):
     ipy_display = types.ModuleType("IPython.display")
     ipy_display.display = fake
     ipy_display.HTML = FakeHTML
+    ipy_display.Markdown = FakeHTML
     sys.modules["IPython"] = ipy
     sys.modules["IPython.display"] = ipy_display
     env = {"__name__": "__main__"}
@@ -209,18 +229,29 @@ def test_four_views_compile_without_sql():
     assert funnel_figs, "Funnel Chart should open with a visual"
     first = funnel_figs[0]
     assert "sales segment" in str(first.layout.title.text)
-    assert first.data[0].type == "bar"
-    assert first.data[0].orientation == "h"
-    assert "ENT" in [t.name for t in first.data]
-    assert "DACH" in [t.name for t in first.data]
+    assert first.data[0].type == "table"
+    assert "#87003C" in str(first.data[0].header.fill.color)
+    assert "ENT" in str(first.data[0].header.values)
+    pair = next(
+        c
+        for c in funnel_figs
+        if c.data and getattr(c.data[0], "type", None) == "bar" and "ENT" in [t.name for t in c.data]
+    )
+    assert pair.data[0].orientation == "h"
+    assert "DACH" in [t.name for t in pair.data]
     titles = [str(c.layout.title.text) for c in funnel_figs]
     assert any([t.name for t in c.data] == ["Lead", "Contact"] for c in funnel_figs)
     assert any("sales segment" in t for t in titles)
     assert any("region" in t for t in titles)
     assert not any("Lead progression" in t for t in titles)
-    tables = [c for c in funnel_calls if isinstance(c, pd.DataFrame) and "status" in list(getattr(c, "columns", []))]
-    assert any("ENT" in list(t.columns) for t in tables)
-    assert any("DACH" in list(t.columns) for t in tables)
+    tables = [
+        c
+        for c in funnel_figs
+        if c.data and getattr(c.data[0], "type", None) == "table"
+    ]
+    headers = "\n".join(str(t.data[0].header.values) for t in tables)
+    assert "ENT" in headers
+    assert "DACH" in headers
 
 
 def test_summary_has_sourced_and_attendance_rate():
@@ -328,6 +359,37 @@ def test_cab_roles_traffic_are_split_and_crash_proof():
         assert src.strip().endswith("fig")
 
 
+def test_app_tables_use_n8n_pink():
+    for name in (
+        "notebook_scoreboard.py",
+        "notebook_funnel.py",
+        "notebook_participation.py",
+        "notebook_attendance.py",
+        "notebook_intent.py",
+        "notebook_survey_eco.py",
+        "notebook_survey_partner.py",
+        "notebook_survey_session.py",
+        "notebook_sfdc_lead_progression.py",
+        "notebook_sfdc_lead_reached.py",
+        "notebook_summary.py",
+        "notebook_staff_speakers.py",
+    ):
+        calls = _exec_view(ROOT / name)
+        tables = [
+            c
+            for c in calls
+            if isinstance(c, go.Figure) and c.data and getattr(c.data[0], "type", None) == "table"
+        ]
+        assert tables, name
+        for fig in tables:
+            fill = str(fig.data[0].header.fill.color)
+            assert "#87003C" in fill, f"{name} header {fill}"
+            cells = str(fig.data[0].cells.fill.color)
+            assert "#FFBCCA" in cells, f"{name} cells {cells}"
+        leftover = [c for c in calls if isinstance(c, pd.DataFrame)]
+        assert not leftover, f"{name} still displays a pandas table"
+
+
 def test_web_europe_chart_is_crash_proof():
     src = (ROOT / "notebook_web_europe.py").read_text()
     ast.parse(src)
@@ -352,4 +414,5 @@ if __name__ == "__main__":
     test_web_markdown_section_has_numbers()
     test_cab_roles_traffic_are_split_and_crash_proof()
     test_web_europe_chart_is_crash_proof()
+    test_app_tables_use_n8n_pink()
     print("ok")

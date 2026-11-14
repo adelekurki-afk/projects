@@ -4,6 +4,50 @@ import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display, Markdown
 
+PINK = "#FF91AC"
+PINK_MID = "#FFBCCA"
+PINK_DEEP = "#87003C"
+INK = "#9CA3AF"
+
+
+def _brand_table(df, title=""):
+    frame = pd.DataFrame(df)
+    cols = [str(c) for c in frame.columns]
+    n = len(frame)
+    vals = [[("" if v is None else str(v)) for v in frame[c].tolist()] for c in frame.columns]
+    stripe = [PINK_MID if i % 2 == 0 else "rgba(255,145,172,0.20)" for i in range(n)]
+    fig = go.Figure(
+        go.Table(
+            header=dict(
+                values=cols,
+                fill_color=PINK_DEEP,
+                font=dict(color="#F9FAFB", size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color=PINK,
+                height=30,
+            ),
+            cells=dict(
+                values=vals,
+                fill_color=[stripe] * len(cols),
+                font=dict(color=INK, size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color="rgba(255,145,172,0.35)",
+                height=26,
+            ),
+        )
+    )
+    top = 44 if title else 8
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        title=dict(text=title, font=dict(size=15, color=INK)) if title else None,
+        height=min(max(top + 30 + 26 * max(n, 1) + 16, 110), 780),
+        margin=dict(t=top, b=8, l=4, r=4),
+        font=dict(family="Inter, Arial, sans-serif", color=INK),
+    )
+    return fig
+
+
 staff_kpis = [
     (113, "Staff tickets", "Fliplet Ticket family = Staff"),
     (168, "n8n on any ticket", "13 staff, 48 speaker, 107 other"),
@@ -46,7 +90,7 @@ staff_bar.update_layout(
 )
 staff_bar.update_xaxes(tickangle=15)
 display(staff_bar)
-display(staff)
+display(_brand_table(staff, "Staff by crew"))
 display(Markdown("Purchases has Ticket family Staff (113). Crew rarely used the attendee door scan, so scan counts are lower than tickets."))
 
 speaker_kpis = [
@@ -88,4 +132,4 @@ spk_bar.update_layout(
 )
 display(spk_bar)
 display(Markdown("86 programme speakers on Partner Day (62 door on 13 Oct + Monday badge), 79 on Ecosystem Day. 60 of them are in both day counts."))
-display(speakers)
+display(_brand_table(speakers, "Programme speakers by day"))

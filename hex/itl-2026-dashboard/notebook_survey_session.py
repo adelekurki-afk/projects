@@ -3,9 +3,51 @@ import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
 
-CORAL = "#FF6D5A"
+PINK = "#FF91AC"
+PINK_MID = "#FFBCCA"
+PINK_DEEP = "#87003C"
+CORAL = PINK
 BLUE = "#5B8FC7"
 INK = "#9CA3AF"
+
+
+def _brand_table(df, title=""):
+    frame = pd.DataFrame(df)
+    cols = [str(c) for c in frame.columns]
+    n = len(frame)
+    vals = [[("" if v is None else str(v)) for v in frame[c].tolist()] for c in frame.columns]
+    stripe = [PINK_MID if i % 2 == 0 else "rgba(255,145,172,0.20)" for i in range(n)]
+    fig = go.Figure(
+        go.Table(
+            header=dict(
+                values=cols,
+                fill_color=PINK_DEEP,
+                font=dict(color="#F9FAFB", size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color=PINK,
+                height=30,
+            ),
+            cells=dict(
+                values=vals,
+                fill_color=[stripe] * len(cols),
+                font=dict(color=INK, size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color="rgba(255,145,172,0.35)",
+                height=26,
+            ),
+        )
+    )
+    top = 44 if title else 8
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        title=dict(text=title, font=dict(size=15, color=INK)) if title else None,
+        height=min(max(top + 30 + 26 * max(n, 1) + 16, 110), 780),
+        margin=dict(t=top, b=8, l=4, r=4),
+        font=dict(family="Inter, Arial, sans-serif", color=INK),
+    )
+    return fig
+
 
 
 def _theme(fig, height=300, axes=True, **kw):
@@ -90,7 +132,7 @@ sessions = pd.DataFrame(
         "speaker_mean": [5.83, 7.50, 6.40, 5.80, 5.00, 6.67, 6.33, 10.00, 9.00, 7.00, 5.00, 5.00, 2.00, 2.00, 2.00],
     }
 )
-display(sessions)
+display(_brand_table(sessions, "Session ratings · 2+ responses"))
 
 singles = pd.DataFrame(
     {
@@ -123,4 +165,4 @@ singles = pd.DataFrame(
         ],
     }
 )
-display(singles)
+display(_brand_table(singles, "Session ratings · single response"))

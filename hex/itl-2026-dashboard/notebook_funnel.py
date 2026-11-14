@@ -98,13 +98,51 @@ def _reached_grouped(rows, title):
     return fig
 
 
-def _dim_table(rows, series_order):
+def _brand_table(df, title=""):
+    frame = pd.DataFrame(df)
+    cols = [str(c) for c in frame.columns]
+    n = len(frame)
+    vals = [[("" if v is None else str(v)) for v in frame[c].tolist()] for c in frame.columns]
+    stripe = [PINK_MID if i % 2 == 0 else "rgba(255,145,172,0.20)" for i in range(n)]
+    fig = go.Figure(
+        go.Table(
+            header=dict(
+                values=cols,
+                fill_color=PINK_DEEP,
+                font=dict(color="#F9FAFB", size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color=PINK,
+                height=30,
+            ),
+            cells=dict(
+                values=vals,
+                fill_color=[stripe] * len(cols),
+                font=dict(color=INK, size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color="rgba(255,145,172,0.35)",
+                height=26,
+            ),
+        )
+    )
+    top = 44 if title else 8
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        title=dict(text=title, font=dict(size=15, color=INK)) if title else None,
+        height=min(max(top + 30 + 26 * max(n, 1) + 16, 110), 780),
+        margin=dict(t=top, b=8, l=4, r=4),
+        font=dict(family="Inter, Arial, sans-serif", color=INK),
+    )
+    return fig
+
+
+def _dim_table(rows, series_order, title):
     statuses = [s for s in STATUS_ORDER if any(str(r[0]) == s for r in rows)]
     lookup = {(str(r[0]), str(r[1])): int(r[2]) for r in rows}
     data = {"status": statuses}
     for name in series_order:
         data[name] = [lookup.get((st, name), 0) for st in statuses]
-    return pd.DataFrame(data)
+    return _brand_table(pd.DataFrame(data), title)
 
 
 def _reached_pair(segment_rows, region_rows):
@@ -384,8 +422,8 @@ try:
 except Exception:
     pass
 
-display(_dim_table(segment_rows, SEGMENT_ORDER))
-display(_dim_table(region_rows, REGION_ORDER))
+display(_dim_table(segment_rows, SEGMENT_ORDER, "SFDC lead reached · sales segment"))
+display(_dim_table(region_rows, REGION_ORDER, "SFDC lead reached · region"))
 display(_reached_pair(segment_rows, region_rows))
 display(_reached_grouped(reached_rows, "SFDC lead reached · Lead and Contact"))
 
@@ -477,7 +515,7 @@ kpis = pd.DataFrame(
         "won": [f"{src_won_n} · {_euro(src_won)}", f"{inf_won_n} · {_euro(inf_won)}", f"{pipe_won_n} · {_euro(pipe_won)}"],
     }
 )
-display(kpis)
-display(_opp_df(sourced))
-display(_opp_df(influenced))
-display(_opp_df(won))
+display(_brand_table(kpis, "Sourced vs influenced"))
+display(_brand_table(_opp_df(sourced), "Sourced opportunities"))
+display(_brand_table(_opp_df(influenced), "Influenced opportunities"))
+display(_brand_table(_opp_df(won), "Closed won"))

@@ -3,9 +3,51 @@ import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
 
-CORAL = "#FF6D5A"
+PINK = "#FF91AC"
+PINK_MID = "#FFBCCA"
+PINK_DEEP = "#87003C"
+CORAL = PINK
 BLUE = "#5B8FC7"
 INK = "#9CA3AF"
+
+
+def _brand_table(df, title=""):
+    frame = pd.DataFrame(df)
+    cols = [str(c) for c in frame.columns]
+    n = len(frame)
+    vals = [[("" if v is None else str(v)) for v in frame[c].tolist()] for c in frame.columns]
+    stripe = [PINK_MID if i % 2 == 0 else "rgba(255,145,172,0.20)" for i in range(n)]
+    fig = go.Figure(
+        go.Table(
+            header=dict(
+                values=cols,
+                fill_color=PINK_DEEP,
+                font=dict(color="#F9FAFB", size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color=PINK,
+                height=30,
+            ),
+            cells=dict(
+                values=vals,
+                fill_color=[stripe] * len(cols),
+                font=dict(color=INK, size=12, family="Inter, Arial, sans-serif"),
+                align="left",
+                line_color="rgba(255,145,172,0.35)",
+                height=26,
+            ),
+        )
+    )
+    top = 44 if title else 8
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        title=dict(text=title, font=dict(size=15, color=INK)) if title else None,
+        height=min(max(top + 30 + 26 * max(n, 1) + 16, 110), 780),
+        margin=dict(t=top, b=8, l=4, r=4),
+        font=dict(family="Inter, Arial, sans-serif", color=INK),
+    )
+    return fig
+
 
 
 def _theme(fig, height=300, axes=True, **kw):
@@ -89,7 +131,7 @@ parts = pd.DataFrame(
         "did_not_attend": [5, 2, 16, 18, 17, 5, 4, 13],
     }
 )
-display(parts)
+display(_brand_table(parts, "Programme parts · mean /5"))
 
 ops = pd.DataFrame(
     {
@@ -111,99 +153,114 @@ ops = pd.DataFrame(
         "poor": [2, 1, 1, 3, 1, 1],
     }
 )
-display(ops)
+display(_brand_table(ops, "Operations · mean /5"))
 
 display(
-    pd.DataFrame(
-        {
-            "question": [
-                "Days attended",
-                "Days attended",
-                "Technical level",
-                "Technical level",
-                "Technical level",
-                "Technical level",
-                "Technical level",
-            ],
-            "answer": [
-                "Ecosystem Day only",
-                "Partner + Ecosystem Day",
-                "About right",
-                "A bit too basic",
-                "Much too basic",
-                "A bit too advanced",
-                "Much too advanced",
-            ],
-            "n": [31, 11, 25, 13, 2, 1, 1],
-        }
+    _brand_table(
+        pd.DataFrame(
+            {
+                "question": [
+                    "Days attended",
+                    "Days attended",
+                    "Technical level",
+                    "Technical level",
+                    "Technical level",
+                    "Technical level",
+                    "Technical level",
+                ],
+                "answer": [
+                    "Ecosystem Day only",
+                    "Partner + Ecosystem Day",
+                    "About right",
+                    "A bit too basic",
+                    "Much too basic",
+                    "A bit too advanced",
+                    "Much too advanced",
+                ],
+                "n": [31, 11, 25, 13, 2, 1, 1],
+            }
+        ),
+        "Days attended and technical level",
     )
 )
 
 display(
-    pd.DataFrame(
-        {
-            "role": [
-                "Developer or engineer",
-                "Founder, freelancer or agency",
-                "IT, platform or security",
-                "Business leader or decision-maker",
-                "Automation or ops lead",
-                "Consultant or implementation partner",
-                "Community contributor or ambassador",
-                "Other",
-            ],
-            "n": [10, 7, 6, 6, 5, 4, 2, 2],
-        }
+    _brand_table(
+        pd.DataFrame(
+            {
+                "role": [
+                    "Developer or engineer",
+                    "Founder, freelancer or agency",
+                    "IT, platform or security",
+                    "Business leader or decision-maker",
+                    "Automation or ops lead",
+                    "Consultant or implementation partner",
+                    "Community contributor or ambassador",
+                    "Other",
+                ],
+                "n": [10, 7, 6, 6, 5, 4, 2, 2],
+            }
+        ),
+        "Who answered",
     )
 )
 
 display(
-    pd.DataFrame(
-        {
-            "n8n_today": [
-                "Self-hosted Community Edition",
-                "Enterprise (self-hosted or cloud)",
-                "n8n Cloud",
-                "Evaluating",
-                "Not yet using",
-            ],
-            "n": [14, 12, 10, 3, 3],
-        }
+    _brand_table(
+        pd.DataFrame(
+            {
+                "n8n_today": [
+                    "Self-hosted Community Edition",
+                    "Enterprise (self-hosted or cloud)",
+                    "n8n Cloud",
+                    "Evaluating",
+                    "Not yet using",
+                ],
+                "n": [14, 12, 10, 3, 3],
+            }
+        ),
+        "How they use n8n today",
     )
 )
 
 display(
-    pd.DataFrame(
-        {
-            "more_next_year": [
-                "Business value and ROI",
-                "Deep dives on n8n features and roadmap",
-                "Running n8n at scale",
-                "Practical workshops and build-alongs",
-                "Building agents for production",
-                "Customer case studies",
-                "Community and open-mic formats",
-                "Partner and integration showcases",
-            ],
-            "n": [21, 21, 19, 19, 19, 16, 6, 5],
-        }
+    _brand_table(
+        pd.DataFrame(
+            {
+                "more_next_year": [
+                    "Business value and ROI",
+                    "Deep dives on n8n features and roadmap",
+                    "Running n8n at scale",
+                    "Practical workshops and build-alongs",
+                    "Building agents for production",
+                    "Customer case studies",
+                    "Community and open-mic formats",
+                    "Partner and integration showcases",
+                ],
+                "n": [21, 21, 19, 19, 19, 16, 6, 5],
+            }
+        ),
+        "More of next year",
     )
 )
 
 display(
-    pd.DataFrame(
-        {
-            "try_next_3_months": [
-                "n8n Agents",
-                "n8n Assistant",
-                "Agentic Context Layer",
-                "New execution engine",
-                "New integrations and nodes",
-                "Credential management",
-                "Development lifecycle",
-                "None of these yet",
-            ],
-            "n": [32, 22, 19, 14, 11, 9, 9, 1],
-        }
+    _brand_table(
+        pd.DataFrame(
+            {
+                "try_next_3_months": [
+                    "n8n Agents",
+                    "n8n Assistant",
+                    "Agentic Context Layer",
+                    "New execution engine",
+                    "New integrations and nodes",
+                    "Credential management",
+                    "Development lifecycle",
+                    "None of these yet",
+                ],
+                "n": [32, 22, 19, 14, 11, 9, 9, 1],
+            }
+        ),
+        "Try in the next 3 months",
     )
 )

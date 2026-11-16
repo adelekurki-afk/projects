@@ -193,6 +193,31 @@ def test_sfdc_charts_are_separate_visuals():
     assert "sales segment and region" not in (ROOT / "charts/sfdc_region.py").read_text()
 
 
+def test_participation_segment_and_country_are_separate():
+    partner_seg = next(c for c in _exec_view(ROOT / "charts/partner_segment.py") if isinstance(c, go.Figure))
+    eco_seg = next(c for c in _exec_view(ROOT / "charts/eco_segment.py") if isinstance(c, go.Figure))
+    cab_seg = next(c for c in _exec_view(ROOT / "charts/cab_segment.py") if isinstance(c, go.Figure))
+    partner_cty = next(c for c in _exec_view(ROOT / "charts/partner_country.py") if isinstance(c, go.Figure))
+    eco_cty = next(c for c in _exec_view(ROOT / "charts/eco_country.py") if isinstance(c, go.Figure))
+    cab_cty = next(c for c in _exec_view(ROOT / "charts/cab_country.py") if isinstance(c, go.Figure))
+    assert list(partner_seg.data[0].y) == ["Unknown", "SMB", "MM", "ENT"]
+    assert "Germany" not in list(partner_seg.data[0].y)
+    assert "ENT" not in list(partner_cty.data[0].y)
+    assert "Germany" in list(partner_cty.data[0].y)
+    assert "Partner Day" in str(partner_seg.layout.title.text)
+    assert "Ecosystem Day" in str(eco_seg.layout.title.text)
+    assert str(cab_seg.layout.title.text).startswith("CAB")
+    assert int(eco_seg.data[0].x[-1]) == 180
+    assert int(cab_seg.data[0].x[-1]) == 28
+    assert int(eco_cty.data[0].x[-1]) == 542
+    assert int(cab_cty.data[0].x[-1]) == 20
+    sql = (ROOT / "lean/attendance_segment_country.sql").read_text()
+    assert "701cj00001LbE7XAAV" in sql
+    assert "701cj00001LbEQvAAN" in sql
+    assert "market_segment" in sql
+    assert "country" in sql
+
+
 def test_ticket_sales_are_charts():
     daily_calls = _exec_view(ROOT / "notebook_ticket_daily.py")
     mix_calls = _exec_view(ROOT / "notebook_ticket_mix.py")
@@ -515,6 +540,7 @@ if __name__ == "__main__":
     test_participation_tab_html()
     test_one_figure_chart_library()
     test_sfdc_charts_are_separate_visuals()
+    test_participation_segment_and_country_are_separate()
     test_ticket_sales_are_charts()
     test_native_section_tables_are_dataframes()
     test_intent_tab_explains_timeframes()

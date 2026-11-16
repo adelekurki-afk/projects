@@ -400,6 +400,29 @@ try:
 except Exception:
     pass
 
+lead_closed_stages = ["Lead", "Meeting booked", "Opportunity", "Pipeline opportunity", "Closed"]
+lead_closed_counts = [1102, 20, 68, 33, 6]
+lead_closed_pcts = [100.0, 1.8, 6.2, 3.0, 0.5]
+lead_closed_fig = go.Figure(
+    go.Funnel(
+        y=lead_closed_stages,
+        x=lead_closed_counts,
+        text=[f"{c:,} ({p}%)" for c, p in zip(lead_closed_counts, lead_closed_pcts)],
+        textinfo="text",
+        textfont={"size": 13, "color": "#F9FAFB"},
+        marker=dict(color=[PINK, "#E56B8A", PINK_DEEP, "#5A0026", "#44001B"], line=dict(width=0)),
+        connector=dict(line=dict(color="rgba(156,163,175,0.35)", dash="dot", width=2)),
+    )
+)
+display(
+    _theme(
+        lead_closed_fig,
+        height=420,
+        title=dict(text="Lead to closed", font=dict(size=16, color=INK)),
+        margin=dict(t=56, b=20, l=200, r=40),
+    )
+)
+
 stages = [s for s, _, _ in funnel_rows]
 counts = [c for _, c, _ in funnel_rows]
 pcts = [p for _, _, p in funnel_rows]

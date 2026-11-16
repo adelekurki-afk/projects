@@ -11,7 +11,7 @@ Plotly CODE cells only show their first `display()`, so every visual is its own 
 | Participants per day | Fliplet visits (426 / 916) | Locked |
 | Staff / speakers / CAB | Tickets 113, speakers 116, CAB 39 | Locked overlays |
 | Attendance % | Came / tickets: 426/487 Partner, 916/1,205 Eco | Locked |
-| Full funnel | Salesforce `lead_funnel` (`salesforce_bq.CampaignMember` + Opportunity) | Live from BQ; App Funnel chart is a 13 Nov snapshot so it does not NameError. Pin **APP: Event people funnel** if you still want 1,119 → 837 |
+| Full funnel | Salesforce `lead_funnel` (`salesforce_bq.CampaignMember` + Opportunity) | Live from BQ. Pin **APP: Chart · Lead to closed** for Lead → meeting booked → opportunity → pipeline opportunity → closed. Pin **APP: Event people funnel** if you still want 1,119 → 837 |
 | SFDC lead reached | LeadHistory + ContactHistory `Status__c` + current `Lead.Status` / `Contact.Status__c` on ITL Free+Paid | Overview Funnel markdown tables + **APP: Funnel Chart** (segment chart and region chart as separate figures) + **APP: SFDC lead reached** SQL (wide STRING columns ENT/MM/SMB/DACH/…) |
 | Ticket sales | In The Loop Registrations · Pacing (Detailed). Paid + Free, Expired/Cancelled excluded | Registration tab. **APP: Ticket sales daily / mix / vs goal** are Plotly visuals (bars+line, stacked area, branded table). Last real day 2026-10-10: 1,151 registrations, 1,043 unique people |
 | Campaign / lead statuses | `CampaignMember.Status` on ITL/Eco/Partner/Meetings; current SFDC status from `fct_campaign_member_pipeline` | Pin **APP: Campaign member statuses** and **APP: Salesforce lead statuses** |

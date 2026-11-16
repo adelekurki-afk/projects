@@ -193,6 +193,18 @@ def test_sfdc_charts_are_separate_visuals():
     assert "sales segment and region" not in (ROOT / "charts/sfdc_region.py").read_text()
 
 
+def test_lead_to_closed_funnel_chart():
+    fig = next(c for c in _exec_view(ROOT / "charts/lead_to_closed.py") if isinstance(c, go.Figure))
+    assert fig.data[0].type == "funnel"
+    assert list(fig.data[0].y) == ["Lead", "Meeting booked", "Opportunity", "Pipeline opportunity", "Closed"]
+    assert [int(v) for v in fig.data[0].x] == [1102, 20, 68, 33, 6]
+    assert "Fliplet" not in str(fig.layout.title.text)
+    sql = (ROOT / "lean/lead_to_closed.sql").read_text()
+    assert "is_pipeline_opportunity" in sql
+    assert "701cj0000157ynMAAQ" in sql
+    assert "701cj00001MqzF9AAJ" in sql
+
+
 def test_attendance_region_shows_all_sales_regions():
     grouped = next(c for c in _exec_view(ROOT / "charts/attendance_region.py") if isinstance(c, go.Figure))
     partner = next(c for c in _exec_view(ROOT / "charts/partner_region.py") if isinstance(c, go.Figure))
@@ -366,7 +378,11 @@ def test_four_views_compile_without_sql():
     assert funnel_figs, "Funnel Chart should open with a visual"
     first = funnel_figs[0]
     assert first.data[0].type == "funnel"
-    assert "Event people" in str(first.layout.title.text)
+    assert str(first.layout.title.text) == "Lead to closed"
+    assert list(first.data[0].y) == ["Lead", "Meeting booked", "Opportunity", "Pipeline opportunity", "Closed"]
+    assert [int(v) for v in first.data[0].x] == [1102, 20, 68, 33, 6]
+    event_people = next(c for c in funnel_figs if "Event people" in str(c.layout.title.text))
+    assert event_people.data[0].type == "funnel"
     seg = next(
         c
         for c in funnel_figs

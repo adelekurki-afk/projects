@@ -2,7 +2,7 @@
 
 This sits on the **Overview** tab, under the summary.
 
-**APP: Funnel Chart** opens with the sales-segment and region tables, then each split as its own grouped bar chart (not one combined figure). Snapshot 14 Nov 2026.
+**APP: Chart · Lead to closed** is the conversion funnel: Lead **1,102** → meeting booked **20** → opportunity **68** → pipeline opportunity **33** → closed **6**. Stages are not nested (opportunity is larger than meeting booked). Pin it on the Funnel tab. **APP: Funnel Chart** is SFDC lead reached by region. Snapshot 16 Nov 2026.
 
 ## Result
 

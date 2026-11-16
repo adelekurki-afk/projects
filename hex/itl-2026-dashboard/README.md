@@ -13,7 +13,7 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 | **Overview** | Event people funnel, Pipeline mix, SFDC Lead vs Contact, SFDC by sales segment, SFDC by region |
 | **Participation** | Attendance KPIs, How visits are built, Who came which days, Floor scans, Role mix, Staff by crew, Speakers by day |
 | **Registration** | **APP: Ticket sales daily / mix / vs goal** (already on the tab) |
-| **Funnel** | Event people funnel, SFDC Lead vs Contact, SFDC by sales segment / region |
+| **Funnel** | **Lead to closed**, Event people funnel, SFDC Lead vs Contact, SFDC by sales segment / region |
 | **Intent** | Website visitors and product users (worldwide + Europe/Germany), YouTube views, Paid search |
 | **Feedback** | Eco recommend, Eco operations, Partner Day overall, Session scores |
 

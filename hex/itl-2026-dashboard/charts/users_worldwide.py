@@ -34,4 +34,6 @@ users = [212181,211254,197717,191155,185104,189926,188846,194738,236602,262172,2
 fig = go.Figure()
 fig.add_scatter(x=weeks, y=users, mode="lines", name="Worldwide", line=dict(color=INK, width=2))
 fig.add_vrect(x0="2026-10-12", x1="2026-10-18", fillcolor=CORAL, opacity=0.18, line_width=0, annotation_text="ITL week", annotation_position="top left", annotation_font=dict(color=INK, size=11))
-display(_theme(fig, height=320, title=dict(text="n8n.io users · worldwide", font=dict(size=16, color=INK)), yaxis_title="Users"))
+fig = _theme(fig, height=320, title=dict(text="n8n.io users · worldwide", font=dict(size=16, color=INK)), yaxis_title="Users", showlegend=False)
+fig.update_xaxes(showgrid=False)
+display(fig)

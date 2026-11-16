@@ -1,4 +1,4 @@
-# Intent · 12–18 Oct conference week · YouTube · Common Room · Paid Google Ads
+# Intent · 12–18 Oct conference week · YouTube · Paid Google Ads
 import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
@@ -204,8 +204,16 @@ display(
 display(
     _line(
         weekly,
-        [("europe_users", BLUE, "Europe"), ("germany_users", CORAL, "Germany")],
-        "n8n.io users · Europe and Germany",
+        [("europe_users", BLUE, "Europe")],
+        "n8n.io users · Europe",
+        "Users",
+    )
+)
+display(
+    _line(
+        weekly,
+        [("germany_users", CORAL, "Germany")],
+        "n8n.io users · Germany",
         "Users",
     )
 )
@@ -218,16 +226,3 @@ display(
     )
 )
 display(_brand_table(paid, "Paid Google Ads · top terms"))
-display(
-    _brand_table(
-        pd.DataFrame(
-            {
-                "gap": ["Social posts"],
-                "status": [
-                    "No Common Room table exists in this warehouse. Cannot show conference-week social posts until that source is connected."
-                ],
-            }
-        ),
-        "Common Room",
-    )
-)

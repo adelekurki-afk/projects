@@ -288,11 +288,27 @@ def test_intent_tab_explains_timeframes():
         "Intent",
         "12–18 Oct",
         "YouTube",
-        "Common Room",
         "Paid Google Ads",
-        "Europe and Germany",
+        "n8n.io users · Europe",
+        "n8n.io users · Germany",
+        "n8n.io users · worldwide",
     ):
         assert needle in src or needle in blob, needle
+    assert "Common Room" not in src
+    assert "Common Room" not in blob
+    titles = [str(c.layout.title.text) for c in calls if isinstance(c, go.Figure)]
+    assert "n8n.io users · worldwide" in titles
+    assert "n8n.io users · Europe" in titles
+    assert "n8n.io users · Germany" in titles
+    assert not any("Europe and Germany" in t for t in titles)
+    europe_fig = next(c for c in _exec_view(ROOT / "charts/users_europe.py") if isinstance(c, go.Figure))
+    germany_fig = next(c for c in _exec_view(ROOT / "charts/users_germany.py") if isinstance(c, go.Figure))
+    assert "Europe" in str(europe_fig.layout.title.text)
+    assert "Germany" not in str(europe_fig.layout.title.text)
+    assert "Germany" in str(germany_fig.layout.title.text)
+    assert "Europe" not in str(germany_fig.layout.title.text)
+    assert europe_fig.data[0].type == "scatter"
+    assert germany_fig.data[0].type == "scatter"
 
 
 def test_four_views_compile_without_sql():

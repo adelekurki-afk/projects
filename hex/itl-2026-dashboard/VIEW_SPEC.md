@@ -45,8 +45,7 @@ Plotly CODE cells only show their first `display()`, so every visual is its own 
 | Ask | Source | Status |
 | --- | --- | --- |
 | Website overall, ITL week highlighted | GA4 n8n.io weekly users | SQL |
-| Germany + Europe lines | GA4 geo on n8n.io | SQL |
+| Germany + Europe charts | GA4 geo on n8n.io | SQL |
 | YouTube views + creations | `fct_youtube_video_daily_stats`, `dim_youtube_video` | SQL |
 | Instance creations by type | `computed.instances` `deployment_type` × `acquired_at` | SQL |
 | SEO / AEO keywords that week | Organic GSC / AEO **not in warehouse**. Paid Google Ads search terms exist | Paid terms only |
-| Social posts (Common Room) | **No Common Room table** in this warehouse | Blocked until a source exists |

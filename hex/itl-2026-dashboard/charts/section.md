@@ -5,3 +5,5 @@ One Plotly figure per cell. Classic App only shows the first `display()`, so the
 Filter Outline to **Chart**, search `APP: Chart ·` or `APP: Ticket sales`, drag onto a tab. Do not Reset layout.
 
 Registration already has daily (bars + cumulative), mix (stacked area), and vs-goal (branded table).
+
+Participation region charts: **APP: Chart · Attendance by region** (Partner vs Eco, all sales regions) plus **APP: Chart · Partner Day · region**, **Ecosystem Day · region**, and **CAB · region**.

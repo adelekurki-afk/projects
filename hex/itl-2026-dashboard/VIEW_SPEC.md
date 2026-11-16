@@ -23,7 +23,7 @@ Plotly CODE cells only show their first `display()`, so every visual is its own 
 | Ask | Source | Status |
 | --- | --- | --- |
 | People per day | Fliplet 426 / 916 | Locked |
-| Region per day | Salesforce Account/Lead on Attended members | SQL |
+| Region per day | Salesforce `sub_region` on Attended members (DACH, North EMEA, South EMEA, US, Other) | SQL |
 | Sales segment per day | Salesforce `Sales_Segment__c` | SQL |
 | Seniority | Title buckets on Salesforce Attended | SQL |
 | Sessions | Fliplet Scans, User Game Scans, Session Feedback | Door scans 391/878; no named session-scan column |

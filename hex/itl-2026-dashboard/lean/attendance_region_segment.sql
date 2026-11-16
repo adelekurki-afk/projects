@@ -1,5 +1,5 @@
--- People who attended each day, by Salesforce region and sales segment.
--- Day = Partner / Eco CampaignMember Status = Attended (not Fliplet door scans).
+-- People who attended each day, by Salesforce sales sub-region and sales segment.
+-- Day = Partner / Eco CampaignMember Status = Attended.
 WITH people AS (
   SELECT
     CASE

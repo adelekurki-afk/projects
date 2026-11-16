@@ -19,7 +19,10 @@ def _brand_table(df, title=""):
     cols = [str(c) for c in frame.columns]
     n = len(frame)
     vals = [[("" if v is None else str(v)) for v in frame[c].tolist()] for c in frame.columns]
-    stripe = [PINK_MID if i % 2 == 0 else "rgba(255,145,172,0.20)" for i in range(n)]
+    stub = [PINK_DEEP] * n
+    numbers = ["#1B1F27" if i % 2 == 0 else "#141820" for i in range(n)]
+    fills = [stub] + [numbers] * max(len(cols) - 1, 0)
+    fonts = [["#F9FAFB"] * n] + [["#E5E7EB"] * n] * max(len(cols) - 1, 0)
     fig = go.Figure(
         go.Table(
             header=dict(
@@ -32,10 +35,10 @@ def _brand_table(df, title=""):
             ),
             cells=dict(
                 values=vals,
-                fill_color=[stripe] * len(cols),
-                font=dict(color=INK, size=12, family="Inter, Arial, sans-serif"),
+                fill_color=fills,
+                font=dict(color=fonts, size=12, family="Inter, Arial, sans-serif"),
                 align="left",
-                line_color="rgba(255,145,172,0.35)",
+                line_color="rgba(156,163,175,0.22)",
                 height=26,
             ),
         )
@@ -50,7 +53,6 @@ def _brand_table(df, title=""):
         font=dict(family="Inter, Arial, sans-serif", color=INK),
     )
     return fig
-
 
 
 def _theme(fig, height=300, axes=True, **kw):
@@ -91,8 +93,9 @@ def _pair(title, left_title, left_rows, right_title, right_rows):
             col=col,
         )
     n = max(len(left_rows), len(right_rows), 1)
+    xmax = max([v for _, v in left_rows] + [v for _, v in right_rows] + [1])
     _theme(fig, height=max(260, 28 * n + 120), title=dict(text=title, font=dict(size=16, color=INK)))
-    fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", color=INK)
+    fig.update_xaxes(showgrid=True, gridcolor="rgba(156,163,175,0.18)", color=INK, range=[0, xmax * 1.18])
     fig.update_yaxes(showgrid=False, color=INK)
     return fig
 
@@ -223,11 +226,11 @@ display(
 
 display(
     _pair(
-        "Region per day · Salesforce Attended (not Fliplet 426 / 916)",
+        "Attendance by region",
         "Partner Day",
-        [("EMEA", 194), ("Unknown", 154), ("NA", 48), ("LATAM", 5), ("APAC", 1), ("ANZ", 1)],
+        [("DACH", 121), ("North EMEA", 29), ("South EMEA", 35), ("US", 22), ("Other", 196)],
         "Ecosystem Day",
-        [("EMEA", 415), ("Unknown", 358), ("NA", 80), ("APAC", 8), ("LATAM", 4)],
+        [("DACH", 448), ("North EMEA", 63), ("South EMEA", 53), ("US", 42), ("Other", 261)],
     )
 )
 

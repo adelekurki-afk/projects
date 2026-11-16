@@ -17,7 +17,10 @@ def _brand_table(df, title=""):
     cols = [str(c) for c in frame.columns]
     n = len(frame)
     vals = [[("" if v is None else str(v)) for v in frame[c].tolist()] for c in frame.columns]
-    stripe = [PINK_MID if i % 2 == 0 else "rgba(255,145,172,0.20)" for i in range(n)]
+    stub = [PINK_DEEP] * n
+    numbers = ["#1B1F27" if i % 2 == 0 else "#141820" for i in range(n)]
+    fills = [stub] + [numbers] * max(len(cols) - 1, 0)
+    fonts = [["#F9FAFB"] * n] + [["#E5E7EB"] * n] * max(len(cols) - 1, 0)
     fig = go.Figure(
         go.Table(
             header=dict(
@@ -30,10 +33,10 @@ def _brand_table(df, title=""):
             ),
             cells=dict(
                 values=vals,
-                fill_color=[stripe] * len(cols),
-                font=dict(color=INK, size=12, family="Inter, Arial, sans-serif"),
+                fill_color=fills,
+                font=dict(color=fonts, size=12, family="Inter, Arial, sans-serif"),
                 align="left",
-                line_color="rgba(255,145,172,0.35)",
+                line_color="rgba(156,163,175,0.22)",
                 height=26,
             ),
         )
@@ -48,7 +51,6 @@ def _brand_table(df, title=""):
         font=dict(family="Inter, Arial, sans-serif", color=INK),
     )
     return fig
-
 
 
 def _theme(fig, height=300, axes=True, **kw):

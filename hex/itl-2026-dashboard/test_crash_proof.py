@@ -193,6 +193,36 @@ def test_sfdc_charts_are_separate_visuals():
     assert "sales segment and region" not in (ROOT / "charts/sfdc_region.py").read_text()
 
 
+def test_attendance_region_shows_all_sales_regions():
+    grouped = next(c for c in _exec_view(ROOT / "charts/attendance_region.py") if isinstance(c, go.Figure))
+    partner = next(c for c in _exec_view(ROOT / "charts/partner_region.py") if isinstance(c, go.Figure))
+    eco = next(c for c in _exec_view(ROOT / "charts/eco_region.py") if isinstance(c, go.Figure))
+    cab = next(c for c in _exec_view(ROOT / "charts/cab_region.py") if isinstance(c, go.Figure))
+    vs = next(c for c in _exec_view(ROOT / "charts/partner_vs_eco.py") if isinstance(c, go.Figure))
+    regions = ["DACH", "North EMEA", "South EMEA", "US", "Other"]
+    assert list(grouped.data[0].y) == regions[::-1]
+    assert list(grouped.data[1].y) == regions[::-1]
+    assert list(partner.data[0].y) == regions[::-1]
+    assert list(eco.data[0].y) == regions[::-1]
+    assert list(vs.data[0].y) == regions[::-1]
+    assert "DACH" in list(cab.data[0].y)
+    assert "Fliplet" not in str(grouped.layout.title.text)
+    assert str(grouped.layout.title.text) == "Attendance by region"
+    assert int(grouped.data[0].x[-1]) == 121
+    assert int(grouped.data[1].x[-1]) == 448
+    sql = (ROOT / "lean/attendance_sales_region.sql").read_text()
+    assert "sub_region" in sql
+    src = (ROOT / "notebook_participation.py").read_text()
+    assert "Attendance by region" in src
+    assert "not Fliplet" not in src
+    assert "DACH" in src
+    pair = [c for c in _exec_view(ROOT / "notebook_participation.py") if isinstance(c, go.Figure)]
+    region_fig = next(c for c in pair if str(getattr(c.layout.title, "text", "") or "") == "Attendance by region")
+    assert list(region_fig.data[0].y) == list(region_fig.data[1].y)
+    assert "DACH" in list(region_fig.data[0].y)
+    assert "North EMEA" in list(region_fig.data[0].y)
+
+
 def test_participation_segment_and_country_are_separate():
     partner_seg = next(c for c in _exec_view(ROOT / "charts/partner_segment.py") if isinstance(c, go.Figure))
     eco_seg = next(c for c in _exec_view(ROOT / "charts/eco_segment.py") if isinstance(c, go.Figure))
@@ -289,8 +319,8 @@ def test_intent_tab_explains_timeframes():
         "12–18 Oct",
         "YouTube",
         "Paid Google Ads",
-        "n8n.io website visitors · Europe and Germany",
-        "n8n.io website visitors · worldwide",
+        "Website visitors · Europe and Germany",
+        "Website visitors · worldwide",
         "Product users · worldwide",
         "Product users · Europe and Germany",
     ):
@@ -298,8 +328,8 @@ def test_intent_tab_explains_timeframes():
     assert "Common Room" not in src
     assert "Common Room" not in blob
     titles = [str(c.layout.title.text) for c in calls if isinstance(c, go.Figure)]
-    assert "n8n.io website visitors · worldwide" in titles
-    assert "n8n.io website visitors · Europe and Germany" in titles
+    assert "Website visitors · worldwide" in titles
+    assert "Website visitors · Europe and Germany" in titles
     assert "Product users · worldwide" in titles
     assert "Product users · Europe and Germany" in titles
     web_fig = next(c for c in _exec_view(ROOT / "charts/users_europe.py") if isinstance(c, go.Figure))
@@ -425,7 +455,8 @@ def test_attendance_has_meetings_and_feedback():
         "Partner Day overall",
         "Ecosystem recommend",
         "Community Lounge",
-        "Salesforce Attended",
+        "Attendance by region",
+        "DACH",
     ):
         assert needle in src, needle
 
@@ -495,7 +526,7 @@ def test_native_section_tables_are_dataframes():
         "tables/event_people.py": ("event_people_funnel_table", 5, "people"),
         "tables/weekly_users.py": ("weekly_n8n_users", 23, "n8n_users"),
         "tables/youtube_views.py": ("youtube_views", 18, "views_gained"),
-        "tables/attendance_region.py": ("attendance_region", 6, "partner_day"),
+        "tables/attendance_region.py": ("attendance_region", 5, "partner_day"),
     }
     for name, (var, rows, col) in expected.items():
         env = _exec_ns(ROOT / name)
@@ -535,7 +566,9 @@ def test_app_tables_use_n8n_pink():
             fill = str(fig.data[0].header.fill.color)
             assert "#87003C" in fill, f"{name} header {fill}"
             cells = str(fig.data[0].cells.fill.color)
-            assert "#FFBCCA" in cells, f"{name} cells {cells}"
+            assert "#87003C" in cells, f"{name} stub {cells}"
+            assert "#1B1F27" in cells, f"{name} numbers {cells}"
+            assert "#FFBCCA" not in cells, f"{name} still pink numbers {cells}"
         leftover = [c for c in calls if isinstance(c, pd.DataFrame)]
         assert not leftover, f"{name} still displays a pandas table"
 

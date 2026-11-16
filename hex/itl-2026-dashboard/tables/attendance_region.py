@@ -3,9 +3,9 @@ import pandas as pd
 
 attendance_region = pd.DataFrame(
     {
-        "region": ["EMEA", "Unknown", "NA", "LATAM", "APAC", "ANZ"],
-        "partner_day": [194, 154, 48, 5, 1, 1],
-        "ecosystem_day": [415, 358, 80, 4, 8, 0],
+        "region": ["DACH", "North EMEA", "South EMEA", "US", "Other"],
+        "partner_day": [121, 29, 35, 22, 196],
+        "ecosystem_day": [448, 63, 53, 42, 261],
     }
 )
 attendance_region

@@ -1,4 +1,4 @@
-# Intent · 12–18 Oct conference week · YouTube · Paid Google Ads
+# Intent · 12–18 Oct conference week · website visitors · product users · YouTube · Paid Google Ads
 import pandas as pd
 import plotly.graph_objects as go
 from IPython.display import display
@@ -77,6 +77,34 @@ _WEEKLY = pd.DataFrame(
         ("2026-11-02", 163038, 40449, 8481),
     ],
     columns=["week_start", "n8n_users", "europe_users", "germany_users"],
+)
+_PRODUCT = pd.DataFrame(
+    [
+        ("2026-06-01", 629836, 149067, 31419),
+        ("2026-06-08", 631480, 148845, 32655),
+        ("2026-06-15", 603100, 143143, 31726),
+        ("2026-06-22", 589167, 137830, 30896),
+        ("2026-06-29", 586222, 139776, 31672),
+        ("2026-07-06", 601886, 138292, 31794),
+        ("2026-07-13", 614110, 133489, 31353),
+        ("2026-07-20", 628786, 133869, 31304),
+        ("2026-07-27", 614571, 131347, 30329),
+        ("2026-08-03", 605016, 127682, 30573),
+        ("2026-08-10", 585886, 121891, 29219),
+        ("2026-08-17", 596258, 125612, 30221),
+        ("2026-08-24", 588687, 127717, 29770),
+        ("2026-08-31", 590591, 131824, 29831),
+        ("2026-09-07", 592854, 132958, 29704),
+        ("2026-09-14", 598061, 135546, 30205),
+        ("2026-09-21", 597599, 134938, 29962),
+        ("2026-09-28", 596899, 136673, 30810),
+        ("2026-10-05", 601276, 138148, 30960),
+        ("2026-10-12", 600362, 137437, 31434),
+        ("2026-10-19", 595025, 139485, 31717),
+        ("2026-10-26", 599475, 137388, 31673),
+        ("2026-11-02", 570526, 138488, 32038),
+    ],
+    columns=["week_start", "wau", "europe_wau", "germany_wau"],
 )
 _YOUTUBE = pd.DataFrame(
     [
@@ -174,6 +202,16 @@ try:
 except Exception:
     pass
 
+product = _PRODUCT.copy()
+try:
+    pwau = intent_product_wau.copy()
+    pwau["week_start"] = pwau["week_start"].map(_week)
+    pwau = pwau[pwau["week_start"] < "2026-11-09"]
+    if not pwau.empty:
+        product = pwau
+except Exception:
+    pass
+
 youtube = _YOUTUBE.copy()
 try:
     y = intent_youtube.copy()
@@ -197,24 +235,32 @@ display(
     _line(
         weekly,
         [("n8n_users", "#9CA3AF", "Worldwide")],
-        "n8n.io users · worldwide",
-        "Users",
+        "n8n.io website visitors · worldwide",
+        "Visitors",
     )
 )
 display(
     _line(
         weekly,
-        [("europe_users", BLUE, "Europe")],
-        "n8n.io users · Europe",
-        "Users",
+        [("europe_users", BLUE, "Europe"), ("germany_users", CORAL, "Germany")],
+        "n8n.io website visitors · Europe and Germany",
+        "Visitors",
     )
 )
 display(
     _line(
-        weekly,
-        [("germany_users", CORAL, "Germany")],
-        "n8n.io users · Germany",
-        "Users",
+        product,
+        [("wau", "#9CA3AF", "Worldwide")],
+        "Product users · worldwide",
+        "Weekly active users",
+    )
+)
+display(
+    _line(
+        product,
+        [("europe_wau", BLUE, "Europe"), ("germany_wau", CORAL, "Germany")],
+        "Product users · Europe and Germany",
+        "Weekly active users",
     )
 )
 display(

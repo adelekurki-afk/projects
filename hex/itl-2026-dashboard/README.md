@@ -14,7 +14,7 @@ Stay on the existing Hex Classic App. Do not use the seven-cell scratch project.
 | **Participation** | Attendance KPIs, How visits are built, Who came which days, Floor scans, Role mix, Staff by crew, Speakers by day |
 | **Registration** | **APP: Ticket sales daily / mix / vs goal** (already on the tab) |
 | **Funnel** | Event people funnel, SFDC Lead vs Contact, SFDC by sales segment / region |
-| **Intent** | n8n.io worldwide, Europe, Germany, YouTube views, Paid search |
+| **Intent** | Website visitors and product users (worldwide + Europe/Germany), YouTube views, Paid search |
 | **Feedback** | Eco recommend, Eco operations, Partner Day overall, Session scores |
 
 After SQL/CODE edits, **Run all** then refresh the App. Markdown updates without Run all. Do not Reset layout — that dumps every SQL probe onto the canvas.
@@ -35,7 +35,7 @@ Salesforce **lead reached** is Lead/Contact status on ITL Free+Paid (1,102 peopl
 
 ## Intent
 
-Weekly n8n.io users with conference week 12–18 Oct highlighted: worldwide, Europe, and Germany as separate charts. YouTube views (from 1 Jul) and videos published. Acquired instances by `deployment_type`. Paid Google Ads search terms that week (organic SEO / AEO is not in the warehouse).
+Website visitors are GA4 distinct `user_pseudo_id` on n8n.io. Product users are weekly UI-active people in `computed.activity_users` (`has_ui_events`). Conference week 12–18 Oct is highlighted. Worldwide is its own chart; Europe and Germany share one chart per metric. YouTube views (from 1 Jul) and videos published. Acquired instances by `deployment_type`. Paid Google Ads search terms that week (organic SEO / AEO is not in the warehouse).
 
 Physical visits are Fliplet. Salesforce registered is not 1,269. Salesforce Attended is not 426 / 916.
 
